@@ -14,6 +14,13 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/cart', function () {
+    return Inertia::render('Cart', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register')
+    ]);
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

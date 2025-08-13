@@ -64,10 +64,22 @@ export function Header() {
                             </span>
                         </button>
 
-                        <GamingButton variant="ghost" size="sm">
+                        <GamingButton
+                            onClick={() => {
+                                window.location.href = "/login";
+                            }}
+                            variant="ghost"
+                            size="sm"
+                        >
                             Sign In
                         </GamingButton>
-                        <GamingButton variant="primary" size="sm">
+                        <GamingButton
+                            variant="primary"
+                            size="sm"
+                            onClick={() => {
+                                window.location.href = "/register";
+                            }}
+                        >
                             Sign Up
                         </GamingButton>
                     </div>
