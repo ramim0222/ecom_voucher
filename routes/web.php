@@ -42,6 +42,22 @@ Route::get('/products/{id}', function ($id) {
     return Inertia::render('Product/ProductDetail', ['id' => $id]);
 });
 
+Route::get('/admin', function () {
+    return Inertia::render('Admin/Dashboard');
+});
+
+Route::get('/admin/users', function () {
+    return Inertia::render('Admin/Users');
+});
+
+Route::get('/admin/products', function () {
+    return Inertia::render('Admin/Products');
+});
+
+Route::get('/admin/orders', function () {
+    return Inertia::render('Admin/Orders');
+});
+
 // Route::get('/dashboard', function () {
 //     return Inertia::render('Dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
