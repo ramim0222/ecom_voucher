@@ -105,7 +105,13 @@ export function UsersTable() {
                                 </td>
                                 <td className="py-3">
                                     <div className="flex gap-2">
-                                        <GamingButton variant="ghost" size="sm">
+                                        <GamingButton
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() =>
+                                                (window.location.href = `/admin/users/${user.id}`)
+                                            }
+                                        >
                                             View Profile
                                         </GamingButton>
                                         <GamingButton
