@@ -47,7 +47,11 @@ Route::get('/admin', function () {
 });
 
 Route::get('/admin/users', function () {
-    return Inertia::render('Admin/Users');
+    return Inertia::render('Admin/Users/Index');
+});
+
+Route::get('/admin/users/{id}', function ($id) {
+    return Inertia::render('Admin/Users/Page', ['id' => $id]);
 });
 
 Route::get('/admin/products', function () {
@@ -55,7 +59,15 @@ Route::get('/admin/products', function () {
 });
 
 Route::get('/admin/orders', function () {
-    return Inertia::render('Admin/Orders');
+    return Inertia::render('Admin/Orders/Index');
+});
+
+Route::get('/admin/orders/{id}', function ($id) {
+    return Inertia::render('Admin/Orders/Page', ['id' => $id]);
+});
+
+Route::get('/admin/categories', function () {
+    return Inertia::render('Admin/Categories');
 });
 
 // Route::get('/dashboard', function () {
