@@ -134,7 +134,13 @@ export function OrdersTable({ filter }) {
                                     {new Date(order.date).toLocaleDateString()}
                                 </td>
                                 <td className="py-3">
-                                    <GamingButton variant="ghost" size="sm">
+                                    <GamingButton
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            (window.location.href = `/admin/orders/${order.id}`)
+                                        }
+                                    >
                                         View Details
                                     </GamingButton>
                                 </td>
