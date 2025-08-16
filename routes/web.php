@@ -22,9 +22,7 @@ Route::get('/checkout', function () {
     return Inertia::render('Checkout');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard/Dashboard');
-});
+
 
 Route::get('/dashboard/profile', function () {
     return Inertia::render('Dashboard/Profile');
@@ -35,11 +33,11 @@ Route::get('/dashboard/orders', function () {
 });
 
 Route::get('/products', function () {
-    return Inertia::render('Product/Products');
+    return Inertia::render('Product/Index');
 });
 
 Route::get('/products/{id}', function ($id) {
-    return Inertia::render('Product/ProductDetail', ['id' => $id]);
+    return Inertia::render('Product/Page', ['id' => $id]);
 });
 
 Route::get('/admin', function () {
@@ -70,14 +68,14 @@ Route::get('/admin/categories', function () {
     return Inertia::render('Admin/Categories');
 });
 
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard/Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 require __DIR__.'/auth.php';

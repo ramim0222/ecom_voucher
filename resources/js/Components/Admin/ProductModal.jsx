@@ -12,6 +12,7 @@ export function ProductModal({ isOpen, onClose, product }) {
         stock: "",
         description: "",
         status: "active",
+        image: "",
     });
 
     useEffect(() => {
@@ -80,7 +81,23 @@ export function ProductModal({ isOpen, onClose, product }) {
                             required
                         />
                     </div>
-
+                    <div>
+                        <label className="block text-sm font-medium mb-2 text-slate-300">
+                            Product Image
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            value={formData.image}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    image: e.target.value,
+                                })
+                            }
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-2 text-slate-300">
@@ -125,7 +142,6 @@ export function ProductModal({ isOpen, onClose, product }) {
                             </select>
                         </div>
                     </div>
-
                     <div className="grid grid-cols-3 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-2 text-slate-300">
@@ -166,15 +182,15 @@ export function ProductModal({ isOpen, onClose, product }) {
 
                         <div>
                             <label className="block text-sm font-medium mb-2 text-slate-300">
-                                Stock
+                                Buying Price
                             </label>
                             <input
                                 type="number"
-                                value={formData.stock}
+                                value={formData.buyingPrice}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
-                                        stock: e.target.value,
+                                        buyingPrice: e.target.value,
                                     })
                                 }
                                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -182,7 +198,6 @@ export function ProductModal({ isOpen, onClose, product }) {
                             />
                         </div>
                     </div>
-
                     <div>
                         <label className="block text-sm font-medium mb-2 text-slate-300">
                             Description

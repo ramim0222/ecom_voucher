@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Link, router } from "@inertiajs/react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export function DashboardLayout({ children }) {
@@ -12,6 +13,10 @@ export function DashboardLayout({ children }) {
         { href: "/dashboard/profile", label: "Profile", icon: "👤" },
         { href: "/", label: "Back to Store", icon: "🛒" },
     ];
+
+    const handleLogout = () => {
+        router.post(route("logout"));
+    };
 
     return (
         <div className="flex min-h-screen">
@@ -43,7 +48,7 @@ export function DashboardLayout({ children }) {
 
                     <nav className="flex-1 space-y-2">
                         {menuItems.map((item) => (
-                            <a
+                            <Link
                                 key={item.href}
                                 href={item.href}
                                 className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors group"
@@ -52,8 +57,19 @@ export function DashboardLayout({ children }) {
                                 <span className="font-medium group-hover:text-accent">
                                     {item.label}
                                 </span>
-                            </a>
+                            </Link>
                         ))}
+
+                        {/* Logout item handled separately */}
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors group w-full text-left"
+                        >
+                            <span className="text-xl">➡️</span>
+                            <span className="font-medium group-hover:text-accent">
+                                Logout
+                            </span>
+                        </button>
                     </nav>
 
                     <div className="pt-6 border-t border-border">
@@ -61,6 +77,7 @@ export function DashboardLayout({ children }) {
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start"
+                            onClick={handleLogout}
                         >
                             <span className="text-xl mr-3">🚪</span>
                             Sign Out

@@ -180,13 +180,6 @@ export default function AdminOrderDetailsPage({ params }) {
                                 >
                                     Payment: {order.paymentStatus}
                                 </span>
-                                <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                        order.deliveryStatus
-                                    )}`}
-                                >
-                                    Delivery: {order.deliveryStatus}
-                                </span>
                             </div>
                         </div>
                         <div className="text-right">
@@ -204,28 +197,11 @@ export default function AdminOrderDetailsPage({ params }) {
                         <GamingButton
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleAdminAction("markDelivered")}
-                            className="text-green-400 hover:text-green-300"
-                            disabled={order.deliveryStatus === "delivered"}
-                        >
-                            📦 Mark as Delivered
-                        </GamingButton>
-                        <GamingButton
-                            variant="ghost"
-                            size="sm"
                             onClick={() => handleAdminAction("refundOrder")}
                             className="text-red-400 hover:text-red-300"
                             disabled={order.paymentStatus === "refunded"}
                         >
                             💰 Refund Order
-                        </GamingButton>
-                        <GamingButton
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleAdminAction("contactBuyer")}
-                            className="text-blue-400 hover:text-blue-300"
-                        >
-                            📧 Contact Buyer
                         </GamingButton>
                     </div>
                 </div>
@@ -380,16 +356,6 @@ export default function AdminOrderDetailsPage({ params }) {
                     </h3>
                     <OrderItemsTable items={order.items} />
                 </div>
-
-                {/* Order Notes */}
-                {order.notes && (
-                    <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700 p-6">
-                        <h3 className="font-heading font-semibold text-lg text-white mb-4">
-                            Order Notes
-                        </h3>
-                        <p className="text-slate-300">{order.notes}</p>
-                    </div>
-                )}
 
                 {/* Activity Log */}
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700 p-6">

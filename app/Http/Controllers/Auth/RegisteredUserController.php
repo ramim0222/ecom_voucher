@@ -30,21 +30,53 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Debug: Log the incoming request data
+        \Log::info('Registration attempt', $request->all());
+
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'phone_number' => 'nullable|string|max:20',
+            'street_address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'zip' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:100',
+            'date_of_birth' => 'nullable|date|before:today',
+            'promotional_emails' => 'boolean',
+            'other_updates' => 'boolean',
+            'terms_accepted' => 'accepted',
         ]);
 
+        \Log::info('Validation passed, creating user...');
+
         $user = User::create([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone_number' => $request->phone_number,
+            'street_address' => $request->street_address,
+            'city' => $request->city,
+            'state' => $request->state,
+            'zip' => $request->zip,
+            'country' => $request->country ?? 'Bangladesh',
+            'role' => 'customer',
+            'status' => 'active',
+            'date_of_birth' => $request->date_of_birth,
+            'promotional_emails' => $request->boolean('promotional_emails', true),
+            'other_updates' => $request->boolean('other_updates', true),
         ]);
+
+        \Log::info('User created with ID: ' . $user->id);
 
         event(new Registered($user));
 
         Auth::login($user);
+
+        \Log::info('User logged in and redirecting to dashboard');
 
         return redirect(route('dashboard', absolute: false));
     }

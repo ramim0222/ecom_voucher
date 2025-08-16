@@ -1,147 +1,124 @@
-"use client";
-
-import { useState } from "react";
+import { useEffect } from "react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import Checkbox from "@/Components/Checkbox";
 
-export default function LoginPage() {
-    const [formData, setFormData] = useState({
+export default function Login({ status, canResetPassword }) {
+    const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
-        rememberMe: false,
+        remember: false,
     });
 
-    const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
+    useEffect(() => {
+        return () => {
+            reset("password");
+        };
+    }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === "checkbox" ? checked : value,
-        });
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors({ ...errors, [name]: "" });
-        }
-    };
-
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.email) {
-            newErrors.email = "Email is required";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Email is invalid";
-        }
-
-        if (!formData.password) {
-            newErrors.password = "Password is required";
-        } else if (formData.password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e) => {
+    const submit = (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
 
-        setIsLoading(true);
-        try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            // Handle successful login
-            alert("Login successful!");
-            window.location.href = "/dashboard";
-        } catch (error) {
-            setErrors({ submit: "Invalid email or password" });
-        } finally {
-            setIsLoading(false);
-        }
+        post(route("login"));
     };
 
     return (
         <div className="min-h-screen">
+            <Head title="Log in" />
             <Header />
             <AuthLayout
                 title="Welcome Back"
                 subtitle="Sign in to your GameVault account"
                 backgroundImage="/placeholder-j7n3w.png"
             >
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {errors.submit && (
-                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-destructive text-sm">
-                            {errors.submit}
+                <form onSubmit={submit} className="space-y-6">
+                    {status && (
+                        <div className="mb-4 text-sm font-medium text-green-600">
+                            {status}
                         </div>
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">
-                            Email Address
-                        </label>
-                        <input
+                        <InputLabel
+                            htmlFor="email"
+                            value="Email Address"
+                            className="block text-sm font-medium mb-2"
+                        />
+
+                        <TextInput
+                            id="email"
                             type="email"
                             name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
+                            value={data.email}
                             className={`w-full bg-input border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
                                 errors.email
                                     ? "border-destructive"
                                     : "border-border"
                             }`}
+                            autoComplete="username"
+                            isFocused={true}
                             placeholder="your@email.com"
+                            onChange={(e) => setData("email", e.target.value)}
                         />
-                        {errors.email && (
-                            <p className="text-destructive text-sm mt-1">
-                                {errors.email}
-                            </p>
-                        )}
+
+                        <InputError message={errors.email} className="mt-2" />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">
-                            Password
-                        </label>
-                        <input
+                        <InputLabel
+                            htmlFor="password"
+                            value="Password"
+                            className="block text-sm font-medium mb-2"
+                        />
+
+                        <TextInput
+                            id="password"
                             type="password"
                             name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
+                            value={data.password}
                             className={`w-full bg-input border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
                                 errors.password
                                     ? "border-destructive"
                                     : "border-border"
                             }`}
+                            autoComplete="current-password"
                             placeholder="Enter your password"
+                            onChange={(e) =>
+                                setData("password", e.target.value)
+                            }
                         />
-                        {errors.password && (
-                            <p className="text-destructive text-sm mt-1">
-                                {errors.password}
-                            </p>
-                        )}
+
+                        <InputError
+                            message={errors.password}
+                            className="mt-2"
+                        />
                     </div>
 
                     <div className="flex items-center justify-between">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                name="rememberMe"
-                                checked={formData.rememberMe}
-                                onChange={handleInputChange}
+                            <Checkbox
+                                name="remember"
+                                checked={data.remember}
+                                onChange={(e) =>
+                                    setData("remember", e.target.checked)
+                                }
                                 className="rounded border-border"
                             />
                             <span className="text-sm">Remember me</span>
                         </label>
-                        <a
-                            href="/auth/forgot-password"
-                            className="text-sm text-accent hover:text-accent/80"
-                        >
-                            Forgot password?
-                        </a>
+                        {canResetPassword && (
+                            <Link
+                                href={route("password.request")}
+                                className="text-sm text-accent hover:text-accent/80"
+                            >
+                                Forgot password?
+                            </Link>
+                        )}
                     </div>
 
                     <GamingButton
@@ -149,9 +126,9 @@ export default function LoginPage() {
                         variant="accent"
                         size="lg"
                         className="w-full"
-                        disabled={isLoading}
+                        disabled={processing}
                     >
-                        {isLoading ? "Signing In..." : "Sign In"}
+                        {processing ? "Signing In..." : "Sign In"}
                     </GamingButton>
 
                     <div className="relative">
@@ -170,6 +147,7 @@ export default function LoginPage() {
                             variant="ghost"
                             size="lg"
                             className="w-full"
+                            type="button"
                         >
                             Google
                         </GamingButton>
@@ -177,6 +155,7 @@ export default function LoginPage() {
                             variant="ghost"
                             size="lg"
                             className="w-full"
+                            type="button"
                         >
                             Discord
                         </GamingButton>
@@ -184,12 +163,12 @@ export default function LoginPage() {
 
                     <p className="text-center text-sm text-muted-foreground">
                         Don't have an account?{" "}
-                        <a
-                            href="/auth/signup"
+                        <Link
+                            href={route("register")}
                             className="text-accent hover:text-accent/80 font-medium"
                         >
                             Sign up
-                        </a>
+                        </Link>
                     </p>
                 </form>
             </AuthLayout>

@@ -1,92 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "@inertiajs/react";
 import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
 export default function SignupPage() {
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+    const { data, setData, post, processing, errors, reset } = useForm({
+        first_name: "",
+        last_name: "",
         email: "",
         password: "",
-        confirmPassword: "",
-        agreeToTerms: false,
+        password_confirmation: "",
+        terms_accepted: false,
     });
-
-    const [errors, setErrors] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === "checkbox" ? checked : value,
-        });
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors({ ...errors, [name]: "" });
-        }
+        setData(name, type === "checkbox" ? checked : value);
     };
 
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.firstName.trim()) {
-            newErrors.firstName = "First name is required";
-        }
-
-        if (!formData.lastName.trim()) {
-            newErrors.lastName = "Last name is required";
-        }
-
-        if (!formData.email) {
-            newErrors.email = "Email is required";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Email is invalid";
-        }
-
-        if (!formData.password) {
-            newErrors.password = "Password is required";
-        } else if (formData.password.length < 8) {
-            newErrors.password = "Password must be at least 8 characters";
-        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-            newErrors.password =
-                "Password must contain uppercase, lowercase, and number";
-        }
-
-        if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match";
-        }
-
-        if (!formData.agreeToTerms) {
-            newErrors.agreeToTerms =
-                "You must agree to the terms and conditions";
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
-
-        setIsLoading(true);
-        try {
-            // Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            // Handle successful signup
-            alert("Account created successfully!");
-            window.location.href = "/auth/login";
-        } catch (error) {
-            setErrors({
-                submit: "Failed to create account. Please try again.",
-            });
-        } finally {
-            setIsLoading(false);
-        }
+        post(route("register"));
     };
 
     return (
@@ -98,12 +35,6 @@ export default function SignupPage() {
                 backgroundImage="/gaming-signup-background.png"
             >
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {errors.submit && (
-                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-destructive text-sm">
-                            {errors.submit}
-                        </div>
-                    )}
-
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-2">
@@ -111,19 +42,19 @@ export default function SignupPage() {
                             </label>
                             <input
                                 type="text"
-                                name="firstName"
-                                value={formData.firstName}
+                                name="first_name"
+                                value={data.first_name}
                                 onChange={handleInputChange}
                                 className={`w-full bg-input border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
-                                    errors.firstName
+                                    errors.first_name
                                         ? "border-destructive"
                                         : "border-border"
                                 }`}
                                 placeholder="John"
                             />
-                            {errors.firstName && (
+                            {errors.first_name && (
                                 <p className="text-destructive text-sm mt-1">
-                                    {errors.firstName}
+                                    {errors.first_name}
                                 </p>
                             )}
                         </div>
@@ -134,19 +65,19 @@ export default function SignupPage() {
                             </label>
                             <input
                                 type="text"
-                                name="lastName"
-                                value={formData.lastName}
+                                name="last_name"
+                                value={data.last_name}
                                 onChange={handleInputChange}
                                 className={`w-full bg-input border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
-                                    errors.lastName
+                                    errors.last_name
                                         ? "border-destructive"
                                         : "border-border"
                                 }`}
                                 placeholder="Doe"
                             />
-                            {errors.lastName && (
+                            {errors.last_name && (
                                 <p className="text-destructive text-sm mt-1">
-                                    {errors.lastName}
+                                    {errors.last_name}
                                 </p>
                             )}
                         </div>
@@ -159,7 +90,7 @@ export default function SignupPage() {
                         <input
                             type="email"
                             name="email"
-                            value={formData.email}
+                            value={data.email}
                             onChange={handleInputChange}
                             className={`w-full bg-input border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
                                 errors.email
@@ -182,7 +113,7 @@ export default function SignupPage() {
                         <input
                             type="password"
                             name="password"
-                            value={formData.password}
+                            value={data.password}
                             onChange={handleInputChange}
                             className={`w-full bg-input border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
                                 errors.password
@@ -204,19 +135,19 @@ export default function SignupPage() {
                         </label>
                         <input
                             type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
+                            name="password_confirmation"
+                            value={data.password_confirmation}
                             onChange={handleInputChange}
                             className={`w-full bg-input border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
-                                errors.confirmPassword
+                                errors.password_confirmation
                                     ? "border-destructive"
                                     : "border-border"
                             }`}
                             placeholder="Confirm your password"
                         />
-                        {errors.confirmPassword && (
+                        {errors.password_confirmation && (
                             <p className="text-destructive text-sm mt-1">
-                                {errors.confirmPassword}
+                                {errors.password_confirmation}
                             </p>
                         )}
                     </div>
@@ -225,8 +156,8 @@ export default function SignupPage() {
                         <label className="flex items-start gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
-                                name="agreeToTerms"
-                                checked={formData.agreeToTerms}
+                                name="terms_accepted"
+                                checked={data.terms_accepted}
                                 onChange={handleInputChange}
                                 className="rounded border-border mt-0.5"
                             />
@@ -247,9 +178,9 @@ export default function SignupPage() {
                                 </a>
                             </span>
                         </label>
-                        {errors.agreeToTerms && (
+                        {errors.terms_accepted && (
                             <p className="text-destructive text-sm mt-1">
-                                {errors.agreeToTerms}
+                                {errors.terms_accepted}
                             </p>
                         )}
                     </div>
@@ -259,9 +190,9 @@ export default function SignupPage() {
                         variant="accent"
                         size="lg"
                         className="w-full"
-                        disabled={isLoading}
+                        disabled={processing}
                     >
-                        {isLoading ? "Creating Account..." : "Create Account"}
+                        {processing ? "Creating Account..." : "Create Account"}
                     </GamingButton>
 
                     <div className="relative">
@@ -295,7 +226,7 @@ export default function SignupPage() {
                     <p className="text-center text-sm text-muted-foreground">
                         Already have an account?{" "}
                         <a
-                            href="/auth/login"
+                            href="/login"
                             className="text-accent hover:text-accent/80 font-medium"
                         >
                             Sign in

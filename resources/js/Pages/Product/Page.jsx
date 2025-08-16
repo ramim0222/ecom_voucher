@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductTabs } from "@/Components/Product/ProductTabs";
 import { RelatedProducts } from "@/Components/Product/RelatedProducts";
 
-export default function ProductDetailsPage({ id }) {
+export default function ProductDetailsPage({ id, auth }) {
+    const [quantity, setQuantity] = useState(1);
+
     const product = {
         id: id,
         title: "Steam Wallet $50",
@@ -15,6 +18,7 @@ export default function ProductDetailsPage({ id }) {
         reviews: 1247,
         category: "PC Gaming",
         availability: "In Stock",
+        stock: 25, // Available quantity
         deliveryTime: "Instant",
         description:
             "Add funds to your Steam Wallet and enjoy thousands of games available on the Steam platform. Perfect for purchasing games, DLC, and in-game items.",
@@ -62,22 +66,6 @@ export default function ProductDetailsPage({ id }) {
                                 className="w-full h-96 object-cover rounded-lg"
                             />
                         </div>
-
-                        {/* Thumbnail Gallery */}
-                        <div className="flex gap-2">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div
-                                    key={i}
-                                    className="w-20 h-20 glass-card rounded-lg p-1 cursor-pointer hover-lift"
-                                >
-                                    <img
-                                        src={`/abstract-geometric-shapes.png?height=80&width=80&query=${product.title} thumbnail ${i}`}
-                                        alt={`${product.title} view ${i}`}
-                                        className="w-full h-full object-cover rounded"
-                                    />
-                                </div>
-                            ))}
-                        </div>
                     </div>
 
                     {/* Product Info */}
@@ -86,9 +74,6 @@ export default function ProductDetailsPage({ id }) {
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="bg-primary/20 text-primary px-2 py-1 rounded text-sm font-medium">
                                     {product.platform}
-                                </span>
-                                <span className="bg-accent/20 text-accent px-2 py-1 rounded text-sm font-medium">
-                                    {product.deliveryTime} Delivery
                                 </span>
                             </div>
 
@@ -147,47 +132,72 @@ export default function ProductDetailsPage({ id }) {
                         </div>
 
                         <div className="space-y-4">
+                            {/* Quantity Selector */}
+                            {product.stock > 0 && (
+                                <div className="flex items-center gap-4">
+                                    <label className="text-sm font-medium">
+                                        Quantity:
+                                    </label>
+                                    <div className="flex items-center border border-border rounded-lg">
+                                        <button
+                                            onClick={() =>
+                                                setQuantity(
+                                                    Math.max(1, quantity - 1)
+                                                )
+                                            }
+                                            className="px-3 py-2 hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            disabled={quantity <= 1}
+                                        >
+                                            -
+                                        </button>
+                                        <span className="px-4 py-2 min-w-[60px] text-center border-l border-r border-border">
+                                            {quantity}
+                                        </span>
+                                        <button
+                                            onClick={() =>
+                                                setQuantity(
+                                                    Math.min(
+                                                        product.stock,
+                                                        quantity + 1
+                                                    )
+                                                )
+                                            }
+                                            className="px-3 py-2 hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            disabled={quantity >= product.stock}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                    <span className="text-sm text-muted-foreground">
+                                        {product.stock} available
+                                    </span>
+                                </div>
+                            )}
+
                             <div className="flex gap-4">
                                 <GamingButton
                                     variant="accent"
                                     size="lg"
                                     className="flex-1"
+                                    disabled={product.stock === 0}
                                 >
-                                    Add to Cart - ${product.price}
+                                    {product.stock === 0
+                                        ? "Out of Stock"
+                                        : `Add to Cart - $${(
+                                              parseFloat(product.price) *
+                                              quantity
+                                          ).toFixed(2)}`}
                                 </GamingButton>
                                 <GamingButton variant="ghost" size="lg">
                                     ♡
                                 </GamingButton>
                             </div>
-
-                            <GamingButton
-                                variant="primary"
-                                size="lg"
-                                className="w-full"
-                            >
-                                Buy Now
-                            </GamingButton>
-                        </div>
-
-                        <div className="glass-card rounded-lg p-4 space-y-3">
-                            <h3 className="font-semibold">Key Features:</h3>
-                            <ul className="space-y-2">
-                                {product.features.map((feature, index) => (
-                                    <li
-                                        key={index}
-                                        className="flex items-center gap-2 text-sm"
-                                    >
-                                        <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
-                                        {feature}
-                                    </li>
-                                ))}
-                            </ul>
                         </div>
                     </div>
                 </div>
 
                 {/* Product Tabs */}
-                <ProductTabs product={product} />
+                <ProductTabs product={product} auth={auth} />
 
                 {/* Related Products */}
                 <RelatedProducts currentProductId={product.id} />
