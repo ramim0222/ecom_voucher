@@ -1,69 +1,58 @@
-import { useState } from "react";
-import { Head, Link, useForm } from "@inertiajs/react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useForm, Link, router } from "@inertiajs/react";
+import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
-import GuestLayout from "@/Layouts/GuestLayout";
+import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
-export default function VerifyEmail({ status }) {
-    const { post, processing } = useForm({});
-
+export default function VerifyEmailPage({ status }) {
     const [resendCount, setResendCount] = useState(0);
     const [lastResendTime, setLastResendTime] = useState(null);
 
-    const submit = (e) => {
-        e.preventDefault();
+    const { post, processing, errors } = useForm();
 
-        if (resendCount >= 3) {
+    // Check if we have a status message (success from controller)
+    useEffect(() => {
+        if (status === "verification-link-sent") {
+            // Reset resend count and update last resend time when email is sent successfully
+            setResendCount((prev) => prev + 1);
+            setLastResendTime(new Date());
+        }
+    }, [status]);
+
+    const handleResendEmail = async () => {
+        if (resendCount >= 6) {
             alert(
-                "Maximum resend attempts reached. Please contact support if you continue having issues."
+                "Maximum resend attempts reached. Please wait before trying again."
             );
             return;
         }
 
         post(route("verification.send"), {
             onSuccess: () => {
-                setResendCount(resendCount + 1);
-                setLastResendTime(new Date());
+                // The controller will redirect back with a status message
+                // We'll handle this in the useEffect above
+            },
+            onError: (errors) => {
+                // Errors are automatically handled by Inertia
+                console.log("Verification email errors:", errors);
             },
         });
     };
 
     const canResend =
-        resendCount < 3 &&
+        resendCount < 6 &&
         (!lastResendTime || Date.now() - lastResendTime > 60000); // 1 minute cooldown
 
     return (
-        <GuestLayout>
-            <Head title="Email Verification" />
-
-            <div className="mb-8 text-center">
-                <h1 className="font-[family-name:var(--font-heading)] font-bold text-3xl mb-2 text-foreground">
-                    Verify Your Email
-                </h1>
-                <p className="text-muted-foreground">
-                    Check your inbox to complete registration
-                </p>
-            </div>
-            <div className="text-center space-y-6">
-                {/* Email Icon with Glow Effect */}
-                <div className="relative mx-auto w-20 h-20">
-                    <div className="absolute inset-0 bg-accent/20 rounded-full animate-pulse"></div>
-                    <div className="relative w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center border border-accent/30">
-                        <svg
-                            className="w-8 h-8 text-accent"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            />
-                        </svg>
-                    </div>
-                </div>
-
+        <div className="min-h-screen">
+            <Header />
+            <AuthLayout
+                title="Verify Your Email"
+                subtitle="Check your inbox to complete registration"
+                backgroundImage="/glowing-gaming-envelope.png"
+            >
                 <div className="text-center space-y-6">
                     {/* Email Icon with Glow Effect */}
                     <div className="relative mx-auto w-20 h-20">
@@ -86,22 +75,21 @@ export default function VerifyEmail({ status }) {
                     </div>
 
                     <div className="space-y-4">
-                        <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
-                            <p className="text-sm text-foreground">
-                                Thanks for signing up! Before getting started,
-                                could you verify your email address by clicking
-                                on the link we just emailed to you? If you
-                                didn't receive the email, we will gladly send
-                                you another.
-                            </p>
-                        </div>
-
                         {status === "verification-link-sent" && (
-                            <div className="mb-4 font-medium text-sm text-green-600">
-                                A new verification link has been sent to your
-                                email address.
+                            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                                <p className="text-sm text-green-600">
+                                    A new verification link has been sent to
+                                    your email address.
+                                </p>
                             </div>
                         )}
+
+                        <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+                            <p className="text-sm">
+                                We've sent a verification link to your email
+                                address.
+                            </p>
+                        </div>
 
                         <div className="text-left space-y-2">
                             <p className="text-sm text-muted-foreground">
@@ -118,41 +106,62 @@ export default function VerifyEmail({ status }) {
                             </ul>
                         </div>
                     </div>
-                </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                    <form onSubmit={submit}>
+                    <div className="space-y-3">
                         <GamingButton
-                            type="submit"
                             variant="accent"
                             size="lg"
+                            className="w-full"
+                            onClick={handleResendEmail}
                             disabled={processing || !canResend}
                         >
                             {processing
                                 ? "Sending..."
                                 : "Resend Verification Email"}
                         </GamingButton>
-                    </form>
 
-                    <Link
-                        href={route("logout")}
-                        method="post"
-                        as="button"
-                        className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Log Out
-                    </Link>
+                        {resendCount > 0 && (
+                            <p className="text-xs text-muted-foreground">
+                                Resent {resendCount}/6 times
+                                {!canResend &&
+                                    resendCount < 6 &&
+                                    " • Wait 1 minute before resending"}
+                            </p>
+                        )}
+
+                        <div className="flex gap-3">
+                            <GamingButton
+                                variant="ghost"
+                                size="lg"
+                                className="flex-1"
+                                onClick={() => router.visit(route("login"))}
+                            >
+                                Sign In
+                            </GamingButton>
+                            <GamingButton
+                                variant="ghost"
+                                size="lg"
+                                className="flex-1"
+                                onClick={() => router.visit(route("register"))}
+                            >
+                                Try Different Email
+                            </GamingButton>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-border pt-4">
+                        <p className="text-xs text-muted-foreground">
+                            Still having trouble?{" "}
+                            <Link
+                                href="/support"
+                                className="text-accent hover:text-accent/80 font-medium"
+                            >
+                                Contact Support
+                            </Link>
+                        </p>
+                    </div>
                 </div>
-
-                {resendCount > 0 && (
-                    <p className="text-xs text-muted-foreground text-center">
-                        Resent {resendCount}/3 times
-                        {!canResend &&
-                            resendCount < 3 &&
-                            " • Wait 1 minute before resending"}
-                    </p>
-                )}
-            </div>
-        </GuestLayout>
+            </AuthLayout>
+        </div>
     );
 }

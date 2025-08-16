@@ -1,65 +1,114 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import { Header } from "@/Components/Layout/Header";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export default function ProfilePage() {
+export default function ProfilePage({ user, status }) {
+    const { props } = usePage();
     const [activeTab, setActiveTab] = useState("profile");
-    const [profileData, setProfileData] = useState({
-        firstName: "John",
-        lastName: "Doe",
-        email: "john@example.com",
-        phone: "+1 (555) 123-4567",
-        dateOfBirth: "1990-01-01",
-        country: "United States",
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deletePassword, setDeletePassword] = useState("");
+
+    // Profile form
+    const {
+        data: profileData,
+        setData: setProfileData,
+        patch: updateProfile,
+        processing: profileProcessing,
+        errors: profileErrors,
+        reset: resetProfile,
+    } = useForm({
+        first_name: user?.first_name || "",
+        last_name: user?.last_name || "",
+        email: user?.email || "",
+        phone_number: user?.phone_number || "",
+        date_of_birth: user?.date_of_birth || "",
+        street_address: user?.street_address || "",
+        city: user?.city || "",
+        state: user?.state || "",
+        zip: user?.zip || "",
+        country: user?.country || "Bangladesh",
     });
 
-    const [passwordData, setPasswordData] = useState({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
+    // Password form
+    const {
+        data: passwordData,
+        setData: setPasswordData,
+        put: updatePassword,
+        processing: passwordProcessing,
+        errors: passwordErrors,
+        reset: resetPassword,
+    } = useForm({
+        current_password: "",
+        password: "",
+        password_confirmation: "",
     });
 
-    const [preferences, setPreferences] = useState({
-        emailNotifications: true,
-        smsNotifications: false,
-        marketingEmails: true,
-        orderUpdates: true,
+    // Preferences form
+    const {
+        data: preferences,
+        setData: setPreferences,
+        put: updatePreferences,
+        processing: preferencesProcessing,
+        errors: preferencesErrors,
+    } = useForm({
+        promotional_emails: user?.promotional_emails || false,
+        other_updates: user?.other_updates || false,
     });
+
+    // Delete account form
+    const { delete: deleteAccount, processing: deleteProcessing } = useForm();
 
     const handleProfileSubmit = (e) => {
         e.preventDefault();
-        // Handle profile update
-        alert("Profile updated successfully!");
+        updateProfile(route("profile.update"));
     };
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
-        // Handle password change
-        alert("Password changed successfully!");
-        setPasswordData({
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: "",
+        updatePassword(route("profile.password"), {
+            onSuccess: () => resetPassword(),
         });
     };
 
     const handlePreferencesSubmit = (e) => {
         e.preventDefault();
-        // Handle preferences update
-        alert("Preferences updated successfully!");
+        updatePreferences(route("profile.preferences"));
     };
+
+    const handleDeleteAccount = (e) => {
+        e.preventDefault();
+        deleteAccount(route("profile.destroy"), {
+            data: { password: deletePassword },
+            onSuccess: () => {
+                setShowDeleteModal(false);
+                setDeletePassword("");
+            },
+        });
+    };
+
+    // Show success messages
+    useEffect(() => {
+        if (status === "profile-updated") {
+            alert("Profile updated successfully!");
+        } else if (status === "password-updated") {
+            alert("Password changed successfully!");
+        } else if (status === "preferences-updated") {
+            alert("Preferences updated successfully!");
+        }
+    }, [status]);
 
     const tabs = [
         { id: "profile", label: "Profile Information" },
         { id: "password", label: "Change Password" },
         { id: "preferences", label: "Preferences" },
+        { id: "delete", label: "Delete Account" },
     ];
 
     return (
         <div className="min-h-screen">
+            <Head title="Profile Settings" />
             <Header />
             <DashboardLayout>
                 <div className="space-y-6">
@@ -103,15 +152,20 @@ export default function ProfilePage() {
                                         </label>
                                         <input
                                             type="text"
-                                            value={profileData.firstName}
+                                            value={profileData.first_name}
                                             onChange={(e) =>
-                                                setProfileData({
-                                                    ...profileData,
-                                                    firstName: e.target.value,
-                                                })
+                                                setProfileData(
+                                                    "first_name",
+                                                    e.target.value
+                                                )
                                             }
                                             className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                         />
+                                        {profileErrors.first_name && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {profileErrors.first_name}
+                                            </p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium mb-2">
@@ -119,15 +173,20 @@ export default function ProfilePage() {
                                         </label>
                                         <input
                                             type="text"
-                                            value={profileData.lastName}
+                                            value={profileData.last_name}
                                             onChange={(e) =>
-                                                setProfileData({
-                                                    ...profileData,
-                                                    lastName: e.target.value,
-                                                })
+                                                setProfileData(
+                                                    "last_name",
+                                                    e.target.value
+                                                )
                                             }
                                             className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                         />
+                                        {profileErrors.last_name && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {profileErrors.last_name}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -139,13 +198,18 @@ export default function ProfilePage() {
                                         type="email"
                                         value={profileData.email}
                                         onChange={(e) =>
-                                            setProfileData({
-                                                ...profileData,
-                                                email: e.target.value,
-                                            })
+                                            setProfileData(
+                                                "email",
+                                                e.target.value
+                                            )
                                         }
                                         className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                     />
+                                    {profileErrors.email && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {profileErrors.email}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -155,31 +219,154 @@ export default function ProfilePage() {
                                         </label>
                                         <input
                                             type="tel"
-                                            value={profileData.phone}
+                                            value={profileData.phone_number}
                                             onChange={(e) =>
-                                                setProfileData({
-                                                    ...profileData,
-                                                    phone: e.target.value,
-                                                })
+                                                setProfileData(
+                                                    "phone_number",
+                                                    e.target.value
+                                                )
                                             }
                                             className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                         />
+                                        {profileErrors.phone_number && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {profileErrors.phone_number}
+                                            </p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium mb-2">
                                             Date of Birth
                                         </label>
+                                        <div className="relative">
+                                            <input
+                                                type={
+                                                    profileData.date_of_birth
+                                                        ? "date"
+                                                        : "text"
+                                                }
+                                                value={
+                                                    profileData.date_of_birth ||
+                                                    ""
+                                                }
+                                                onChange={(e) =>
+                                                    setProfileData(
+                                                        "date_of_birth",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onFocus={(e) => {
+                                                    e.target.type = "date";
+                                                }}
+                                                onBlur={(e) => {
+                                                    if (!e.target.value) {
+                                                        e.target.type = "text";
+                                                    }
+                                                }}
+                                                placeholder="Select your date of birth"
+                                                className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 text-foreground"
+                                                style={{
+                                                    colorScheme: "dark light",
+                                                }}
+                                            />
+                                        </div>
+                                        {profileErrors.date_of_birth && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {profileErrors.date_of_birth}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Street Address
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={profileData.street_address}
+                                        onChange={(e) =>
+                                            setProfileData(
+                                                "street_address",
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Enter your street address"
+                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                    />
+                                    {profileErrors.street_address && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {profileErrors.street_address}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">
+                                            City
+                                        </label>
                                         <input
-                                            type="date"
-                                            value={profileData.dateOfBirth}
+                                            type="text"
+                                            value={profileData.city}
                                             onChange={(e) =>
-                                                setProfileData({
-                                                    ...profileData,
-                                                    dateOfBirth: e.target.value,
-                                                })
+                                                setProfileData(
+                                                    "city",
+                                                    e.target.value
+                                                )
                                             }
+                                            placeholder="Enter your city"
                                             className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                         />
+                                        {profileErrors.city && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {profileErrors.city}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">
+                                            State/Province
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={profileData.state}
+                                            onChange={(e) =>
+                                                setProfileData(
+                                                    "state",
+                                                    e.target.value
+                                                )
+                                            }
+                                            placeholder="Enter your state/province"
+                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                        {profileErrors.state && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {profileErrors.state}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-2">
+                                            ZIP/Postal Code
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={profileData.zip}
+                                            onChange={(e) =>
+                                                setProfileData(
+                                                    "zip",
+                                                    e.target.value
+                                                )
+                                            }
+                                            placeholder="Enter your ZIP/postal code"
+                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        />
+                                        {profileErrors.zip && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {profileErrors.zip}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -190,13 +377,16 @@ export default function ProfilePage() {
                                     <select
                                         value={profileData.country}
                                         onChange={(e) =>
-                                            setProfileData({
-                                                ...profileData,
-                                                country: e.target.value,
-                                            })
+                                            setProfileData(
+                                                "country",
+                                                e.target.value
+                                            )
                                         }
                                         className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                     >
+                                        <option value="Bangladesh">
+                                            Bangladesh
+                                        </option>
                                         <option value="United States">
                                             United States
                                         </option>
@@ -208,14 +398,22 @@ export default function ProfilePage() {
                                             Australia
                                         </option>
                                     </select>
+                                    {profileErrors.country && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {profileErrors.country}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <GamingButton
                                     type="submit"
                                     variant="primary"
                                     size="lg"
+                                    disabled={profileProcessing}
                                 >
-                                    Save Changes
+                                    {profileProcessing
+                                        ? "Saving..."
+                                        : "Save Changes"}
                                 </GamingButton>
                             </form>
                         )}
@@ -232,16 +430,21 @@ export default function ProfilePage() {
                                     </label>
                                     <input
                                         type="password"
-                                        value={passwordData.currentPassword}
+                                        value={passwordData.current_password}
                                         onChange={(e) =>
-                                            setPasswordData({
-                                                ...passwordData,
-                                                currentPassword: e.target.value,
-                                            })
+                                            setPasswordData(
+                                                "current_password",
+                                                e.target.value
+                                            )
                                         }
                                         className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                         placeholder="Enter current password"
                                     />
+                                    {passwordErrors.current_password && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {passwordErrors.current_password}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -250,16 +453,21 @@ export default function ProfilePage() {
                                     </label>
                                     <input
                                         type="password"
-                                        value={passwordData.newPassword}
+                                        value={passwordData.password}
                                         onChange={(e) =>
-                                            setPasswordData({
-                                                ...passwordData,
-                                                newPassword: e.target.value,
-                                            })
+                                            setPasswordData(
+                                                "password",
+                                                e.target.value
+                                            )
                                         }
                                         className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                         placeholder="Enter new password"
                                     />
+                                    {passwordErrors.password && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {passwordErrors.password}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -268,24 +476,36 @@ export default function ProfilePage() {
                                     </label>
                                     <input
                                         type="password"
-                                        value={passwordData.confirmPassword}
+                                        value={
+                                            passwordData.password_confirmation
+                                        }
                                         onChange={(e) =>
-                                            setPasswordData({
-                                                ...passwordData,
-                                                confirmPassword: e.target.value,
-                                            })
+                                            setPasswordData(
+                                                "password_confirmation",
+                                                e.target.value
+                                            )
                                         }
                                         className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
                                         placeholder="Confirm new password"
                                     />
+                                    {passwordErrors.password_confirmation && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {
+                                                passwordErrors.password_confirmation
+                                            }
+                                        </p>
+                                    )}
                                 </div>
 
                                 <GamingButton
                                     type="submit"
                                     variant="primary"
                                     size="lg"
+                                    disabled={passwordProcessing}
                                 >
-                                    Change Password
+                                    {passwordProcessing
+                                        ? "Changing..."
+                                        : "Change Password"}
                                 </GamingButton>
                             </form>
                         )}
@@ -305,72 +525,19 @@ export default function ProfilePage() {
                                             <input
                                                 type="checkbox"
                                                 checked={
-                                                    preferences.emailNotifications
+                                                    preferences.promotional_emails
                                                 }
                                                 onChange={(e) =>
-                                                    setPreferences({
-                                                        ...preferences,
-                                                        emailNotifications:
-                                                            e.target.checked,
-                                                    })
+                                                    setPreferences(
+                                                        "promotional_emails",
+                                                        e.target.checked
+                                                    )
                                                 }
                                                 className="rounded border-border"
                                             />
                                             <div>
                                                 <span className="font-medium">
-                                                    Email Notifications
-                                                </span>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Receive general
-                                                    notifications via email
-                                                </p>
-                                            </div>
-                                        </label>
-
-                                        <label className="flex items-center gap-3 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    preferences.smsNotifications
-                                                }
-                                                onChange={(e) =>
-                                                    setPreferences({
-                                                        ...preferences,
-                                                        smsNotifications:
-                                                            e.target.checked,
-                                                    })
-                                                }
-                                                className="rounded border-border"
-                                            />
-                                            <div>
-                                                <span className="font-medium">
-                                                    SMS Notifications
-                                                </span>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Receive important updates
-                                                    via SMS
-                                                </p>
-                                            </div>
-                                        </label>
-
-                                        <label className="flex items-center gap-3 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    preferences.marketingEmails
-                                                }
-                                                onChange={(e) =>
-                                                    setPreferences({
-                                                        ...preferences,
-                                                        marketingEmails:
-                                                            e.target.checked,
-                                                    })
-                                                }
-                                                className="rounded border-border"
-                                            />
-                                            <div>
-                                                <span className="font-medium">
-                                                    Marketing Emails
+                                                    Promotional Emails
                                                 </span>
                                                 <p className="text-sm text-muted-foreground">
                                                     Receive promotional offers
@@ -383,24 +550,23 @@ export default function ProfilePage() {
                                             <input
                                                 type="checkbox"
                                                 checked={
-                                                    preferences.orderUpdates
+                                                    preferences.other_updates
                                                 }
                                                 onChange={(e) =>
-                                                    setPreferences({
-                                                        ...preferences,
-                                                        orderUpdates:
-                                                            e.target.checked,
-                                                    })
+                                                    setPreferences(
+                                                        "other_updates",
+                                                        e.target.checked
+                                                    )
                                                 }
                                                 className="rounded border-border"
                                             />
                                             <div>
                                                 <span className="font-medium">
-                                                    Order Updates
+                                                    Other Updates
                                                 </span>
                                                 <p className="text-sm text-muted-foreground">
                                                     Receive updates about your
-                                                    orders
+                                                    orders and account
                                                 </p>
                                             </div>
                                         </label>
@@ -411,14 +577,116 @@ export default function ProfilePage() {
                                     type="submit"
                                     variant="primary"
                                     size="lg"
+                                    disabled={preferencesProcessing}
                                 >
-                                    Save Preferences
+                                    {preferencesProcessing
+                                        ? "Saving..."
+                                        : "Save Preferences"}
                                 </GamingButton>
                             </form>
+                        )}
+
+                        {/* Delete Account Tab */}
+                        {activeTab === "delete" && (
+                            <div className="space-y-6">
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                    <h3 className="font-heading font-semibold text-lg text-red-800 mb-2">
+                                        Delete Account
+                                    </h3>
+                                    <p className="text-red-700 mb-4">
+                                        Once your account is deleted, all of its
+                                        resources and data will be permanently
+                                        deleted. Before deleting your account,
+                                        please download any data or information
+                                        that you wish to retain.
+                                    </p>
+                                    <GamingButton
+                                        type="button"
+                                        variant="ghost"
+                                        size="lg"
+                                        className="bg-red-600 hover:bg-red-700 text-white border border-red-600 hover:border-red-700"
+                                        onClick={() => setShowDeleteModal(true)}
+                                    >
+                                        Delete Account
+                                    </GamingButton>
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
             </DashboardLayout>
+
+            {/* Delete Account Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <div className="bg-slate-800/90 backdrop-blur-xl rounded-xl border border-slate-700 w-full max-w-md">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+                                    <span className="text-red-400 text-xl">
+                                        ⚠️
+                                    </span>
+                                </div>
+                                <h2 className="font-heading font-bold text-xl text-white">
+                                    Delete Account
+                                </h2>
+                            </div>
+
+                            <p className="text-slate-300 mb-6 leading-relaxed">
+                                Once your account is deleted, all of its
+                                resources and data will be permanently deleted.
+                                Please enter your password to confirm you would
+                                like to permanently delete your account.
+                            </p>
+
+                            <form
+                                onSubmit={handleDeleteAccount}
+                                className="space-y-4"
+                            >
+                                <div>
+                                    <label className="block text-sm font-medium mb-2 text-slate-300">
+                                        Password
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={deletePassword}
+                                        onChange={(e) =>
+                                            setDeletePassword(e.target.value)
+                                        }
+                                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder-slate-400"
+                                        placeholder="Enter your password"
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
+                                    <GamingButton
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={() =>
+                                            setShowDeleteModal(false)
+                                        }
+                                        className="flex-1 text-slate-300 border border-slate-600 hover:bg-slate-700"
+                                    >
+                                        Cancel
+                                    </GamingButton>
+                                    <GamingButton
+                                        type="submit"
+                                        variant="ghost"
+                                        className="flex-1 bg-red-600 hover:bg-red-700 text-white border border-red-600 hover:border-red-700"
+                                        disabled={deleteProcessing}
+                                    >
+                                        {deleteProcessing
+                                            ? "Deleting..."
+                                            : "Delete Account"}
+                                    </GamingButton>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

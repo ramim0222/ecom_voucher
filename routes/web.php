@@ -24,14 +24,6 @@ Route::get('/checkout', function () {
 
 
 
-Route::get('/dashboard/profile', function () {
-    return Inertia::render('Dashboard/Profile');
-});
-
-Route::get('/dashboard/orders', function () {
-    return Inertia::render('Dashboard/Orders');
-});
-
 Route::get('/products', function () {
     return Inertia::render('Product/Index');
 });
@@ -65,16 +57,48 @@ Route::get('/admin/orders/{id}', function ($id) {
 });
 
 Route::get('/admin/categories', function () {
+
     return Inertia::render('Admin/Categories');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard/Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+
+
+
+
+//Customer Middleware Group Routes
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::group([
+        'middleware' => function ($request, $next) {
+            if (! auth()->user() || auth()->user()->role !== 'customer') {
+                abort(403, 'Unauthorized.');
+            }
+            if (auth()->user()->status !== 'active') {
+                abort(403, 'Your account has been banned. Please contact support.');
+            }
+            return $next($request);
+        }
+    ], function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('Dashboard/Dashboard');
+        });
+
+        Route::get('/dashboard/profile', [ProfileController::class, 'dashboard'])->name('dashboard.profile');
+
+        Route::get('/dashboard/orders', function () {
+            return Inertia::render('Dashboard/Orders');
+        });
+
+    });
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::put('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

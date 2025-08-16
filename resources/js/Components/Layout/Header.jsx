@@ -1,6 +1,10 @@
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { usePage } from "@inertiajs/react";
 
 export function Header() {
+    const { auth } = usePage().props;
+    const isAuthenticated = !!auth.user;
+
     return (
         <header className="sticky top-0 z-50 glass-card border-b border-border/50">
             <div className="container mx-auto px-4 py-4">
@@ -64,24 +68,38 @@ export function Header() {
                             </span>
                         </button>
 
-                        <GamingButton
-                            onClick={() => {
-                                window.location.href = "/login";
-                            }}
-                            variant="ghost"
-                            size="sm"
-                        >
-                            Sign In
-                        </GamingButton>
-                        <GamingButton
-                            variant="primary"
-                            size="sm"
-                            onClick={() => {
-                                window.location.href = "/register";
-                            }}
-                        >
-                            Sign Up
-                        </GamingButton>
+                        {isAuthenticated ? (
+                            <GamingButton
+                                variant="primary"
+                                size="sm"
+                                onClick={() => {
+                                    window.location.href = "/dashboard";
+                                }}
+                            >
+                                Dashboard
+                            </GamingButton>
+                        ) : (
+                            <>
+                                <GamingButton
+                                    onClick={() => {
+                                        window.location.href = "/login";
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                >
+                                    Sign In
+                                </GamingButton>
+                                <GamingButton
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() => {
+                                        window.location.href = "/register";
+                                    }}
+                                >
+                                    Sign Up
+                                </GamingButton>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
