@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export function ProductsTable({ onEdit }) {
+export function ProductsTable({ onEdit, onAddCode }) {
     const [products] = useState([
         {
             id: 1,
@@ -129,6 +129,13 @@ export function ProductsTable({ onEdit }) {
                                 </td>
                                 <td className="py-3">
                                     <div className="flex gap-2">
+                                        <GamingButton
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => onAddCode(product)}
+                                        >
+                                            Add code
+                                        </GamingButton>
                                         <GamingButton
                                             variant="ghost"
                                             size="sm"
