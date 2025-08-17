@@ -14,7 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::where('role', 'customer')->get();
         return Inertia::render('Admin/Users/Index', ['users' => $users]);
     }
 
@@ -23,7 +23,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return Inertia::render('Admin/Users/Page', ['id' => $id]);
+        $user = User::findOrFail($id);
+        return Inertia::render('Admin/Users/Page', ['user' => $user]);
     }
 
     /**

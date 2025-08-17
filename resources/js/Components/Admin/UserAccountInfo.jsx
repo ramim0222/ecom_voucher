@@ -14,7 +14,7 @@ export function UserAccountInfo({ user }) {
                             First Name
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.firstName}
+                            {user.first_name}
                         </div>
                     </div>
                     <div>
@@ -22,7 +22,7 @@ export function UserAccountInfo({ user }) {
                             Last Name
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.lastName}
+                            {user.last_name}
                         </div>
                     </div>
                     <div>
@@ -31,9 +31,13 @@ export function UserAccountInfo({ user }) {
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white flex items-center justify-between">
                             {user.email}
-                            {user.emailVerified && (
+                            {user.email_verified_at ? (
                                 <span className="text-green-400 text-sm">
                                     ✓ Verified
+                                </span>
+                            ) : (
+                                <span className="text-red-400 text-sm">
+                                    ✗ Unverified
                                 </span>
                             )}
                         </div>
@@ -43,7 +47,7 @@ export function UserAccountInfo({ user }) {
                             Phone Number
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.phone || "Not provided"}
+                            {user.phone_number || "Not provided"}
                         </div>
                     </div>
                 </div>
@@ -60,7 +64,7 @@ export function UserAccountInfo({ user }) {
                             Street Address
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.address?.street || "Not provided"}
+                            {user.street_address || "Not provided"}
                         </div>
                     </div>
                     <div>
@@ -68,7 +72,7 @@ export function UserAccountInfo({ user }) {
                             City
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.address?.city || "Not provided"}
+                            {user.city || "Not provided"}
                         </div>
                     </div>
                     <div>
@@ -76,7 +80,7 @@ export function UserAccountInfo({ user }) {
                             State
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.address?.state || "Not provided"}
+                            {user.state || "Not provided"}
                         </div>
                     </div>
                     <div>
@@ -84,7 +88,7 @@ export function UserAccountInfo({ user }) {
                             ZIP Code
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.address?.zipCode || "Not provided"}
+                            {user.zip || "Not provided"}
                         </div>
                     </div>
                     <div>
@@ -92,7 +96,7 @@ export function UserAccountInfo({ user }) {
                             Country
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {user.address?.country || "Not provided"}
+                            {user.country || "Not provided"}
                         </div>
                     </div>
                 </div>
@@ -109,15 +113,7 @@ export function UserAccountInfo({ user }) {
                             Registration Date
                         </label>
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {new Date(user.registrationDate).toLocaleString()}
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-1">
-                            Last Login
-                        </label>
-                        <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white">
-                            {new Date(user.lastLogin).toLocaleString()}
+                            {new Date(user.created_at).toLocaleString()}
                         </div>
                     </div>
                     <div>
@@ -127,12 +123,12 @@ export function UserAccountInfo({ user }) {
                         <div className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3">
                             <span
                                 className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    user.accountStatus === "active"
+                                    user.status === "active"
                                         ? "text-green-400 bg-green-400/20"
                                         : "text-red-400 bg-red-400/20"
                                 }`}
                             >
-                                {user.accountStatus}
+                                {user.status}
                             </span>
                         </div>
                     </div>
@@ -146,47 +142,27 @@ export function UserAccountInfo({ user }) {
                 </h3>
                 <div className="space-y-3">
                     <div className="flex items-center justify-between bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3">
-                        <span className="text-white">
-                            Newsletter Subscription
-                        </span>
-                        <span
-                            className={`text-sm ${
-                                user.preferences?.newsletter
-                                    ? "text-green-400"
-                                    : "text-red-400"
-                            }`}
-                        >
-                            {user.preferences?.newsletter
-                                ? "Enabled"
-                                : "Disabled"}
-                        </span>
-                    </div>
-                    <div className="flex items-center justify-between bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3">
                         <span className="text-white">Promotional Emails</span>
                         <span
                             className={`text-sm ${
-                                user.preferences?.promotions
+                                user.promotional_emails
                                     ? "text-green-400"
                                     : "text-red-400"
                             }`}
                         >
-                            {user.preferences?.promotions
-                                ? "Enabled"
-                                : "Disabled"}
+                            {user.promotional_emails ? "Enabled" : "Disabled"}
                         </span>
                     </div>
                     <div className="flex items-center justify-between bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3">
-                        <span className="text-white">Order Updates</span>
+                        <span className="text-white">Other Updates</span>
                         <span
                             className={`text-sm ${
-                                user.preferences?.orderUpdates
+                                user.other_updates
                                     ? "text-green-400"
                                     : "text-red-400"
                             }`}
                         >
-                            {user.preferences?.orderUpdates
-                                ? "Enabled"
-                                : "Disabled"}
+                            {user.other_updates ? "Enabled" : "Disabled"}
                         </span>
                     </div>
                 </div>

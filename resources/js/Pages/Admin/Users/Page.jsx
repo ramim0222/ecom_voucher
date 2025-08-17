@@ -7,37 +7,7 @@ import { UserAccountInfo } from "@/Components/Admin/UserAccountInfo";
 import { UserOrderHistory } from "@/Components/Admin/UserOrderHistory";
 import { AdminActionModal } from "@/Components/Admin/AdminActionModal";
 
-export default function AdminUserProfilePage({ params }) {
-    const userId = params?.id || "1";
-
-    // Mock user data - in real app, this would be fetched based on userId
-    const [user] = useState({
-        id: Number.parseInt(userId),
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@example.com",
-        avatar: "/diverse-user-avatars.png",
-        phone: "+1 (555) 123-4567",
-        registrationDate: "2023-06-15T10:30:00Z",
-        lastLogin: "2024-01-20T14:22:00Z",
-        totalOrders: 12,
-        totalSpent: 1456.78,
-        accountStatus: "active",
-        emailVerified: true,
-        address: {
-            street: "123 Gaming Street",
-            city: "San Francisco",
-            state: "CA",
-            zipCode: "94102",
-            country: "United States",
-        },
-        preferences: {
-            newsletter: true,
-            promotions: false,
-            orderUpdates: true,
-        },
-    });
-
+export default function AdminUserProfilePage({ user }) {
     const [activeTab, setActiveTab] = useState("account");
     const [actionModal, setActionModal] = useState({
         isOpen: false,
@@ -51,14 +21,6 @@ export default function AdminUserProfilePage({ params }) {
             deactivate: {
                 title: "Deactivate Account",
                 message: `Are you sure you want to deactivate ${user.firstName} ${user.lastName}'s account? They will no longer be able to access their account or make purchases.`,
-            },
-            sendEmail: {
-                title: "Send Email",
-                message: `Send a custom email to ${user.firstName} ${user.lastName} (${user.email})`,
-            },
-            resetPassword: {
-                title: "Reset Password",
-                message: `Send a password reset link to ${user.firstName} ${user.lastName}? They will receive an email with instructions to create a new password.`,
             },
         };
 
@@ -115,36 +77,22 @@ export default function AdminUserProfilePage({ params }) {
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700 p-6">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                                {user.avatar ? (
-                                    <img
-                                        src={user.avatar || "/placeholder.svg"}
-                                        alt={`${user.firstName} ${user.lastName}`}
-                                        className="w-16 h-16 rounded-full object-cover"
-                                    />
-                                ) : (
-                                    <span className="text-white font-bold text-xl">
-                                        {user.firstName[0]}
-                                        {user.lastName[0]}
-                                    </span>
-                                )}
-                            </div>
                             <div>
                                 <h2 className="font-heading font-bold text-xl text-white">
-                                    {user.firstName} {user.lastName}
+                                    {user.first_name} {user.last_name}
                                 </h2>
                                 <p className="text-slate-400">{user.email}</p>
                                 <div className="flex items-center gap-4 mt-2">
                                     <span
                                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            user.accountStatus === "active"
+                                            user.status === "active"
                                                 ? "text-green-400 bg-green-400/20"
                                                 : "text-red-400 bg-red-400/20"
                                         }`}
                                     >
-                                        {user.accountStatus}
+                                        {user.status}
                                     </span>
-                                    {user.emailVerified && (
+                                    {user.email_verified_at && (
                                         <span className="text-blue-400 text-xs flex items-center gap-1">
                                             ✓ Email Verified
                                         </span>
@@ -157,7 +105,7 @@ export default function AdminUserProfilePage({ params }) {
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-white">
-                                    {user.totalOrders}
+                                    User Order Count
                                 </div>
                                 <div className="text-slate-400 text-sm">
                                     Total Orders
@@ -165,7 +113,7 @@ export default function AdminUserProfilePage({ params }) {
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-white">
-                                    ${user.totalSpent.toFixed(2)}
+                                    User Total Spent
                                 </div>
                                 <div className="text-slate-400 text-sm">
                                     Total Spent
@@ -174,7 +122,7 @@ export default function AdminUserProfilePage({ params }) {
                             <div className="text-center col-span-2 lg:col-span-1">
                                 <div className="text-sm text-white">
                                     {new Date(
-                                        user.registrationDate
+                                        user.created_at
                                     ).toLocaleDateString()}
                                 </div>
                                 <div className="text-slate-400 text-sm">
@@ -189,26 +137,10 @@ export default function AdminUserProfilePage({ params }) {
                         <GamingButton
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleAdminAction("sendEmail")}
-                            className="text-blue-400 hover:text-blue-300"
-                        >
-                            📧 Send Email
-                        </GamingButton>
-                        <GamingButton
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleAdminAction("resetPassword")}
-                            className="text-yellow-400 hover:text-yellow-300"
-                        >
-                            🔑 Reset Password
-                        </GamingButton>
-                        <GamingButton
-                            variant="ghost"
-                            size="sm"
                             onClick={() => handleAdminAction("deactivate")}
                             className="text-red-400 hover:text-red-300"
                         >
-                            🚫 Deactivate Account
+                            🚫 Ban Account
                         </GamingButton>
                     </div>
                 </div>
