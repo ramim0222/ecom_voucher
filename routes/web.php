@@ -85,6 +85,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('dashboard');
 
         Route::get('/dashboard/profile', [ProfileController::class, 'dashboard'])->name('dashboard.profile');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+        Route::put('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
 
         Route::get('/dashboard/orders', function () {
             return Inertia::render('Dashboard/Orders');
@@ -94,11 +97,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-    Route::put('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
-});
 
 require __DIR__.'/auth.php';

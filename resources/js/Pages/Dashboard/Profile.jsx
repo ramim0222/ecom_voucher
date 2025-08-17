@@ -236,103 +236,74 @@ export default function ProfilePage({ user, status }) {
                                         </label>
                                         <div className="relative">
                                             <input
-                                                type="text"
+                                                type="date"
                                                 value={
                                                     profileData.date_of_birth
-                                                        ? new Date(
-                                                              profileData.date_of_birth
-                                                          ).toLocaleDateString(
-                                                              "en-US",
-                                                              {
-                                                                  month: "2-digit",
-                                                                  day: "2-digit",
-                                                                  year: "numeric",
+                                                        ? (() => {
+                                                              // Handle different date formats
+                                                              const dateStr =
+                                                                  profileData.date_of_birth;
+                                                              if (
+                                                                  dateStr.includes(
+                                                                      "T"
+                                                                  )
+                                                              ) {
+                                                                  // ISO datetime format
+                                                                  return dateStr.split(
+                                                                      "T"
+                                                                  )[0];
+                                                              } else if (
+                                                                  dateStr.match(
+                                                                      /^\d{4}-\d{2}-\d{2}$/
+                                                                  )
+                                                              ) {
+                                                                  // Already in YYYY-MM-DD format
+                                                                  return dateStr;
+                                                              } else {
+                                                                  // Try to parse and format
+                                                                  const date =
+                                                                      new Date(
+                                                                          dateStr
+                                                                      );
+                                                                  if (
+                                                                      !isNaN(
+                                                                          date.getTime()
+                                                                      )
+                                                                  ) {
+                                                                      return date
+                                                                          .toISOString()
+                                                                          .split(
+                                                                              "T"
+                                                                          )[0];
+                                                                  }
+                                                                  return "";
                                                               }
-                                                          )
+                                                          })()
                                                         : ""
                                                 }
                                                 onChange={(e) => {
-                                                    // Allow only date format input
-                                                    const value =
-                                                        e.target.value;
-                                                    if (
-                                                        value === "" ||
-                                                        /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(
-                                                            value
-                                                        )
-                                                    ) {
-                                                        if (value === "") {
-                                                            setProfileData(
-                                                                "date_of_birth",
-                                                                ""
-                                                            );
-                                                        } else {
-                                                            const [
-                                                                month,
-                                                                day,
-                                                                year,
-                                                            ] =
-                                                                value.split(
-                                                                    "/"
-                                                                );
-                                                            const date =
-                                                                new Date(
-                                                                    year,
-                                                                    month - 1,
-                                                                    day
-                                                                );
-                                                            if (
-                                                                !isNaN(
-                                                                    date.getTime()
-                                                                )
-                                                            ) {
-                                                                setProfileData(
-                                                                    "date_of_birth",
-                                                                    date
-                                                                        .toISOString()
-                                                                        .split(
-                                                                            "T"
-                                                                        )[0]
-                                                                );
-                                                            }
-                                                        }
-                                                    }
+                                                    setProfileData(
+                                                        "date_of_birth",
+                                                        e.target.value
+                                                    );
                                                 }}
-                                                onFocus={(e) => {
-                                                    e.target.type = "date";
-                                                    e.target.value =
-                                                        profileData.date_of_birth ||
-                                                        "";
-                                                }}
-                                                onBlur={(e) => {
-                                                    e.target.type = "text";
-                                                    if (
-                                                        profileData.date_of_birth
-                                                    ) {
-                                                        e.target.value =
-                                                            new Date(
-                                                                profileData.date_of_birth
-                                                            ).toLocaleDateString(
-                                                                "en-US",
-                                                                {
-                                                                    month: "2-digit",
-                                                                    day: "2-digit",
-                                                                    year: "numeric",
-                                                                }
-                                                            );
-                                                    }
-                                                }}
-                                                placeholder="mm/dd/yyyy"
                                                 className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary text-foreground pr-12"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    const input =
-                                                        e.target
-                                                            .previousElementSibling;
-                                                    input.focus();
+                                                    const input = e.target
+                                                        .closest(".relative")
+                                                        .querySelector(
+                                                            "input[type='date']"
+                                                        );
+                                                    if (input) {
+                                                        input.focus();
+                                                        if (input.showPicker) {
+                                                            input.showPicker();
+                                                        }
+                                                    }
                                                 }}
                                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground hover:text-primary transition-colors"
                                             >
