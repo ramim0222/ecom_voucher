@@ -54,10 +54,8 @@ export default function CodeUploadModal({
 
             setProcessedCodes(codes);
 
-            // Call the parent callback with processed codes
-            if (onProcessCodes) {
-                onProcessCodes(codes, product);
-            }
+            // Don't automatically upload - just process and show the codes
+            // The user will click "Save Codes" to actually upload them
         } catch (error) {
             setErrors({ file: "Error processing file. Please try again." });
         } finally {
@@ -112,13 +110,13 @@ export default function CodeUploadModal({
                             <span className="font-medium text-orange-300">
                                 Name:
                             </span>{" "}
-                            {product.name}
+                            {product.title}
                         </p>
                         <p className="text-slate-300">
                             <span className="font-medium text-orange-300">
                                 Category:
                             </span>{" "}
-                            {product.category}
+                            {product.category?.name || "No Category"}
                         </p>
                     </div>
                 )}
@@ -280,9 +278,14 @@ export default function CodeUploadModal({
                             variant="primary"
                             size="lg"
                             onClick={() => {
-                                // Here you would typically save the codes to database
-                                console.log("Saving codes:", processedCodes);
-                                handleClose();
+                                // Call the parent callback to actually save the codes
+                                if (
+                                    onProcessCodes &&
+                                    processedCodes.length > 0
+                                ) {
+                                    onProcessCodes(processedCodes, product);
+                                }
+                                // Don't close here - let the parent handle closing after successful upload
                             }}
                             className="flex-1"
                         >

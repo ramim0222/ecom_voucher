@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Code;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -14,7 +15,12 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->get();
+        $products = Product::with(['category', 'codes'])->get()->map(function ($product) {
+            // Calculate total_codes and sold_codes dynamically
+            $product->total_codes = $product->codes->count();
+            $product->sold_codes = $product->codes->where('status', 'sold')->count();
+            return $product;
+        });
         $categories = Category::where('status', 'active')->get();
 
         return Inertia::render('Admin/Products', [
@@ -33,8 +39,6 @@ class ProductController extends Controller
             'original_price' => 'nullable|numeric|min:0',
             'buying_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'total_codes' => 'nullable|integer|min:0',
-            'sold_codes' => 'nullable|integer|min:0',
             'features' => 'nullable|array',
             'is_featured' => 'boolean',
             'sort_order' => 'nullable|integer',
@@ -49,8 +53,8 @@ class ProductController extends Controller
             'original_price' => $request->original_price,
             'buying_price' => $request->buying_price,
             'description' => $request->description,
-            'total_codes' => $request->total_codes ?? 0,
-            'sold_codes' => $request->sold_codes ?? 0,
+            'total_codes' => 0,
+            'sold_codes' => 0,
             'features' => $request->features ? json_encode($request->features) : null,
             'is_featured' => $request->boolean('is_featured'),
             'sort_order' => $request->sort_order ?? 0,
@@ -79,8 +83,6 @@ class ProductController extends Controller
             'original_price' => 'nullable|numeric|min:0',
             'buying_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'total_codes' => 'nullable|integer|min:0',
-            'sold_codes' => 'nullable|integer|min:0',
             'features' => 'nullable|array',
             'is_featured' => 'boolean',
             'sort_order' => 'nullable|integer',
@@ -95,8 +97,8 @@ class ProductController extends Controller
             'original_price' => $request->original_price,
             'buying_price' => $request->buying_price,
             'description' => $request->description,
-            'total_codes' => $request->total_codes ?? 0,
-            'sold_codes' => $request->sold_codes ?? 0,
+            'total_codes' => 0,
+            'sold_codes' => 0,
             'features' => $request->features ? json_encode($request->features) : null,
             'is_featured' => $request->boolean('is_featured'),
             'sort_order' => $request->sort_order ?? 0,
@@ -130,5 +132,95 @@ class ProductController extends Controller
         $product->delete();
 
         return back()->with('success', 'Product deleted successfully.');
+    }
+
+    public function uploadCodes(Request $request, Product $product)
+    {
+        $request->validate([
+            'codes' => 'required|array',
+            'codes.*' => 'required|string|max:255'
+        ]);
+
+        $uploadedCodes = [];
+        $duplicateCodes = [];
+
+        foreach ($request->codes as $codeValue) {
+            // Check if code already exists for this product
+            $existingCode = Code::where('product_id', $product->id)
+                               ->where('code', $codeValue)
+                               ->first();
+
+            if ($existingCode) {
+                $duplicateCodes[] = $codeValue;
+            } else {
+                $uploadedCodes[] = [
+                    'code' => $codeValue,
+                    'product_id' => $product->id,
+                    'status' => 'available',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+        }
+
+        // Bulk insert new codes
+        if (!empty($uploadedCodes)) {
+            Code::insert($uploadedCodes);
+        }
+
+        // Update product's total_codes count
+        $product->update([
+            'total_codes' => $product->codes()->count()
+        ]);
+
+        $message = count($uploadedCodes) . ' codes uploaded successfully.';
+        if (!empty($duplicateCodes)) {
+            $message .= ' ' . count($duplicateCodes) . ' duplicate codes were skipped.';
+        }
+
+        return back()->with('success', $message);
+    }
+
+        public function getCodes(Product $product)
+    {
+        $codes = $product->codes()->latest()->get();
+
+        return response()->json([
+            'codes' => $codes,
+            'total_codes' => $codes->count(),
+            'available_codes' => $codes->where('status', 'available')->count(),
+            'sold_codes' => $codes->where('status', 'sold')->count()
+        ]);
+    }
+
+    public function bulkDeleteCodes(Request $request, Product $product)
+    {
+        \Log::info('Bulk delete request received', [
+            'product_id' => $product->id,
+            'request_data' => $request->all()
+        ]);
+
+        $request->validate([
+            'code_ids' => 'required|array',
+            'code_ids.*' => 'required|integer'
+        ]);
+
+        // Delete codes that belong to this product
+        $deletedCount = Code::where('product_id', $product->id)
+                           ->whereIn('id', $request->code_ids)
+                           ->delete();
+
+        \Log::info('Bulk delete completed', [
+            'deleted_count' => $deletedCount,
+            'product_id' => $product->id
+        ]);
+
+        // Update product's total_codes count
+        $product->update([
+            'total_codes' => $product->codes()->count(),
+            'sold_codes' => $product->codes()->where('status', 'sold')->count()
+        ]);
+
+        return back()->with('success', "{$deletedCount} codes deleted successfully.");
     }
 }

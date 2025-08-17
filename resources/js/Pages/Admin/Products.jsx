@@ -6,6 +6,7 @@ import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductsTable } from "@/Components/Admin/ProductsTable";
 import { ProductModal } from "@/Components/Admin/ProductModal";
 import CodeUploadModal from "@/Components/Admin/CodeUploadModal";
+import ViewCodesModal from "@/Components/Admin/ViewCodesModal";
 import { router } from "@inertiajs/react";
 
 export default function AdminProducts({ products = [], categories = [] }) {
@@ -13,6 +14,9 @@ export default function AdminProducts({ products = [], categories = [] }) {
     const [editingProduct, setEditingProduct] = useState(null);
     const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
     const [selectedProductForCodes, setSelectedProductForCodes] =
+        useState(null);
+    const [isViewCodesModalOpen, setIsViewCodesModalOpen] = useState(false);
+    const [selectedProductForViewing, setSelectedProductForViewing] =
         useState(null);
 
     const handleAddProduct = () => {
@@ -30,6 +34,11 @@ export default function AdminProducts({ products = [], categories = [] }) {
         setIsCodeModalOpen(true);
     };
 
+    const handleViewCodes = (product) => {
+        setSelectedProductForViewing(product);
+        setIsViewCodesModalOpen(true);
+    };
+
     const handleSaveProduct = (productData) => {
         const formData = new FormData();
 
@@ -41,8 +50,6 @@ export default function AdminProducts({ products = [], categories = [] }) {
         formData.append("original_price", productData.original_price || "");
         formData.append("buying_price", productData.buying_price);
         formData.append("description", productData.description || "");
-        formData.append("total_codes", productData.total_codes || "0");
-        formData.append("sold_codes", productData.sold_codes || "0");
         formData.append("is_featured", productData.is_featured ? "1" : "0");
         formData.append("sort_order", productData.sort_order || "0");
 
@@ -98,13 +105,34 @@ export default function AdminProducts({ products = [], categories = [] }) {
     const handleProcessCodes = (codes, product) => {
         console.log("Processing codes for product:", product);
         console.log("Codes:", codes);
-        // Here you would typically save the codes to the database
-        // For now, we'll just log them
+
+        // Save codes to the database
+        router.post(
+            `/admin/products/${product.id}/codes`,
+            { codes: codes },
+            {
+                onSuccess: () => {
+                    setIsCodeModalOpen(false);
+                    setSelectedProductForCodes(null);
+                    // Refresh the page to show updated stock counts
+                    window.location.reload();
+                },
+                onError: (errors) => {
+                    console.error("Code upload failed:", errors);
+                    alert("Failed to upload codes. Please try again.");
+                },
+            }
+        );
     };
 
     const handleCloseCodeModal = () => {
         setIsCodeModalOpen(false);
         setSelectedProductForCodes(null);
+    };
+
+    const handleCloseViewCodesModal = () => {
+        setIsViewCodesModalOpen(false);
+        setSelectedProductForViewing(null);
     };
 
     return (
@@ -132,6 +160,7 @@ export default function AdminProducts({ products = [], categories = [] }) {
                     products={products}
                     onEdit={handleEditProduct}
                     onAddCode={handleAddCode}
+                    onViewCodes={handleViewCodes}
                     onDelete={handleDeleteProduct}
                 />
 
@@ -148,6 +177,12 @@ export default function AdminProducts({ products = [], categories = [] }) {
                     onClose={handleCloseCodeModal}
                     product={selectedProductForCodes}
                     onProcessCodes={handleProcessCodes}
+                />
+
+                <ViewCodesModal
+                    isOpen={isViewCodesModalOpen}
+                    onClose={handleCloseViewCodesModal}
+                    product={selectedProductForViewing}
                 />
             </div>
         </AdminLayout>

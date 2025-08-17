@@ -1,5 +1,7 @@
 "use client";
 
+import { GamingButton } from "../ui/GamingButton";
+
 export function CategoriesTable({ categories, onEdit, onDelete }) {
     return (
         <div className="overflow-x-auto">
@@ -81,20 +83,22 @@ export function CategoriesTable({ categories, onEdit, onDelete }) {
                             </td>
                             <td className="py-4 px-4">
                                 <div className="flex items-center gap-2">
-                                    <button
+                                    <GamingButton
                                         onClick={() => onEdit(category)}
                                         className="text-blue-400 hover:text-blue-300 transition-colors p-1"
+                                        variant="ghost"
                                         title="Edit category"
                                     >
                                         ✏️
-                                    </button>
-                                    <button
+                                    </GamingButton>
+                                    <GamingButton
                                         onClick={() => onDelete(category)}
                                         className="text-red-400 hover:text-red-300 transition-colors p-1"
                                         title="Delete category"
+                                        variant="ghost"
                                     >
                                         🗑️
-                                    </button>
+                                    </GamingButton>
                                 </div>
                             </td>
                         </tr>

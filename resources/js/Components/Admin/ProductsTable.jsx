@@ -3,13 +3,22 @@
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export function ProductsTable({ products = [], onEdit, onAddCode, onDelete }) {
+export function ProductsTable({
+    products = [],
+    onEdit,
+    onAddCode,
+    onDelete,
+    onViewCodes,
+}) {
     return (
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
             <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead>
                         <tr className="border-b border-slate-700">
+                            <th className="text-left py-3 text-slate-400 font-medium">
+                                Image
+                            </th>
                             <th className="text-left py-3 text-slate-400 font-medium">
                                 Product
                             </th>
@@ -36,6 +45,33 @@ export function ProductsTable({ products = [], onEdit, onAddCode, onDelete }) {
                                 key={product.id}
                                 className="border-b border-slate-700/50"
                             >
+                                <td className="py-3">
+                                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-700">
+                                        {product.product_image ? (
+                                            <img
+                                                src={`/storage/${product.product_image}`}
+                                                alt={product.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                                <svg
+                                                    className="w-6 h-6"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                        )}
+                                    </div>
+                                </td>
                                 <td className="py-3">
                                     <div>
                                         <p className="text-white font-medium">
@@ -87,27 +123,34 @@ export function ProductsTable({ products = [], onEdit, onAddCode, onDelete }) {
                                     </span>
                                 </td>
                                 <td className="py-3">
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 flex-wrap">
                                         <GamingButton
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => onAddCode(product)}
                                         >
-                                            Add code
+                                            ➕
+                                        </GamingButton>
+                                        <GamingButton
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => onViewCodes(product)}
+                                        >
+                                            🔍
                                         </GamingButton>
                                         <GamingButton
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => onEdit(product)}
                                         >
-                                            Edit
+                                            ✏️
                                         </GamingButton>
                                         <GamingButton
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => onDelete(product.id)}
                                         >
-                                            Delete
+                                            🗑️
                                         </GamingButton>
                                     </div>
                                 </td>

@@ -16,8 +16,6 @@ export function ProductModal({
         price: "",
         original_price: "",
         buying_price: "",
-        total_codes: "",
-        sold_codes: "",
         description: "",
         status: "active",
         is_featured: false,
@@ -33,8 +31,6 @@ export function ProductModal({
                 price: product.price?.toString() || "",
                 original_price: product.original_price?.toString() || "",
                 buying_price: product.buying_price?.toString() || "",
-                total_codes: product.total_codes?.toString() || "",
-                sold_codes: product.sold_codes?.toString() || "",
                 description: product.description || "",
                 status: product.status || "active",
                 is_featured: product.is_featured || false,
@@ -48,8 +44,6 @@ export function ProductModal({
                 price: "",
                 original_price: "",
                 buying_price: "",
-                total_codes: "",
-                sold_codes: "",
                 description: "",
                 status: "active",
                 is_featured: false,
@@ -223,57 +217,21 @@ export function ProductModal({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-2 text-slate-300">
-                                Total Codes
-                            </label>
-                            <input
-                                type="number"
-                                value={formData.total_codes}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        total_codes: e.target.value,
-                                    })
-                                }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-2 text-slate-300">
-                                Sold Codes
-                            </label>
-                            <input
-                                type="number"
-                                value={formData.sold_codes}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        sold_codes: e.target.value,
-                                    })
-                                }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-2 text-slate-300">
-                                Sort Order
-                            </label>
-                            <input
-                                type="number"
-                                value={formData.sort_order}
-                                onChange={(e) =>
-                                    setFormData({
-                                        ...formData,
-                                        sort_order: e.target.value,
-                                    })
-                                }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            />
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-2 text-slate-300">
+                            Sort Order
+                        </label>
+                        <input
+                            type="number"
+                            value={formData.sort_order}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    sort_order: e.target.value,
+                                })
+                            }
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-2 text-slate-300">

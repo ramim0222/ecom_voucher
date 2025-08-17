@@ -104,6 +104,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
         Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+        Route::post('/admin/products/{product}/codes', [ProductController::class, 'uploadCodes'])->name('admin.products.codes.upload');
+        Route::get('/admin/products/{product}/codes', [ProductController::class, 'getCodes'])->name('admin.products.codes.get');
+        Route::post('/admin/products/{product}/codes/bulk-delete', [ProductController::class, 'bulkDeleteCodes'])->name('admin.products.codes.bulk-delete');
 
         Route::get('/admin/orders', function () {
             return Inertia::render('Admin/Orders/Index');
