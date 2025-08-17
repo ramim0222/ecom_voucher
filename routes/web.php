@@ -32,9 +32,7 @@ Route::get('/products/{id}', function ($id) {
     return Inertia::render('Product/Page', ['id' => $id]);
 });
 
-Route::get('/admin', function () {
-    return Inertia::render('Admin/Dashboard');
-});
+
 
 Route::get('/admin/users', function () {
     return Inertia::render('Admin/Users/Index');
@@ -92,6 +90,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard/orders', function () {
             return Inertia::render('Dashboard/Orders');
         });
+
+    });
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::group([
+        'middleware' => function ($request, $next) {
+            if (! auth()->user() || auth()->user()->role !== 'admin') {
+                abort(403, 'Unauthorized.');
+            }
+            return $next($request);
+        }
+    ], function () {
+
+
+        Route::get('/admin', function () {
+            return Inertia::render('Admin/Dashboard');
+        })->name('admin');
+
+        Route::get('/admin/profile', function () {
+            return Inertia::render('Admin/Profile');
+        })->name('admin.profile');
+
+        Route::patch('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
 
     });
 });

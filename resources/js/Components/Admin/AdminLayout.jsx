@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { router } from "@inertiajs/react";
 
 export function AdminLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const menuItems = [
         { href: "/admin", label: "Dashboard", icon: "📊" },
+        { href: "/admin/profile", label: "Profile", icon: "👤" },
         { href: "/admin/products", label: "Products", icon: "🎮" },
         { href: "/admin/orders", label: "Orders", icon: "📦" },
         { href: "/admin/users", label: "Users", icon: "👥" },
         { href: "/admin/categories", label: "Categories", icon: "📂" },
+        { href: "/admin/settings", label: "Settings", icon: "⚙️" },
+
         { href: "/", label: "View Store", icon: "🛒" },
     ];
 
@@ -63,6 +67,7 @@ export function AdminLayout({ children }) {
                             variant="ghost"
                             size="sm"
                             className="w-full justify-start text-slate-300 hover:text-white"
+                            onClick={() => router.post(route("logout"))}
                         >
                             <span className="text-xl mr-3">🚪</span>
                             Sign Out
