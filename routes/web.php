@@ -82,7 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ], function () {
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard/Dashboard');
-        });
+        })->name('dashboard');
 
         Route::get('/dashboard/profile', [ProfileController::class, 'dashboard'])->name('dashboard.profile');
 
@@ -99,7 +99,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::put('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

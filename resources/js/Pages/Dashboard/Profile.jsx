@@ -57,9 +57,6 @@ export default function ProfilePage({ user, status }) {
         other_updates: user?.other_updates || false,
     });
 
-    // Delete account form
-    const { delete: deleteAccount, processing: deleteProcessing } = useForm();
-
     const handleProfileSubmit = (e) => {
         e.preventDefault();
         updateProfile(route("profile.update"));
@@ -103,7 +100,6 @@ export default function ProfilePage({ user, status }) {
         { id: "profile", label: "Profile Information" },
         { id: "password", label: "Change Password" },
         { id: "preferences", label: "Preferences" },
-        { id: "delete", label: "Delete Account" },
     ];
 
     return (
@@ -240,35 +236,121 @@ export default function ProfilePage({ user, status }) {
                                         </label>
                                         <div className="relative">
                                             <input
-                                                type={
-                                                    profileData.date_of_birth
-                                                        ? "date"
-                                                        : "text"
-                                                }
+                                                type="text"
                                                 value={
-                                                    profileData.date_of_birth ||
-                                                    ""
+                                                    profileData.date_of_birth
+                                                        ? new Date(
+                                                              profileData.date_of_birth
+                                                          ).toLocaleDateString(
+                                                              "en-US",
+                                                              {
+                                                                  month: "2-digit",
+                                                                  day: "2-digit",
+                                                                  year: "numeric",
+                                                              }
+                                                          )
+                                                        : ""
                                                 }
-                                                onChange={(e) =>
-                                                    setProfileData(
-                                                        "date_of_birth",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                onFocus={(e) => {
-                                                    e.target.type = "date";
-                                                }}
-                                                onBlur={(e) => {
-                                                    if (!e.target.value) {
-                                                        e.target.type = "text";
+                                                onChange={(e) => {
+                                                    // Allow only date format input
+                                                    const value =
+                                                        e.target.value;
+                                                    if (
+                                                        value === "" ||
+                                                        /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(
+                                                            value
+                                                        )
+                                                    ) {
+                                                        if (value === "") {
+                                                            setProfileData(
+                                                                "date_of_birth",
+                                                                ""
+                                                            );
+                                                        } else {
+                                                            const [
+                                                                month,
+                                                                day,
+                                                                year,
+                                                            ] =
+                                                                value.split(
+                                                                    "/"
+                                                                );
+                                                            const date =
+                                                                new Date(
+                                                                    year,
+                                                                    month - 1,
+                                                                    day
+                                                                );
+                                                            if (
+                                                                !isNaN(
+                                                                    date.getTime()
+                                                                )
+                                                            ) {
+                                                                setProfileData(
+                                                                    "date_of_birth",
+                                                                    date
+                                                                        .toISOString()
+                                                                        .split(
+                                                                            "T"
+                                                                        )[0]
+                                                                );
+                                                            }
+                                                        }
                                                     }
                                                 }}
-                                                placeholder="Select your date of birth"
-                                                className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100 text-foreground"
-                                                style={{
-                                                    colorScheme: "dark light",
+                                                onFocus={(e) => {
+                                                    e.target.type = "date";
+                                                    e.target.value =
+                                                        profileData.date_of_birth ||
+                                                        "";
                                                 }}
+                                                onBlur={(e) => {
+                                                    e.target.type = "text";
+                                                    if (
+                                                        profileData.date_of_birth
+                                                    ) {
+                                                        e.target.value =
+                                                            new Date(
+                                                                profileData.date_of_birth
+                                                            ).toLocaleDateString(
+                                                                "en-US",
+                                                                {
+                                                                    month: "2-digit",
+                                                                    day: "2-digit",
+                                                                    year: "numeric",
+                                                                }
+                                                            );
+                                                    }
+                                                }}
+                                                placeholder="mm/dd/yyyy"
+                                                className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary text-foreground pr-12"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    const input =
+                                                        e.target
+                                                            .previousElementSibling;
+                                                    input.focus();
+                                                }}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground hover:text-primary transition-colors"
+                                            >
+                                                <svg
+                                                    className="w-5 h-5"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                    />
+                                                </svg>
+                                            </button>
                                         </div>
                                         {profileErrors.date_of_birth && (
                                             <p className="text-red-500 text-sm mt-1">
@@ -585,108 +667,9 @@ export default function ProfilePage({ user, status }) {
                                 </GamingButton>
                             </form>
                         )}
-
-                        {/* Delete Account Tab */}
-                        {activeTab === "delete" && (
-                            <div className="space-y-6">
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                    <h3 className="font-heading font-semibold text-lg text-red-800 mb-2">
-                                        Delete Account
-                                    </h3>
-                                    <p className="text-red-700 mb-4">
-                                        Once your account is deleted, all of its
-                                        resources and data will be permanently
-                                        deleted. Before deleting your account,
-                                        please download any data or information
-                                        that you wish to retain.
-                                    </p>
-                                    <GamingButton
-                                        type="button"
-                                        variant="ghost"
-                                        size="lg"
-                                        className="bg-red-600 hover:bg-red-700 text-white border border-red-600 hover:border-red-700"
-                                        onClick={() => setShowDeleteModal(true)}
-                                    >
-                                        Delete Account
-                                    </GamingButton>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             </DashboardLayout>
-
-            {/* Delete Account Modal */}
-            {showDeleteModal && (
-                <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-slate-800/90 backdrop-blur-xl rounded-xl border border-slate-700 w-full max-w-md">
-                        <div className="p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                                    <span className="text-red-400 text-xl">
-                                        ⚠️
-                                    </span>
-                                </div>
-                                <h2 className="font-heading font-bold text-xl text-white">
-                                    Delete Account
-                                </h2>
-                            </div>
-
-                            <p className="text-slate-300 mb-6 leading-relaxed">
-                                Once your account is deleted, all of its
-                                resources and data will be permanently deleted.
-                                Please enter your password to confirm you would
-                                like to permanently delete your account.
-                            </p>
-
-                            <form
-                                onSubmit={handleDeleteAccount}
-                                className="space-y-4"
-                            >
-                                <div>
-                                    <label className="block text-sm font-medium mb-2 text-slate-300">
-                                        Password
-                                    </label>
-                                    <input
-                                        type="password"
-                                        value={deletePassword}
-                                        onChange={(e) =>
-                                            setDeletePassword(e.target.value)
-                                        }
-                                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder-slate-400"
-                                        placeholder="Enter your password"
-                                        required
-                                        autoFocus
-                                    />
-                                </div>
-
-                                <div className="flex gap-3 pt-2">
-                                    <GamingButton
-                                        type="button"
-                                        variant="ghost"
-                                        onClick={() =>
-                                            setShowDeleteModal(false)
-                                        }
-                                        className="flex-1 text-slate-300 border border-slate-600 hover:bg-slate-700"
-                                    >
-                                        Cancel
-                                    </GamingButton>
-                                    <GamingButton
-                                        type="submit"
-                                        variant="ghost"
-                                        className="flex-1 bg-red-600 hover:bg-red-700 text-white border border-red-600 hover:border-red-700"
-                                        disabled={deleteProcessing}
-                                    >
-                                        {deleteProcessing
-                                            ? "Deleting..."
-                                            : "Delete Account"}
-                                    </GamingButton>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
