@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { router } from "@inertiajs/react";
+import { ConfirmModal } from "./ConfirmModal";
 
 export function UsersTable({ users }) {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -143,77 +144,30 @@ export function UsersTable({ users }) {
             </div>
 
             {/* Ban/Unban Confirmation Modal */}
-            {showConfirmModal && (
-                <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-slate-800/90 backdrop-blur-xl rounded-xl border border-slate-700 w-full max-w-md">
-                        <div className="p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div
-                                    className={`w-10 h-10 ${
-                                        actionType === "banned"
-                                            ? "bg-red-500/20"
-                                            : "bg-green-500/20"
-                                    } rounded-full flex items-center justify-center`}
-                                >
-                                    <span
-                                        className={`${
-                                            actionType === "banned"
-                                                ? "text-red-400"
-                                                : "text-green-400"
-                                        } text-xl`}
-                                    >
-                                        {actionType === "banned" ? "⚠️" : "✅"}
-                                    </span>
-                                </div>
-                                <h2 className="font-heading font-bold text-xl text-white">
-                                    {actionType === "banned" ? "Ban" : "Unban"}{" "}
-                                    User
-                                </h2>
-                            </div>
-
-                            <p className="text-slate-300 mb-6 leading-relaxed">
-                                {selectedUser
-                                    ? `Are you sure you want to ${
-                                          actionType === "banned"
-                                              ? "ban"
-                                              : "unban"
-                                      } ${selectedUser.first_name} ${
-                                          selectedUser.last_name
-                                      }? ${
-                                          actionType === "banned"
-                                              ? "They will no longer be able to access their account."
-                                              : "They will regain access to their account."
-                                      }`
-                                    : ""}
-                            </p>
-
-                            <div className="flex gap-3">
-                                <GamingButton
-                                    type="button"
-                                    variant="ghost"
-                                    onClick={closeModal}
-                                    className="flex-1 text-slate-300"
-                                >
-                                    Cancel
-                                </GamingButton>
-                                <GamingButton
-                                    type="button"
-                                    onClick={confirmStatusChange}
-                                    className={`flex-1 ${
-                                        actionType === "banned"
-                                            ? "bg-red-600 hover:bg-red-700"
-                                            : "bg-green-600 hover:bg-green-700"
-                                    } text-white`}
-                                >
-                                    {actionType === "banned"
-                                        ? "Ban User"
-                                        : "Unban User"}
-                                </GamingButton>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={closeModal}
+                onConfirm={confirmStatusChange}
+                title={`${actionType === "banned" ? "Ban" : "Unban"} User`}
+                message={
+                    selectedUser
+                        ? `Are you sure you want to ${
+                              actionType === "banned" ? "ban" : "unban"
+                          } ${selectedUser.first_name} ${
+                              selectedUser.last_name
+                          }? ${
+                              actionType === "banned"
+                                  ? "They will no longer be able to access their account."
+                                  : "They will regain access to their account."
+                          }`
+                        : ""
+                }
+                confirmText={
+                    actionType === "banned" ? "Ban User" : "Unban User"
+                }
+                confirmVariant={actionType === "banned" ? "danger" : "success"}
+                icon={actionType === "banned" ? "⚠️" : "✅"}
+            />
         </div>
     );
 }
