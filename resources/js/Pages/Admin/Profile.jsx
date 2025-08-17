@@ -19,7 +19,9 @@ export default function AdminProfile() {
             state: user.state || "",
             zip: user.zip || "",
             country: user.country || "Bangladesh",
-            date_of_birth: user.date_of_birth || "",
+            date_of_birth: user.date_of_birth
+                ? user.date_of_birth.split("T")[0]
+                : "",
             promotional_emails: user.promotional_emails || false,
             other_updates: user.other_updates || false,
         });
@@ -302,7 +304,13 @@ export default function AdminProfile() {
                                     </label>
                                     <input
                                         type="date"
-                                        value={data.date_of_birth}
+                                        value={
+                                            data.date_of_birth
+                                                ? data.date_of_birth.split(
+                                                      "T"
+                                                  )[0]
+                                                : ""
+                                        }
                                         onChange={(e) =>
                                             setData(
                                                 "date_of_birth",
@@ -316,56 +324,6 @@ export default function AdminProfile() {
                                             {errors.date_of_birth}
                                         </p>
                                     )}
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <h3 className="text-lg font-medium text-white">
-                                    Email Preferences
-                                </h3>
-
-                                <div className="flex items-center">
-                                    <input
-                                        id="promotional_emails"
-                                        type="checkbox"
-                                        checked={data.promotional_emails}
-                                        onChange={(e) =>
-                                            setData(
-                                                "promotional_emails",
-                                                e.target.checked
-                                            )
-                                        }
-                                        className="w-4 h-4 text-orange-500 bg-slate-700 border-slate-600 rounded focus:ring-orange-500 focus:ring-2"
-                                    />
-                                    <label
-                                        htmlFor="promotional_emails"
-                                        className="ml-3 text-sm text-slate-300"
-                                    >
-                                        Receive promotional emails about new
-                                        gaming vouchers and special offers
-                                    </label>
-                                </div>
-
-                                <div className="flex items-center">
-                                    <input
-                                        id="other_updates"
-                                        type="checkbox"
-                                        checked={data.other_updates}
-                                        onChange={(e) =>
-                                            setData(
-                                                "other_updates",
-                                                e.target.checked
-                                            )
-                                        }
-                                        className="w-4 h-4 text-orange-500 bg-slate-700 border-slate-600 rounded focus:ring-orange-500 focus:ring-2"
-                                    />
-                                    <label
-                                        htmlFor="other_updates"
-                                        className="ml-3 text-sm text-slate-300"
-                                    >
-                                        Receive updates about orders and account
-                                        information
-                                    </label>
                                 </div>
                             </div>
 
@@ -442,7 +400,11 @@ export default function AdminProfile() {
                                         Date of Birth
                                     </h3>
                                     <p className="text-white">
-                                        {user.date_of_birth || "Not set"}
+                                        {user.date_of_birth
+                                            ? new Date(
+                                                  user.date_of_birth
+                                              ).toLocaleDateString()
+                                            : "Not set"}
                                     </p>
                                 </div>
                             </div>

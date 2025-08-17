@@ -2,41 +2,45 @@
 
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { router } from "@inertiajs/react";
 
-export function UsersTable() {
-    const [users] = useState([
-        {
-            id: 1,
-            name: "John Doe",
-            email: "john@example.com",
-            orders: 12,
-            totalSpent: 456.78,
-            status: "active",
-            joinDate: "2023-06-15",
-        },
-        {
-            id: 2,
-            name: "Jane Smith",
-            email: "jane@example.com",
-            orders: 8,
-            totalSpent: 234.56,
-            status: "active",
-            joinDate: "2023-08-22",
-        },
-        {
-            id: 3,
-            name: "Mike Johnson",
-            email: "mike@example.com",
-            orders: 3,
-            totalSpent: 89.97,
-            status: "banned",
-            joinDate: "2023-12-01",
-        },
-    ]);
+export function UsersTable({ users }) {
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [actionType, setActionType] = useState("");
 
     const handleStatusChange = (userId, newStatus) => {
-        // Handle status update
-        alert(`User ${userId} status updated to ${newStatus}`);
+        const user = users.find((u) => u.id === userId);
+        setSelectedUser(user);
+        setActionType(newStatus);
+        setShowConfirmModal(true);
+    };
+
+    const confirmStatusChange = () => {
+        if (selectedUser && actionType) {
+            router.patch(
+                `/admin/users/${selectedUser.id}/status`,
+                {
+                    status: actionType,
+                },
+                {
+                    onSuccess: () => {
+                        setShowConfirmModal(false);
+                        setSelectedUser(null);
+                        setActionType("");
+                    },
+                    onError: (errors) => {
+                        console.error("Error updating user status:", errors);
+                    },
+                }
+            );
+        }
+    };
+
+    const closeModal = () => {
+        setShowConfirmModal(false);
+        setSelectedUser(null);
+        setActionType("");
     };
 
     return (
@@ -74,7 +78,7 @@ export function UsersTable() {
                                 <td className="py-3">
                                     <div>
                                         <p className="text-white font-medium">
-                                            {user.name}
+                                            {user.first_name} {user.last_name}
                                         </p>
                                         <p className="text-slate-400 text-sm">
                                             {user.email}
@@ -82,10 +86,10 @@ export function UsersTable() {
                                     </div>
                                 </td>
                                 <td className="py-3 text-slate-300">
-                                    {user.orders}
+                                    User order count
                                 </td>
                                 <td className="py-3 text-white font-medium">
-                                    ${user.totalSpent.toFixed(2)}
+                                    User total spent
                                 </td>
                                 <td className="py-3">
                                     <span
@@ -100,7 +104,7 @@ export function UsersTable() {
                                 </td>
                                 <td className="py-3 text-slate-400">
                                     {new Date(
-                                        user.joinDate
+                                        user.created_at
                                     ).toLocaleDateString()}
                                 </td>
                                 <td className="py-3">
@@ -137,6 +141,79 @@ export function UsersTable() {
                     </tbody>
                 </table>
             </div>
+
+            {/* Ban/Unban Confirmation Modal */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-slate-800/90 backdrop-blur-xl rounded-xl border border-slate-700 w-full max-w-md">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div
+                                    className={`w-10 h-10 ${
+                                        actionType === "banned"
+                                            ? "bg-red-500/20"
+                                            : "bg-green-500/20"
+                                    } rounded-full flex items-center justify-center`}
+                                >
+                                    <span
+                                        className={`${
+                                            actionType === "banned"
+                                                ? "text-red-400"
+                                                : "text-green-400"
+                                        } text-xl`}
+                                    >
+                                        {actionType === "banned" ? "⚠️" : "✅"}
+                                    </span>
+                                </div>
+                                <h2 className="font-heading font-bold text-xl text-white">
+                                    {actionType === "banned" ? "Ban" : "Unban"}{" "}
+                                    User
+                                </h2>
+                            </div>
+
+                            <p className="text-slate-300 mb-6 leading-relaxed">
+                                {selectedUser
+                                    ? `Are you sure you want to ${
+                                          actionType === "banned"
+                                              ? "ban"
+                                              : "unban"
+                                      } ${selectedUser.first_name} ${
+                                          selectedUser.last_name
+                                      }? ${
+                                          actionType === "banned"
+                                              ? "They will no longer be able to access their account."
+                                              : "They will regain access to their account."
+                                      }`
+                                    : ""}
+                            </p>
+
+                            <div className="flex gap-3">
+                                <GamingButton
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={closeModal}
+                                    className="flex-1 text-slate-300"
+                                >
+                                    Cancel
+                                </GamingButton>
+                                <GamingButton
+                                    type="button"
+                                    onClick={confirmStatusChange}
+                                    className={`flex-1 ${
+                                        actionType === "banned"
+                                            ? "bg-red-600 hover:bg-red-700"
+                                            : "bg-green-600 hover:bg-green-700"
+                                    } text-white`}
+                                >
+                                    {actionType === "banned"
+                                        ? "Ban User"
+                                        : "Unban User"}
+                                </GamingButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -34,30 +35,6 @@ Route::get('/products/{id}', function ($id) {
 
 
 
-Route::get('/admin/users', function () {
-    return Inertia::render('Admin/Users/Index');
-});
-
-Route::get('/admin/users/{id}', function ($id) {
-    return Inertia::render('Admin/Users/Page', ['id' => $id]);
-});
-
-Route::get('/admin/products', function () {
-    return Inertia::render('Admin/Products');
-});
-
-Route::get('/admin/orders', function () {
-    return Inertia::render('Admin/Orders/Index');
-});
-
-Route::get('/admin/orders/{id}', function ($id) {
-    return Inertia::render('Admin/Orders/Page', ['id' => $id]);
-});
-
-Route::get('/admin/categories', function () {
-
-    return Inertia::render('Admin/Categories');
-});
 
 
 
@@ -94,6 +71,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+//admin middleware group routes
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::group([
         'middleware' => function ($request, $next) {
@@ -114,6 +93,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         })->name('admin.profile');
 
         Route::patch('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+
+        Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+        Route::get('/admin/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
+        Route::patch('/admin/users/{id}/status', [UserController::class, 'updateStatus'])->name('admin.users.update-status');
+
+        Route::get('/admin/products', function () {
+            return Inertia::render('Admin/Products');
+        });
+
+        Route::get('/admin/orders', function () {
+            return Inertia::render('Admin/Orders/Index');
+        });
+
+        Route::get('/admin/orders/{id}', function ($id) {
+            return Inertia::render('Admin/Orders/Page', ['id' => $id]);
+        });
+
+        Route::get('/admin/categories', function () {
+
+            return Inertia::render('Admin/Categories');
+        });
+
 
     });
 });

@@ -3,7 +3,7 @@
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { UsersTable } from "@/Components/Admin/UsersTable";
 
-export default function AdminUsers() {
+export default function AdminUsers({ users }) {
     return (
         <AdminLayout>
             <div className="space-y-6">
@@ -16,7 +16,7 @@ export default function AdminUsers() {
                     </p>
                 </div>
 
-                <UsersTable />
+                <UsersTable users={users} />
             </div>
         </AdminLayout>
     );
