@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -110,10 +111,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('Admin/Orders/Page', ['id' => $id]);
         });
 
-        Route::get('/admin/categories', function () {
-
-            return Inertia::render('Admin/Categories');
-        });
+        Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+        Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+        Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
+        Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
 
     });

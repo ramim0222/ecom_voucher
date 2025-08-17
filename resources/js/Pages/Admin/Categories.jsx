@@ -6,46 +6,9 @@ import { GamingButton } from "@/Components/ui/GamingButton";
 import { CategoriesTable } from "@/Components/Admin/CategoriesTable";
 import { CategoryModal } from "@/Components/Admin/CategoryModal";
 import { DeleteConfirmModal } from "@/Components/Admin/DeleteConfirmModal";
+import { router } from "@inertiajs/react";
 
-export default function AdminCategoriesPage() {
-    const [categories, setCategories] = useState([
-        {
-            id: 1,
-            name: "Steam Games",
-            slug: "steam-games",
-            dateCreated: "2024-01-15",
-            productCount: 245,
-        },
-        {
-            id: 2,
-            name: "PlayStation Store",
-            slug: "playstation-store",
-            dateCreated: "2024-01-16",
-            productCount: 189,
-        },
-        {
-            id: 3,
-            name: "Xbox Live",
-            slug: "xbox-live",
-            dateCreated: "2024-01-17",
-            productCount: 156,
-        },
-        {
-            id: 4,
-            name: "Nintendo eShop",
-            slug: "nintendo-eshop",
-            dateCreated: "2024-01-18",
-            productCount: 98,
-        },
-        {
-            id: 5,
-            name: "Epic Games Store",
-            slug: "epic-games-store",
-            dateCreated: "2024-01-19",
-            productCount: 67,
-        },
-    ]);
-
+export default function AdminCategoriesPage({ categories }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -57,7 +20,10 @@ export default function AdminCategoriesPage() {
     const filteredCategories = categories.filter(
         (category) =>
             category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            category.slug.toLowerCase().includes(searchTerm.toLowerCase())
+            (category.description &&
+                category.description
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()))
     );
 
     // Pagination
@@ -84,41 +50,54 @@ export default function AdminCategoriesPage() {
     };
 
     const handleSaveCategory = (categoryData) => {
+        const formData = new FormData();
+        formData.append("name", categoryData.name);
+        formData.append("description", categoryData.description || "");
+        formData.append("status", categoryData.status || "active");
+
+        if (categoryData.logo) {
+            formData.append("logo", categoryData.logo);
+        }
+
         if (selectedCategory) {
             // Edit existing category
-            setCategories(
-                categories.map((cat) =>
-                    cat.id === selectedCategory.id
-                        ? {
-                              ...cat,
-                              ...categoryData,
-                              slug: categoryData.name
-                                  .toLowerCase()
-                                  .replace(/\s+/g, "-"),
-                          }
-                        : cat
-                )
+            formData.append("_method", "PUT");
+            router.post(
+                route("admin.categories.update", selectedCategory.id),
+                formData,
+                {
+                    onSuccess: () => {
+                        setIsModalOpen(false);
+                        setSelectedCategory(null);
+                    },
+                    onError: (errors) => {
+                        console.error("Update failed:", errors);
+                    },
+                }
             );
         } else {
             // Add new category
-            const newCategory = {
-                id: Math.max(...categories.map((c) => c.id)) + 1,
-                ...categoryData,
-                slug: categoryData.name.toLowerCase().replace(/\s+/g, "-"),
-                dateCreated: new Date().toISOString().split("T")[0],
-                productCount: 0,
-            };
-            setCategories([...categories, newCategory]);
+            router.post(route("admin.categories.store"), formData, {
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                },
+                onError: (errors) => {
+                    console.error("Creation failed:", errors);
+                },
+            });
         }
-        setIsModalOpen(false);
     };
 
     const handleConfirmDelete = () => {
-        setCategories(
-            categories.filter((cat) => cat.id !== selectedCategory.id)
-        );
-        setIsDeleteModalOpen(false);
-        setSelectedCategory(null);
+        router.delete(route("admin.categories.destroy", selectedCategory.id), {
+            onSuccess: () => {
+                setIsDeleteModalOpen(false);
+                setSelectedCategory(null);
+            },
+            onError: (errors) => {
+                console.error("Deletion failed:", errors);
+            },
+        });
     };
 
     return (

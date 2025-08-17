@@ -1,26 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export function CategoryModal({ isOpen, onClose, onSave, category }) {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
+        status: "active",
+        logo: null,
     });
     const [errors, setErrors] = useState({});
+    const [logoPreview, setLogoPreview] = useState(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (category) {
             setFormData({
                 name: category.name || "",
                 description: category.description || "",
+                status: category.status || "active",
+                logo: null,
             });
+            setLogoPreview(category.logo ? `/storage/${category.logo}` : null);
         } else {
             setFormData({
                 name: "",
                 description: "",
+                status: "active",
+                logo: null,
             });
+            setLogoPreview(null);
         }
         setErrors({});
     }, [category, isOpen]);
@@ -30,6 +40,58 @@ export function CategoryModal({ isOpen, onClose, onSave, category }) {
         setFormData({ ...formData, [name]: value });
         if (errors[name]) {
             setErrors({ ...errors, [name]: "" });
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                setErrors({
+                    ...errors,
+                    logo: "Logo file size must be less than 2MB",
+                });
+                return;
+            }
+
+            // Validate file type
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/jpg",
+                "image/gif",
+                "image/svg+xml",
+            ];
+            if (!allowedTypes.includes(file.type)) {
+                setErrors({
+                    ...errors,
+                    logo: "Logo must be a valid image file (JPEG, PNG, JPG, GIF, SVG)",
+                });
+                return;
+            }
+
+            setFormData({ ...formData, logo: file });
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setLogoPreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+
+            // Clear any existing logo error
+            if (errors.logo) {
+                setErrors({ ...errors, logo: "" });
+            }
+        }
+    };
+
+    const handleRemoveLogo = () => {
+        setFormData({ ...formData, logo: null });
+        setLogoPreview(category?.logo ? `/storage/${category.logo}` : null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
     };
 
@@ -51,7 +113,13 @@ export function CategoryModal({ isOpen, onClose, onSave, category }) {
         if (!validateForm()) return;
 
         onSave(formData);
-        setFormData({ name: "", description: "" });
+        setFormData({
+            name: "",
+            description: "",
+            status: "active",
+            logo: null,
+        });
+        setLogoPreview(null);
     };
 
     if (!isOpen) return null;
@@ -118,6 +186,61 @@ export function CategoryModal({ isOpen, onClose, onSave, category }) {
                                 className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors resize-none"
                                 placeholder="Enter category description"
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                                Status
+                            </label>
+                            <select
+                                name="status"
+                                value={formData.status}
+                                onChange={handleInputChange}
+                                className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors"
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">
+                                Logo (Optional)
+                            </label>
+
+                            {logoPreview && (
+                                <div className="mb-3 relative inline-block">
+                                    <img
+                                        src={logoPreview}
+                                        alt="Logo preview"
+                                        className="w-20 h-20 object-cover rounded-lg border-2 border-slate-600"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveLogo}
+                                        className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm transition-colors"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            )}
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-orange-500 file:text-white hover:file:bg-orange-600 transition-colors"
+                            />
+                            {errors.logo && (
+                                <p className="text-red-400 text-sm mt-1">
+                                    {errors.logo}
+                                </p>
+                            )}
+                            <p className="text-slate-400 text-xs mt-2">
+                                Supported formats: JPEG, PNG, JPG, GIF, SVG. Max
+                                size: 2MB
+                            </p>
                         </div>
 
                         <div className="flex gap-3 pt-4">

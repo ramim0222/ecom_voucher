@@ -13,13 +13,16 @@ export function CategoriesTable({ categories, onEdit, onDelete }) {
                             Name
                         </th>
                         <th className="text-left py-3 px-4 font-medium text-slate-300">
-                            Slug
+                            Description
                         </th>
                         <th className="text-left py-3 px-4 font-medium text-slate-300">
-                            Products
+                            Status
                         </th>
                         <th className="text-left py-3 px-4 font-medium text-slate-300">
-                            Date Created
+                            Logo
+                        </th>
+                        <th className="text-left py-3 px-4 font-medium text-slate-300">
+                            Created
                         </th>
                         <th className="text-left py-3 px-4 font-medium text-slate-300">
                             Actions
@@ -41,18 +44,39 @@ export function CategoriesTable({ categories, onEdit, onDelete }) {
                                 </div>
                             </td>
                             <td className="py-4 px-4">
-                                <code className="bg-slate-700/50 px-2 py-1 rounded text-sm text-slate-300">
-                                    {category.slug}
-                                </code>
+                                <div className="text-slate-300 text-sm max-w-xs truncate">
+                                    {category.description || "No description"}
+                                </div>
                             </td>
                             <td className="py-4 px-4">
-                                <span className="bg-orange-500/20 text-orange-300 px-2 py-1 rounded-full text-sm">
-                                    {category.productCount} items
+                                <span
+                                    className={`px-2 py-1 rounded-full text-sm ${
+                                        category.status === "active"
+                                            ? "bg-green-500/20 text-green-300"
+                                            : "bg-gray-500/20 text-gray-300"
+                                    }`}
+                                >
+                                    {category.status}
                                 </span>
                             </td>
                             <td className="py-4 px-4 text-slate-300">
+                                {category.logo ? (
+                                    <img
+                                        src={`/storage/${category.logo}`}
+                                        alt={category.name}
+                                        className="w-10 h-10 rounded-lg object-cover border border-slate-600"
+                                    />
+                                ) : (
+                                    <div className="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center border border-slate-600">
+                                        <span className="text-slate-400 text-xs">
+                                            No logo
+                                        </span>
+                                    </div>
+                                )}
+                            </td>
+                            <td className="py-4 px-4 text-slate-400 text-sm">
                                 {new Date(
-                                    category.dateCreated
+                                    category.created_at
                                 ).toLocaleDateString()}
                             </td>
                             <td className="py-4 px-4">
