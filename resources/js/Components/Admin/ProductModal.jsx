@@ -3,47 +3,68 @@
 import { useState, useEffect } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export function ProductModal({ isOpen, onClose, product }) {
+export function ProductModal({
+    isOpen,
+    onClose,
+    product,
+    categories = [],
+    onSave,
+}) {
     const [formData, setFormData] = useState({
         title: "",
-        platform: "",
+        category_id: "",
         price: "",
-        originalPrice: "",
-        stock: "",
+        original_price: "",
+        buying_price: "",
+        total_codes: "",
+        sold_codes: "",
         description: "",
         status: "active",
-        image: "",
+        is_featured: false,
+        sort_order: "",
+        product_image: null,
     });
 
     useEffect(() => {
         if (product) {
             setFormData({
                 title: product.title || "",
-                platform: product.platform || "",
+                category_id: product.category_id?.toString() || "",
                 price: product.price?.toString() || "",
-                originalPrice: product.originalPrice?.toString() || "",
-                stock: product.stock?.toString() || "",
+                original_price: product.original_price?.toString() || "",
+                buying_price: product.buying_price?.toString() || "",
+                total_codes: product.total_codes?.toString() || "",
+                sold_codes: product.sold_codes?.toString() || "",
                 description: product.description || "",
                 status: product.status || "active",
+                is_featured: product.is_featured || false,
+                sort_order: product.sort_order?.toString() || "",
+                product_image: null,
             });
         } else {
             setFormData({
                 title: "",
-                platform: "",
+                category_id: "",
                 price: "",
-                originalPrice: "",
-                stock: "",
+                original_price: "",
+                buying_price: "",
+                total_codes: "",
+                sold_codes: "",
                 description: "",
                 status: "active",
+                is_featured: false,
+                sort_order: "",
+                product_image: null,
             });
         }
     }, [product]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle form submission
-        alert(product ? "Product updated!" : "Product created!");
-        onClose();
+
+        // Pass the raw form data to the parent component
+        // The parent will handle FormData creation
+        onSave(formData);
     };
 
     if (!isOpen) return null;
@@ -88,11 +109,10 @@ export function ProductModal({ isOpen, onClose, product }) {
                         <input
                             type="file"
                             accept="image/*"
-                            value={formData.image}
                             onChange={(e) =>
                                 setFormData({
                                     ...formData,
-                                    image: e.target.value,
+                                    product_image: e.target.files[0],
                                 })
                             }
                             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -101,25 +121,28 @@ export function ProductModal({ isOpen, onClose, product }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-2 text-slate-300">
-                                Platform
+                                Category
                             </label>
                             <select
-                                value={formData.platform}
+                                value={formData.category_id}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
-                                        platform: e.target.value,
+                                        category_id: e.target.value,
                                     })
                                 }
                                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
                             >
-                                <option value="">Select Platform</option>
-                                <option value="Steam">Steam</option>
-                                <option value="PlayStation">PlayStation</option>
-                                <option value="Xbox">Xbox</option>
-                                <option value="Nintendo">Nintendo</option>
-                                <option value="Epic Games">Epic Games</option>
+                                <option value="">Select Category</option>
+                                {categories.map((category) => (
+                                    <option
+                                        key={category.id}
+                                        value={category.id}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
@@ -169,11 +192,11 @@ export function ProductModal({ isOpen, onClose, product }) {
                             <input
                                 type="number"
                                 step="0.01"
-                                value={formData.originalPrice}
+                                value={formData.original_price}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
-                                        originalPrice: e.target.value,
+                                        original_price: e.target.value,
                                     })
                                 }
                                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -186,15 +209,69 @@ export function ProductModal({ isOpen, onClose, product }) {
                             </label>
                             <input
                                 type="number"
-                                value={formData.buyingPrice}
+                                step="0.01"
+                                value={formData.buying_price}
                                 onChange={(e) =>
                                     setFormData({
                                         ...formData,
-                                        buyingPrice: e.target.value,
+                                        buying_price: e.target.value,
                                     })
                                 }
                                 className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-slate-300">
+                                Total Codes
+                            </label>
+                            <input
+                                type="number"
+                                value={formData.total_codes}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        total_codes: e.target.value,
+                                    })
+                                }
+                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-slate-300">
+                                Sold Codes
+                            </label>
+                            <input
+                                type="number"
+                                value={formData.sold_codes}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        sold_codes: e.target.value,
+                                    })
+                                }
+                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-2 text-slate-300">
+                                Sort Order
+                            </label>
+                            <input
+                                type="number"
+                                value={formData.sort_order}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        sort_order: e.target.value,
+                                    })
+                                }
+                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                         </div>
                     </div>
@@ -213,6 +290,23 @@ export function ProductModal({ isOpen, onClose, product }) {
                             rows={4}
                             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
+                    </div>
+
+                    <div>
+                        <label className="flex items-center gap-2 text-slate-300">
+                            <input
+                                type="checkbox"
+                                checked={formData.is_featured}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        is_featured: e.target.checked,
+                                    })
+                                }
+                                className="rounded bg-slate-700 border-slate-600 text-orange-500 focus:ring-orange-500"
+                            />
+                            Featured Product
+                        </label>
                     </div>
 
                     <div className="flex gap-4 pt-4">

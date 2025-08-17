@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -99,9 +100,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
         Route::patch('/admin/users/{id}/status', [UserController::class, 'updateStatus'])->name('admin.users.update-status');
 
-        Route::get('/admin/products', function () {
-            return Inertia::render('Admin/Products');
-        });
+        Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
+        Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
+        Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
+        Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 
         Route::get('/admin/orders', function () {
             return Inertia::render('Admin/Orders/Index');

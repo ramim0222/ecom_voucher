@@ -3,53 +3,7 @@
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export function ProductsTable({ onEdit, onAddCode }) {
-    const [products] = useState([
-        {
-            id: 1,
-            title: "Steam Wallet $50",
-            platform: "Steam",
-            price: 45.99,
-            originalPrice: 50.0,
-            stock: 100,
-            status: "active",
-        },
-        {
-            id: 2,
-            title: "PlayStation Store $25",
-            platform: "PlayStation",
-            price: 22.99,
-            originalPrice: 25.0,
-            stock: 75,
-            status: "active",
-        },
-        {
-            id: 3,
-            title: "Xbox Game Pass 3 Months",
-            platform: "Xbox",
-            price: 29.99,
-            originalPrice: 35.99,
-            stock: 50,
-            status: "active",
-        },
-        {
-            id: 4,
-            title: "Nintendo eShop $20",
-            platform: "Nintendo",
-            price: 18.99,
-            originalPrice: 20.0,
-            stock: 0,
-            status: "inactive",
-        },
-    ]);
-
-    const handleDelete = (id) => {
-        if (confirm("Are you sure you want to delete this product?")) {
-            // Handle delete
-            alert("Product deleted!");
-        }
-    };
-
+export function ProductsTable({ products = [], onEdit, onAddCode, onDelete }) {
     return (
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
             <div className="overflow-x-auto">
@@ -60,7 +14,7 @@ export function ProductsTable({ onEdit, onAddCode }) {
                                 Product
                             </th>
                             <th className="text-left py-3 text-slate-400 font-medium">
-                                Platform
+                                Category
                             </th>
                             <th className="text-left py-3 text-slate-400 font-medium">
                                 Price
@@ -90,30 +44,35 @@ export function ProductsTable({ onEdit, onAddCode }) {
                                     </div>
                                 </td>
                                 <td className="py-3 text-slate-300">
-                                    {product.platform}
+                                    {product.category?.name || "No Category"}
                                 </td>
                                 <td className="py-3">
                                     <div className="flex items-center gap-2">
                                         <span className="text-white font-medium">
                                             ${product.price}
                                         </span>
-                                        {product.originalPrice >
-                                            product.price && (
-                                            <span className="text-slate-400 line-through text-sm">
-                                                ${product.originalPrice}
-                                            </span>
-                                        )}
+                                        {product.original_price &&
+                                            product.original_price >
+                                                product.price && (
+                                                <span className="text-slate-400 line-through text-sm">
+                                                    ${product.original_price}
+                                                </span>
+                                            )}
                                     </div>
                                 </td>
                                 <td className="py-3">
                                     <span
                                         className={
-                                            product.stock > 0
+                                            product.total_codes -
+                                                product.sold_codes >
+                                            0
                                                 ? "text-white"
                                                 : "text-red-400"
                                         }
                                     >
-                                        {product.stock}
+                                        {product.total_codes -
+                                            product.sold_codes}{" "}
+                                        / {product.total_codes}
                                     </span>
                                 </td>
                                 <td className="py-3">
@@ -146,9 +105,7 @@ export function ProductsTable({ onEdit, onAddCode }) {
                                         <GamingButton
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() =>
-                                                handleDelete(product.id)
-                                            }
+                                            onClick={() => onDelete(product.id)}
                                         >
                                             Delete
                                         </GamingButton>
