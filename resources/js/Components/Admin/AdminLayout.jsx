@@ -14,6 +14,7 @@ export function AdminLayout({ children }) {
         { href: "/admin/orders", label: "Orders", icon: "📦" },
         { href: "/admin/users", label: "Users", icon: "👥" },
         { href: "/admin/categories", label: "Categories", icon: "📂" },
+        { href: "/admin/reviews", label: "Reviews", icon: "💬" },
         { href: "/admin/settings", label: "Settings", icon: "⚙️" },
 
         { href: "/", label: "View Store", icon: "🛒" },

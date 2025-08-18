@@ -1,8 +1,9 @@
 import { GamingButton } from "@/Components/ui/GamingButton";
-import { usePage } from "@inertiajs/react";
+import { usePage, Link } from "@inertiajs/react";
+import Dropdown from "@/Components/Dropdown";
 
 export function Header() {
-    const { auth } = usePage().props;
+    const { auth, categories = [] } = usePage().props;
     const isAuthenticated = !!auth.user;
 
     return (
@@ -22,30 +23,57 @@ export function Header() {
                         </div>
 
                         <nav className="hidden md:flex items-center gap-6">
-                            <a
-                                href="#"
+                            <Link
+                                href={route("welcome")}
                                 className="text-foreground hover:text-accent transition-colors"
                             >
                                 Home
-                            </a>
-                            <a
-                                href="#"
-                                className="text-foreground hover:text-accent transition-colors"
-                            >
-                                Categories
-                            </a>
-                            <a
+                            </Link>
+                            <Dropdown>
+                                <Dropdown.Trigger>
+                                    <button className="text-foreground hover:text-accent transition-colors flex items-center gap-1">
+                                        Categories
+                                        <span>▾</span>
+                                    </button>
+                                </Dropdown.Trigger>
+                                <Dropdown.Content
+                                    align="left"
+                                    width="48"
+                                    contentClasses="py-1 bg-white dark:bg-slate-800"
+                                >
+                                    <div className="max-h-80 overflow-auto">
+                                        {(categories || []).map((cat) => (
+                                            <Dropdown.Link
+                                                key={cat.id}
+                                                href={route("products", {
+                                                    category: cat.id,
+                                                })}
+                                                className="dark:text-slate-200 dark:hover:bg-slate-700"
+                                            >
+                                                {cat.name}
+                                            </Dropdown.Link>
+                                        ))}
+                                        {(!categories ||
+                                            categories.length === 0) && (
+                                            <div className="px-4 py-2 text-sm text-muted-foreground">
+                                                No categories
+                                            </div>
+                                        )}
+                                    </div>
+                                </Dropdown.Content>
+                            </Dropdown>
+                            <Link
                                 href="#"
                                 className="text-foreground hover:text-accent transition-colors"
                             >
                                 Deals
-                            </a>
-                            <a
+                            </Link>
+                            <Link
                                 href="#"
                                 className="text-foreground hover:text-accent transition-colors"
                             >
                                 Support
-                            </a>
+                            </Link>
                         </nav>
                     </div>
 

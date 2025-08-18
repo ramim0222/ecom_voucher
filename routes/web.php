@@ -7,33 +7,18 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Front\IndexController;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 
-Route::get('/cart', function () {
-    return Inertia::render('Cart');
-});
+Route::get('/cart', [IndexController::class, 'cart'])->name('cart');
 
-Route::get('/checkout', function () {
-    return Inertia::render('Checkout');
-});
+Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
 
 
 
-Route::get('/products', function () {
-    return Inertia::render('Product/Index');
-});
-
-Route::get('/products/{id}', function ($id) {
-    return Inertia::render('Product/Page', ['id' => $id]);
-});
+Route::get('/products', [IndexController::class, 'products'])->name('products');
+Route::get('/products/{id}', [IndexController::class, 'product'])->name('product');
 
 
 
@@ -121,6 +106,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
         Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
+
+        Route::get('/admin/reviews', function () {
+            return Inertia::render('Admin/Reviews');
+        })->name('admin.reviews');
 
     });
 });

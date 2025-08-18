@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use App\Models\Category;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,6 +36,18 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'categories' => fn () => Category::query()
+                ->orderBy('name')
+                ->get(['id', 'name', 'logo', 'status'])
+                ->map(function ($c) {
+                    return [
+                        'id' => $c->id,
+                        'name' => $c->name,
+                        'logo' => $c->logo,
+                        'status' => is_string($c->status) ? strtolower($c->status) : $c->status,
+                    ];
+                })
+                ->toArray(),
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

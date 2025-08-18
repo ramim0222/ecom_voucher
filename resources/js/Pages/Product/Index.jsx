@@ -5,76 +5,10 @@ import { VoucherCard } from "@/Components/ui/VoucherCard";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductFilters } from "@/Components/Product/ProductFilter";
 import { ProductSort } from "@/Components/Product/ProductSort";
+import { usePage } from "@inertiajs/react";
 
-export default function ProductsPage() {
-    const products = [
-        {
-            id: 1,
-            title: "Steam Wallet $50",
-            price: "45.99",
-            originalPrice: "50.00",
-            discount: 8,
-            platform: "Steam",
-            rating: 4.8,
-            category: "PC Gaming",
-            availability: "In Stock",
-        },
-        {
-            id: 2,
-            title: "PlayStation Store $25",
-            price: "22.99",
-            originalPrice: "25.00",
-            discount: 8,
-            platform: "PlayStation",
-            rating: 4.9,
-            category: "Console Gaming",
-            availability: "In Stock",
-        },
-        {
-            id: 3,
-            title: "Xbox Game Pass 3 Months",
-            price: "29.99",
-            originalPrice: "35.99",
-            discount: 17,
-            platform: "Xbox",
-            rating: 4.7,
-            category: "Console Gaming",
-            availability: "In Stock",
-        },
-        {
-            id: 4,
-            title: "Nintendo eShop $20",
-            price: "18.99",
-            originalPrice: "20.00",
-            discount: 5,
-            platform: "Nintendo",
-            rating: 4.6,
-            category: "Console Gaming",
-            availability: "In Stock",
-        },
-        {
-            id: 5,
-            title: "Epic Games Store $15",
-            price: "13.99",
-            originalPrice: "15.00",
-            discount: 7,
-            platform: "Epic Games",
-            rating: 4.5,
-            category: "PC Gaming",
-            availability: "In Stock",
-        },
-        {
-            id: 6,
-            title: "Google Play $10",
-            price: "9.49",
-            originalPrice: "10.00",
-            discount: 5,
-            platform: "Google Play",
-            rating: 4.4,
-            category: "Mobile Gaming",
-            availability: "In Stock",
-        },
-    ];
+export default function ProductsPage({ products = [], activeCategory = null }) {
+    const { categories = [] } = usePage().props;
 
     return (
         <div className="min-h-screen">
@@ -94,10 +28,17 @@ export default function ProductsPage() {
                     </div>
 
                     <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             <span className="text-sm text-muted-foreground">
                                 Showing {products.length} results
                             </span>
+                            {activeCategory && (
+                                <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full">
+                                    {categories.find(
+                                        (c) => c.id === activeCategory
+                                    )?.name || "Selected"}
+                                </span>
+                            )}
                         </div>
                         <ProductSort />
                     </div>
@@ -117,7 +58,14 @@ export default function ProductsPage() {
                             {products.map((product) => (
                                 <VoucherCard
                                     key={product.id}
-                                    {...product}
+                                    title={product.title}
+                                    price={product.price}
+                                    originalPrice={product.original_price}
+                                    platform={
+                                        categories.find(
+                                            (c) => c.id === product.category_id
+                                        )?.name || ""
+                                    }
                                     onClick={() =>
                                         (window.location.href = `/products/${product.id}`)
                                     }
