@@ -57,4 +57,9 @@ class Product extends Model
         // Always count available codes directly from the database
         return $this->codes()->where('status', 'available')->count();
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

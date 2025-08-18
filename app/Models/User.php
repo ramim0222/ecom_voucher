@@ -84,5 +84,8 @@ class User extends Authenticatable
         return $this->status === 'active';
     }
 
-
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
+use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,11 @@ Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
 
 Route::get('/products', [FrontProductController::class, 'products'])->name('products');
 Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('product');
+
+// Review routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+});
 
 
 

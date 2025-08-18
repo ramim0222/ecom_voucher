@@ -5,7 +5,12 @@ import { ProductTabs } from "@/Components/Product/ProductTabs";
 import { RelatedProducts } from "@/Components/Product/RelatedProducts";
 import { Link } from "@inertiajs/react";
 
-export default function ProductDetailsPage({ product, auth }) {
+export default function ProductDetailsPage({
+    product,
+    auth,
+    reviews,
+    userHasReviewed,
+}) {
     const [quantity, setQuantity] = useState(1);
 
     // Debug: Log product data to console
@@ -215,7 +220,12 @@ export default function ProductDetailsPage({ product, auth }) {
                 </div>
 
                 {/* Product Tabs */}
-                <ProductTabs product={product} auth={auth} />
+                <ProductTabs
+                    product={product}
+                    auth={auth}
+                    reviews={reviews}
+                    userHasReviewed={userHasReviewed}
+                />
 
                 {/* Related Products */}
                 <RelatedProducts currentProductId={product.id} />

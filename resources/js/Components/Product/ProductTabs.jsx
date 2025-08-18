@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ProductReviews } from "./ProductReviews";
 import { ProductFeatures } from "./ProductFeatures";
 
-export function ProductTabs({ product, auth }) {
+export function ProductTabs({ product, auth, reviews, userHasReviewed }) {
     const [activeTab, setActiveTab] = useState("description");
 
     return (
@@ -36,7 +36,7 @@ export function ProductTabs({ product, auth }) {
                             : "border-transparent text-muted-foreground hover:text-foreground"
                     } font-medium`}
                 >
-                    Reviews ({product.reviews})
+                    Reviews ({product.reviews_count || 0})
                 </button>
             </div>
 
@@ -53,7 +53,12 @@ export function ProductTabs({ product, auth }) {
                         </div>
                     </>
                 ) : activeTab === "reviews" ? (
-                    <ProductReviews product={product} auth={auth} />
+                    <ProductReviews
+                        product={product}
+                        auth={auth}
+                        reviews={reviews}
+                        userHasReviewed={userHasReviewed}
+                    />
                 ) : activeTab === "features" ? (
                     <ProductFeatures product={product} />
                 ) : null}

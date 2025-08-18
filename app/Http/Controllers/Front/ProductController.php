@@ -32,7 +32,7 @@ class ProductController extends Controller
 
     public function product($id)
     {
-        $product = Product::with('category')->find($id);
+        $product = Product::with(['category', 'reviews.user'])->find($id);
 
         if (!$product) {
             abort(404);
@@ -43,14 +43,42 @@ class ProductController extends Controller
             $product->features = [];
         }
 
-        // Add reviews count (placeholder for now)
-        $product->reviews = 0;
+        // Get approved reviews with user information
+        $approvedReviews = $product->reviews()
+            ->where('status', 'approved')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'user' => $review->user->full_name,
+                    'rating' => $review->rating,
+                    'comment' => $review->review,
+                    'date' => $review->created_at->format('Y-m-d'),
+                    'avatar' => '/placeholder-user.jpg', // You can add user avatars later
+                ];
+            });
+
+        // Calculate review statistics
+        $reviewsCount = $approvedReviews->count();
+        $averageRating = $reviewsCount > 0 ? $approvedReviews->avg('rating') : 0;
+
+        // Add computed review data to product
+        $product->reviews_count = $reviewsCount;
+        $product->average_rating = round($averageRating, 1);
+
+        // Check if current user has already reviewed this product
+        $userHasReviewed = auth()->check() ?
+            $product->reviews()->where('user_id', auth()->id())->exists() : false;
 
         // The stock is automatically calculated via the getStockAttribute() accessor in the Product model
         // and is included in JSON via the $appends array
 
         return Inertia::render('Product/Page', [
             'product' => $product,
+            'reviews' => $approvedReviews,
+            'userHasReviewed' => $userHasReviewed,
         ]);
     }
 }
