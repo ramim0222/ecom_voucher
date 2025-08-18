@@ -49,7 +49,11 @@ export default function HomePage() {
                         access to your favorite gaming platforms.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <GamingButton variant="accent" size="lg">
+                        <GamingButton
+                            variant="accent"
+                            size="lg"
+                            onClick={() => (window.location.href = "/products")}
+                        >
                             Explore Vouchers
                         </GamingButton>
                         <GamingButton variant="secondary" size="lg">
