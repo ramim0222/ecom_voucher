@@ -3,7 +3,7 @@ import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductTabs } from "@/Components/Product/ProductTabs";
 import { RelatedProducts } from "@/Components/Product/RelatedProducts";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 
 export default function ProductDetailsPage({
     product,
@@ -12,6 +12,7 @@ export default function ProductDetailsPage({
     userHasReviewed,
 }) {
     const [quantity, setQuantity] = useState(1);
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
 
     // Debug: Log product data to console
     console.log("Product data:", product);
@@ -25,6 +26,47 @@ export default function ProductDetailsPage({
                   100
           )
         : 0;
+
+    const addToCart = () => {
+        // Check if user is authenticated
+        if (!auth.user) {
+            router.visit("/login");
+            return;
+        }
+
+        // Check if product is in stock
+        if ((product.stock || 0) === 0) {
+            alert("This product is out of stock.");
+            return;
+        }
+
+        // Check if requested quantity is available
+        if (quantity > (product.stock || 0)) {
+            alert(`Only ${product.stock} items available in stock.`);
+            return;
+        }
+
+        setIsAddingToCart(true);
+
+        router.post(
+            "/cart/add",
+            {
+                product_id: product.id,
+                quantity: quantity,
+            },
+            {
+                onSuccess: () => {
+                    alert("Product added to cart successfully!");
+                    setIsAddingToCart(false);
+                },
+                onError: (errors) => {
+                    console.error("Failed to add to cart:", errors);
+                    alert("Failed to add product to cart. Please try again.");
+                    setIsAddingToCart(false);
+                },
+            }
+        );
+    };
 
     return (
         <div className="min-h-screen">
@@ -209,14 +251,22 @@ export default function ProductDetailsPage({
                                     variant="accent"
                                     size="lg"
                                     className="flex-1"
-                                    disabled={(product.stock || 0) === 0}
+                                    disabled={
+                                        (product.stock || 0) === 0 ||
+                                        isAddingToCart
+                                    }
+                                    onClick={addToCart}
                                 >
-                                    {(product.stock || 0) === 0
+                                    {isAddingToCart
+                                        ? "Adding to Cart..."
+                                        : (product.stock || 0) === 0
                                         ? "Out of Stock"
-                                        : `Add to Cart - $${(
+                                        : auth.user
+                                        ? `Add to Cart - $${(
                                               parseFloat(product.price) *
                                               quantity
-                                          ).toFixed(2)}`}
+                                          ).toFixed(2)}`
+                                        : "Login to Add to Cart"}
                                 </GamingButton>
                                 <GamingButton variant="ghost" size="lg">
                                     ♡

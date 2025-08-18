@@ -88,13 +88,19 @@ export function Header() {
                                 🔍
                             </button>
                         </div>
+                        {/* Cart */}
 
-                        <button className="relative p-2 hover:bg-muted rounded-lg transition-colors">
-                            <span className="text-xl">🛒</span>
-                            <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                0
-                            </span>
-                        </button>
+                        {isAuthenticated && (
+                            <Link
+                                href={route("cart")}
+                                className="relative p-2 hover:bg-muted rounded-lg transition-colors"
+                            >
+                                <span className="text-xl">🛒</span>
+                                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                    0
+                                </span>
+                            </Link>
+                        )}
 
                         {isAuthenticated ? (
                             <GamingButton

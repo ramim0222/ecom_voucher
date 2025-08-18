@@ -2,7 +2,7 @@
 
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export function CartSummary({ subtotal, tax, total, itemCount }) {
+export function CartSummary({ subtotal, total, itemCount }) {
     return (
         <div className="glass-card rounded-xl p-6 sticky top-24">
             <h2 className="font-heading font-semibold text-xl mb-6">
@@ -13,10 +13,6 @@ export function CartSummary({ subtotal, tax, total, itemCount }) {
                 <div className="flex justify-between">
                     <span>Subtotal ({itemCount} items)</span>
                     <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span>Tax</span>
-                    <span>${tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Shipping</span>

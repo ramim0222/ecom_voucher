@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
+use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -14,7 +15,7 @@ use App\Http\Controllers\Front\IndexController;
 
 Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 
-Route::get('/cart', [IndexController::class, 'cart'])->name('cart');
+
 
 Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
 
@@ -25,8 +26,11 @@ Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('
 
 // Review routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
 });
+
+// Public cart add route (handles authentication redirect internally)
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 
 
 
@@ -58,6 +62,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
         Route::put('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+        Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::get('/cart', [CartController::class, 'cart'])->name('cart');
+        Route::patch('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
+        Route::delete('/cart/{cart}', [CartController::class, 'remove'])->name('cart.remove');
+        Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
         Route::get('/dashboard/orders', function () {
             return Inertia::render('Dashboard/Orders');

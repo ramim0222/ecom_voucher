@@ -1,64 +1,99 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { CartItem } from "@/Components/Cart/CartItem";
 import { CartSummary } from "@/Components/Cart/CartSummary";
+import { router, usePage } from "@inertiajs/react";
 
-export default function CartPage() {
-    const [cartItems, setCartItems] = useState([
-        {
-            id: 1,
-            title: "Steam Wallet $50",
-            price: 45.99,
-            originalPrice: 50.0,
-            platform: "Steam",
-            image: "/steam-voucher-card.png",
-            quantity: 1,
-        },
-        {
-            id: 2,
-            title: "PlayStation Store $25",
-            price: 22.99,
-            originalPrice: 25.0,
-            platform: "PlayStation",
-            image: "/playstation-voucher-card.png",
-            quantity: 2,
-        },
-        {
-            id: 3,
-            title: "Xbox Game Pass 3 Months",
-            price: 29.99,
-            originalPrice: 35.99,
-            platform: "Xbox",
-            image: "/placeholder-x1i2i.png",
-            quantity: 1,
-        },
-    ]);
+export default function CartPage({ cartItems: initialCartItems = [] }) {
+    const { props } = usePage();
+    const { flash } = props;
+    const [cartItems, setCartItems] = useState(initialCartItems);
+
+    // Update local state when props change
+    useEffect(() => {
+        setCartItems(initialCartItems);
+    }, [initialCartItems]);
+
+    // Show flash messages
+    useEffect(() => {
+        if (flash?.success) {
+            // You can implement a better toast/notification system here
+            console.log("Success:", flash.success);
+        }
+        if (flash?.error) {
+            alert("Error: " + flash.error);
+        }
+    }, [flash]);
 
     const updateQuantity = (id, newQuantity) => {
         if (newQuantity === 0) {
-            setCartItems(cartItems.filter((item) => item.id !== id));
-        } else {
-            setCartItems(
-                cartItems.map((item) =>
-                    item.id === id ? { ...item, quantity: newQuantity } : item
-                )
-            );
+            removeItem(id);
+            return;
         }
+
+        // Check stock before updating
+        const item = cartItems.find((item) => item.id === id);
+        if (item && newQuantity > item.stock) {
+            alert(`Only ${item.stock} items available in stock.`);
+            return;
+        }
+
+        // Optimistic update - update UI immediately
+        setCartItems(
+            cartItems.map((item) =>
+                item.id === id ? { ...item, quantity: newQuantity } : item
+            )
+        );
+
+        // Send request to server
+        router.patch(
+            `/cart/${id}`,
+            { quantity: newQuantity },
+            {
+                onError: () => {
+                    // Revert on error and reload fresh data
+                    router.reload({ only: ["cartItems"] });
+                },
+            }
+        );
     };
 
     const removeItem = (id) => {
+        // Optimistic update - remove item immediately
         setCartItems(cartItems.filter((item) => item.id !== id));
+
+        // Send request to server
+        router.delete(`/cart/${id}`, {
+            onError: () => {
+                // Revert on error and reload fresh data
+                router.reload({ only: ["cartItems"] });
+            },
+        });
+    };
+
+    const clearCart = () => {
+        if (confirm("Are you sure you want to clear your cart?")) {
+            // Optimistic update - clear items immediately
+            setCartItems([]);
+
+            // Send request to server
+            router.delete("/cart", {
+                onError: () => {
+                    // Revert on error and reload fresh data
+                    router.reload({ only: ["cartItems"] });
+                },
+            });
+        }
     };
 
     const subtotal = cartItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
     );
-    const tax = subtotal * 0.08; // 8% tax
-    const total = subtotal + tax;
+    const total = subtotal;
 
     if (cartItems.length === 0) {
         return (
@@ -124,7 +159,11 @@ export default function CartPage() {
                             >
                                 Continue Shopping
                             </GamingButton>
-                            <GamingButton variant="secondary" size="lg">
+                            <GamingButton
+                                variant="secondary"
+                                size="lg"
+                                onClick={clearCart}
+                            >
                                 Clear Cart
                             </GamingButton>
                         </div>
@@ -134,7 +173,6 @@ export default function CartPage() {
                     <div className="lg:col-span-1">
                         <CartSummary
                             subtotal={subtotal}
-                            tax={tax}
                             total={total}
                             itemCount={cartItems.length}
                         />

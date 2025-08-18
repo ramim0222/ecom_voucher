@@ -26,6 +26,11 @@ export function CartItem({ item, onUpdateQuantity, onRemove }) {
                             <p className="text-sm text-muted-foreground">
                                 {item.platform}
                             </p>
+                            {item.stock && item.stock < 10 && (
+                                <p className="text-xs text-orange-500">
+                                    Only {item.stock} left in stock
+                                </p>
+                            )}
                         </div>
                         <button
                             onClick={() => onRemove(item.id)}
@@ -67,6 +72,9 @@ export function CartItem({ item, onUpdateQuantity, onRemove }) {
                                             item.quantity + 1
                                         )
                                     }
+                                    disabled={
+                                        item.quantity >= (item.stock || 0)
+                                    }
                                     className="w-8 h-8 p-0"
                                 >
                                     +
@@ -75,13 +83,17 @@ export function CartItem({ item, onUpdateQuantity, onRemove }) {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {item.originalPrice && (
-                                <span className="text-sm text-muted-foreground line-through">
-                                    ${item.originalPrice.toFixed(2)}
-                                </span>
-                            )}
+                            {item.originalPrice &&
+                                typeof item.originalPrice === "number" && (
+                                    <span className="text-sm text-muted-foreground line-through">
+                                        ${item.originalPrice.toFixed(2)}
+                                    </span>
+                                )}
                             <span className="text-xl font-bold text-accent">
-                                ${(item.price * item.quantity).toFixed(2)}
+                                $
+                                {(
+                                    (item.price || 0) * (item.quantity || 1)
+                                ).toFixed(2)}
                             </span>
                         </div>
                     </div>
