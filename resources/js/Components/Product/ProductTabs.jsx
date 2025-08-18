@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ProductReviews } from "./ProductReviews";
+import { ProductFeatures } from "./ProductFeatures";
 
 export function ProductTabs({ product, auth }) {
     const [activeTab, setActiveTab] = useState("description");
@@ -16,6 +17,16 @@ export function ProductTabs({ product, auth }) {
                     } font-medium`}
                 >
                     Description
+                </button>
+                <button
+                    onClick={() => setActiveTab("features")}
+                    className={`px-4 py-2 border-b-2 transition-colors ${
+                        activeTab === "features"
+                            ? "border-accent text-accent"
+                            : "border-transparent text-muted-foreground hover:text-foreground"
+                    } font-medium`}
+                >
+                    Features
                 </button>
                 <button
                     onClick={() => setActiveTab("reviews")}
@@ -40,35 +51,12 @@ export function ProductTabs({ product, auth }) {
                                 {product.description}
                             </p>
                         </div>
-
-                        {product.features &&
-                            Array.isArray(product.features) &&
-                            product.features.length > 0 && (
-                                <div>
-                                    <h4 className="font-medium mb-3">
-                                        What's Included:
-                                    </h4>
-                                    <ul className="space-y-2">
-                                        {product.features.map(
-                                            (feature, index) => (
-                                                <li
-                                                    key={index}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
-                                                    <span className="text-sm">
-                                                        {feature}
-                                                    </span>
-                                                </li>
-                                            )
-                                        )}
-                                    </ul>
-                                </div>
-                            )}
                     </>
-                ) : (
+                ) : activeTab === "reviews" ? (
                     <ProductReviews product={product} auth={auth} />
-                )}
+                ) : activeTab === "features" ? (
+                    <ProductFeatures product={product} />
+                ) : null}
             </div>
         </div>
     );

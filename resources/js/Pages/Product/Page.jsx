@@ -65,7 +65,7 @@ export default function ProductDetailsPage({ product, auth }) {
                         <div>
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="bg-primary/20 text-primary px-2 py-1 rounded text-sm font-medium">
-                                    {product.category.title}
+                                    {product.category.name}
                                 </span>
                                 {product.is_featured && (
                                     <span className="bg-accent/20 text-accent px-2 py-1 rounded text-sm font-medium">
