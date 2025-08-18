@@ -2,12 +2,13 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Front\IndexController;
+use App\Http\Controllers\Front\ProductController as FrontProductController;
 
 Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 
@@ -17,8 +18,8 @@ Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
 
 
 
-Route::get('/products', [IndexController::class, 'products'])->name('products');
-Route::get('/products/{id}', [IndexController::class, 'product'])->name('product');
+Route::get('/products', [FrontProductController::class, 'products'])->name('products');
+Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('product');
 
 
 
@@ -85,13 +86,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/users/{id}', [UserController::class, 'show'])->name('admin.users.show');
         Route::patch('/admin/users/{id}/status', [UserController::class, 'updateStatus'])->name('admin.users.update-status');
 
-        Route::get('/admin/products', [ProductController::class, 'index'])->name('admin.products.index');
-        Route::post('/admin/products', [ProductController::class, 'store'])->name('admin.products.store');
-        Route::put('/admin/products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
-        Route::delete('/admin/products/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
-        Route::post('/admin/products/{product}/codes', [ProductController::class, 'uploadCodes'])->name('admin.products.codes.upload');
-        Route::get('/admin/products/{product}/codes', [ProductController::class, 'getCodes'])->name('admin.products.codes.get');
-        Route::post('/admin/products/{product}/codes/bulk-delete', [ProductController::class, 'bulkDeleteCodes'])->name('admin.products.codes.bulk-delete');
+        Route::get('/admin/products', [AdminProductController::class, 'index'])->name('admin.products.index');
+        Route::post('/admin/products', [AdminProductController::class, 'store'])->name('admin.products.store');
+        Route::put('/admin/products/{product}', [AdminProductController::class, 'update'])->name('admin.products.update');
+        Route::delete('/admin/products/{product}', [AdminProductController::class, 'destroy'])->name('admin.products.destroy');
+        Route::post('/admin/products/{product}/codes', [AdminProductController::class, 'uploadCodes'])->name('admin.products.codes.upload');
+        Route::get('/admin/products/{product}/codes', [AdminProductController::class, 'getCodes'])->name('admin.products.codes.get');
+        Route::post('/admin/products/{product}/codes/bulk-delete', [AdminProductController::class, 'bulkDeleteCodes'])->name('admin.products.codes.bulk-delete');
 
         Route::get('/admin/orders', function () {
             return Inertia::render('Admin/Orders/Index');
