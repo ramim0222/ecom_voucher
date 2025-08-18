@@ -19,6 +19,7 @@ class ProductController extends Controller
         }
 
         $products = $query
+            ->with('codes')
             ->orderBy('sort_order')
             ->orderByDesc('id')
             ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image']);
@@ -31,6 +32,25 @@ class ProductController extends Controller
 
     public function product($id)
     {
-        return Inertia::render('Product/Page', ['id' => $id]);
+        $product = Product::with('category')->find($id);
+
+        if (!$product) {
+            abort(404);
+        }
+
+        // Ensure features is an array (casting handles this automatically)
+        if (!$product->features) {
+            $product->features = [];
+        }
+
+        // Add reviews count (placeholder for now)
+        $product->reviews = 0;
+
+        // The stock is automatically calculated via the getStockAttribute() accessor in the Product model
+        // and is included in JSON via the $appends array
+
+        return Inertia::render('Product/Page', [
+            'product' => $product,
+        ]);
     }
 }

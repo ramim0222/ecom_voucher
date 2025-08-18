@@ -61,6 +61,22 @@ export default function ProductsPage({ products = [], activeCategory = null }) {
                                     title={product.title}
                                     price={product.price}
                                     originalPrice={product.original_price}
+                                    discount={
+                                        product.original_price &&
+                                        product.original_price > product.price
+                                            ? Math.round(
+                                                  ((product.original_price -
+                                                      product.price) /
+                                                      product.original_price) *
+                                                      100
+                                              )
+                                            : null
+                                    }
+                                    image={
+                                        product.product_image
+                                            ? `/storage/${product.product_image}`
+                                            : null
+                                    }
                                     platform={
                                         categories.find(
                                             (c) => c.id === product.category_id

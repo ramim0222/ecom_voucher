@@ -3,38 +3,23 @@ import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductTabs } from "@/Components/Product/ProductTabs";
 import { RelatedProducts } from "@/Components/Product/RelatedProducts";
+import { Link } from "@inertiajs/react";
 
-export default function ProductDetailsPage({ id, auth }) {
+export default function ProductDetailsPage({ product, auth }) {
     const [quantity, setQuantity] = useState(1);
 
-    const product = {
-        id: id,
-        title: "Steam Wallet $50",
-        price: "45.99",
-        originalPrice: "50.00",
-        discount: 8,
-        platform: "Steam",
-        rating: 4.8,
-        reviews: 1247,
-        category: "PC Gaming",
-        availability: "In Stock",
-        stock: 25, // Available quantity
-        deliveryTime: "Instant",
-        description:
-            "Add funds to your Steam Wallet and enjoy thousands of games available on the Steam platform. Perfect for purchasing games, DLC, and in-game items.",
-        features: [
-            "Instant digital delivery",
-            "No expiration date",
-            "Works worldwide",
-            "24/7 customer support",
-        ],
-        howToRedeem: [
-            "Log into your Steam account",
-            "Go to 'Account Details'",
-            "Click 'Add funds to your Steam Wallet'",
-            "Enter the code and click 'Continue'",
-        ],
-    };
+    // Debug: Log product data to console
+    console.log("Product data:", product);
+    console.log("Product stock:", product.stock);
+    console.log("Product stock type:", typeof product.stock);
+
+    const discount = product.original_price
+        ? Math.round(
+              ((product.original_price - product.price) /
+                  product.original_price) *
+                  100
+          )
+        : 0;
 
     return (
         <div className="min-h-screen">
@@ -43,13 +28,16 @@ export default function ProductDetailsPage({ id, auth }) {
             {/* Breadcrumb */}
             <div className="container mx-auto px-4 py-4">
                 <nav className="text-sm text-muted-foreground">
-                    <a href="/" className="hover:text-accent">
+                    <Link href={route("welcome")} className="hover:text-accent">
                         Home
-                    </a>
+                    </Link>
                     <span className="mx-2">/</span>
-                    <a href="/products" className="hover:text-accent">
+                    <Link
+                        href={route("products")}
+                        className="hover:text-accent"
+                    >
                         Products
-                    </a>
+                    </Link>
                     <span className="mx-2">/</span>
                     <span className="text-foreground">{product.title}</span>
                 </nav>
@@ -61,7 +49,11 @@ export default function ProductDetailsPage({ id, auth }) {
                     <div className="space-y-4">
                         <div className="glass-card rounded-xl p-4">
                             <img
-                                src={`/abstract-geometric-shapes.png?height=400&width=600&query=${product.title} voucher card`}
+                                src={
+                                    product.product_image
+                                        ? `/storage/${product.product_image}`
+                                        : "/placeholder.jpg"
+                                }
                                 alt={product.title}
                                 className="w-full h-96 object-cover rounded-lg"
                             />
@@ -73,8 +65,13 @@ export default function ProductDetailsPage({ id, auth }) {
                         <div>
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="bg-primary/20 text-primary px-2 py-1 rounded text-sm font-medium">
-                                    {product.platform}
+                                    {product.category.title}
                                 </span>
+                                {product.is_featured && (
+                                    <span className="bg-accent/20 text-accent px-2 py-1 rounded text-sm font-medium">
+                                        ⭐ Featured
+                                    </span>
+                                )}
                             </div>
 
                             <h1 className="font-heading font-bold text-3xl md:text-4xl mb-4">
@@ -83,7 +80,7 @@ export default function ProductDetailsPage({ id, auth }) {
 
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="flex items-center gap-1">
-                                    <div className="flex text-accent">
+                                    {/* <div className="flex text-accent">
                                         {[...Array(5)].map((_, i) => (
                                             <span
                                                 key={i}
@@ -97,11 +94,11 @@ export default function ProductDetailsPage({ id, auth }) {
                                                 ★
                                             </span>
                                         ))}
-                                    </div>
-                                    <span className="text-sm text-muted-foreground ml-1">
+                                    </div> */}
+                                    {/* <span className="text-sm text-muted-foreground ml-1">
                                         ({product.rating}) • {product.reviews}{" "}
                                         reviews
-                                    </span>
+                                    </span> */}
                                 </div>
                             </div>
                         </div>
@@ -111,29 +108,47 @@ export default function ProductDetailsPage({ id, auth }) {
                                 <span className="text-3xl font-bold text-accent">
                                     ${product.price}
                                 </span>
-                                {product.originalPrice && (
-                                    <span className="text-xl text-muted-foreground line-through">
-                                        ${product.originalPrice}
-                                    </span>
-                                )}
-                                {product.discount && (
+                                {product.original_price &&
+                                    product.original_price > product.price && (
+                                        <span className="text-xl text-muted-foreground line-through">
+                                            ${product.original_price}
+                                        </span>
+                                    )}
+                                {discount > 0 && (
                                     <span className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm font-semibold">
-                                        Save {product.discount}%
+                                        Save {discount}%
                                     </span>
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-                                <span className="text-sm font-medium">
-                                    {product.availability}
-                                </span>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <span
+                                        className={`w-3 h-3 rounded-full ${
+                                            product.stock > 0
+                                                ? "bg-green-500"
+                                                : "bg-red-500"
+                                        }`}
+                                    ></span>
+                                    <span className="text-sm font-medium">
+                                        {product.stock > 0
+                                            ? "In Stock"
+                                            : "Out of Stock"}
+                                    </span>
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                    <span className="font-medium">
+                                        {product.stock}
+                                    </span>{" "}
+                                    codes available
+                                </div>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             {/* Quantity Selector */}
-                            {product.stock > 0 && (
+                            {(product.stock > 0 ||
+                                true) /* Temporarily always show for debugging */ && (
                                 <div className="flex items-center gap-4">
                                     <label className="text-sm font-medium">
                                         Quantity:
@@ -163,13 +178,16 @@ export default function ProductDetailsPage({ id, auth }) {
                                                 )
                                             }
                                             className="px-3 py-2 hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                            disabled={quantity >= product.stock}
+                                            disabled={
+                                                quantity >=
+                                                (product.stock || 10)
+                                            }
                                         >
                                             +
                                         </button>
                                     </div>
                                     <span className="text-sm text-muted-foreground">
-                                        {product.stock} available
+                                        {product.stock || 0} available
                                     </span>
                                 </div>
                             )}
@@ -179,9 +197,9 @@ export default function ProductDetailsPage({ id, auth }) {
                                     variant="accent"
                                     size="lg"
                                     className="flex-1"
-                                    disabled={product.stock === 0}
+                                    disabled={(product.stock || 0) === 0}
                                 >
-                                    {product.stock === 0
+                                    {(product.stock || 0) === 0
                                         ? "Out of Stock"
                                         : `Add to Cart - $${(
                                               parseFloat(product.price) *

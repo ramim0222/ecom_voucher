@@ -53,6 +53,13 @@ export default function AdminProducts({ products = [], categories = [] }) {
         formData.append("is_featured", productData.is_featured ? "1" : "0");
         formData.append("sort_order", productData.sort_order || "0");
 
+        // Handle features array
+        if (productData.features && Array.isArray(productData.features)) {
+            productData.features.forEach((feature, index) => {
+                formData.append(`features[${index}]`, feature);
+            });
+        }
+
         // Handle file upload
         if (productData.product_image) {
             formData.append("product_image", productData.product_image);

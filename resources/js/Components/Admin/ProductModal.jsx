@@ -17,6 +17,7 @@ export function ProductModal({
         original_price: "",
         buying_price: "",
         description: "",
+        features: "",
         status: "active",
         is_featured: false,
         sort_order: "",
@@ -32,6 +33,9 @@ export function ProductModal({
                 original_price: product.original_price?.toString() || "",
                 buying_price: product.buying_price?.toString() || "",
                 description: product.description || "",
+                features: Array.isArray(product.features)
+                    ? product.features.join("\n")
+                    : "",
                 status: product.status || "active",
                 is_featured: product.is_featured || false,
                 sort_order: product.sort_order?.toString() || "",
@@ -45,6 +49,7 @@ export function ProductModal({
                 original_price: "",
                 buying_price: "",
                 description: "",
+                features: "",
                 status: "active",
                 is_featured: false,
                 sort_order: "",
@@ -56,9 +61,17 @@ export function ProductModal({
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Pass the raw form data to the parent component
-        // The parent will handle FormData creation
-        onSave(formData);
+        // Convert features string to array
+        const featuresArray = formData.features
+            .split("\n")
+            .map((feature) => feature.trim())
+            .filter((feature) => feature.length > 0);
+
+        // Pass the processed form data to the parent component
+        onSave({
+            ...formData,
+            features: featuresArray,
+        });
     };
 
     if (!isOpen) return null;
@@ -246,6 +259,27 @@ export function ProductModal({
                                 })
                             }
                             rows={4}
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2 text-slate-300">
+                            Features{" "}
+                            <span className="text-slate-500">
+                                (one per line)
+                            </span>
+                        </label>
+                        <textarea
+                            value={formData.features}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    features: e.target.value,
+                                })
+                            }
+                            rows={4}
+                            placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
                             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
                     </div>

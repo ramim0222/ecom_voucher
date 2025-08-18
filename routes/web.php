@@ -3,12 +3,12 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Front\IndexController;
-use App\Http\Controllers\Front\ProductController as FrontProductController;
 
 Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 

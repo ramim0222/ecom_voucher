@@ -19,6 +19,8 @@ class ProductController extends Controller
             // Calculate total_codes and sold_codes dynamically
             $product->total_codes = $product->codes->count();
             $product->sold_codes = $product->codes->where('status', 'sold')->count();
+            // Ensure stock attribute is available (it's auto-calculated via accessor)
+            $product->append('stock');
             return $product;
         });
         $categories = Category::where('status', 'active')->get();
@@ -53,8 +55,6 @@ class ProductController extends Controller
             'original_price' => $request->original_price,
             'buying_price' => $request->buying_price,
             'description' => $request->description,
-            'total_codes' => 0,
-            'sold_codes' => 0,
             'features' => $request->features ? json_encode($request->features) : null,
             'is_featured' => $request->boolean('is_featured'),
             'sort_order' => $request->sort_order ?? 0,
@@ -97,8 +97,6 @@ class ProductController extends Controller
             'original_price' => $request->original_price,
             'buying_price' => $request->buying_price,
             'description' => $request->description,
-            'total_codes' => 0,
-            'sold_codes' => 0,
             'features' => $request->features ? json_encode($request->features) : null,
             'is_featured' => $request->boolean('is_featured'),
             'sort_order' => $request->sort_order ?? 0,

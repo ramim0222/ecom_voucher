@@ -41,24 +41,30 @@ export function ProductTabs({ product, auth }) {
                             </p>
                         </div>
 
-                        <div>
-                            <h4 className="font-medium mb-3">
-                                What's Included:
-                            </h4>
-                            <ul className="space-y-2">
-                                {product.features.map((feature, index) => (
-                                    <li
-                                        key={index}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
-                                        <span className="text-sm">
-                                            {feature}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        {product.features &&
+                            Array.isArray(product.features) &&
+                            product.features.length > 0 && (
+                                <div>
+                                    <h4 className="font-medium mb-3">
+                                        What's Included:
+                                    </h4>
+                                    <ul className="space-y-2">
+                                        {product.features.map(
+                                            (feature, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="flex items-center gap-2"
+                                                >
+                                                    <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
+                                                    <span className="text-sm">
+                                                        {feature}
+                                                    </span>
+                                                </li>
+                                            )
+                                        )}
+                                    </ul>
+                                </div>
+                            )}
                     </>
                 ) : (
                     <ProductReviews product={product} auth={auth} />
