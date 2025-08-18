@@ -83,29 +83,36 @@ export default function ProductDetailsPage({
                                 {product.title}
                             </h1>
 
-                            <div className="flex items-center gap-4 mb-4">
-                                <div className="flex items-center gap-1">
-                                    {/* <div className="flex text-accent">
-                                        {[...Array(5)].map((_, i) => (
-                                            <span
-                                                key={i}
-                                                className={
-                                                    i <
-                                                    Math.floor(product.rating)
-                                                        ? "text-accent"
-                                                        : "text-muted"
-                                                }
-                                            >
-                                                ★
-                                            </span>
-                                        ))}
-                                    </div> */}
-                                    {/* <span className="text-sm text-muted-foreground ml-1">
-                                        ({product.rating}) • {product.reviews}{" "}
-                                        reviews
-                                    </span> */}
+                            {product.average_rating > 0 && (
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="flex items-center gap-1">
+                                        <div className="flex text-accent">
+                                            {[...Array(5)].map((_, i) => (
+                                                <span
+                                                    key={i}
+                                                    className={
+                                                        i <
+                                                        Math.floor(
+                                                            product.average_rating
+                                                        )
+                                                            ? "text-accent"
+                                                            : "text-muted-foreground/30"
+                                                    }
+                                                >
+                                                    ★
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <span className="text-sm text-muted-foreground ml-1">
+                                            ({product.average_rating}) •{" "}
+                                            {product.reviews_count} review
+                                            {product.reviews_count !== 1
+                                                ? "s"
+                                                : ""}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         <div className="space-y-4">

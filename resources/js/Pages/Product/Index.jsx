@@ -82,6 +82,8 @@ export default function ProductsPage({ products = [], activeCategory = null }) {
                                             (c) => c.id === product.category_id
                                         )?.name || ""
                                     }
+                                    rating={product.average_rating}
+                                    reviewsCount={product.reviews_count}
                                     onClick={() =>
                                         (window.location.href = `/products/${product.id}`)
                                     }

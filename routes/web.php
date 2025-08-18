@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\ProfileController;
@@ -114,9 +115,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
 
-        Route::get('/admin/reviews', function () {
-            return Inertia::render('Admin/Reviews');
-        })->name('admin.reviews');
+        Route::get('/admin/reviews', [AdminReviewController::class, 'index'])->name('admin.reviews');
+        Route::patch('/admin/reviews/{review}/status', [AdminReviewController::class, 'updateStatus'])->name('admin.reviews.update-status');
+        Route::delete('/admin/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 
     });
 });

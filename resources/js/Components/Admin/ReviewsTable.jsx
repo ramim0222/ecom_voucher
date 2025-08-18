@@ -2,7 +2,7 @@
 
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export function ReviewsTable({ reviews, onToggleStatus, onDelete }) {
+export function ReviewsTable({ reviews, onApprove, onReject, onDelete }) {
     const renderStars = (rating) => {
         const max = 5;
         return (
@@ -91,18 +91,21 @@ export function ReviewsTable({ reviews, onToggleStatus, onDelete }) {
                                     </div>
                                 </td>
                                 <td className="py-4 px-4">
-                                    <button
-                                        onClick={() => onToggleStatus(review)}
+                                    <span
                                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            review.status === "active"
+                                            review.status === "approved"
                                                 ? "bg-green-500/20 text-green-300"
-                                                : "bg-gray-500/20 text-gray-300"
+                                                : review.status === "pending"
+                                                ? "bg-yellow-500/20 text-yellow-300"
+                                                : "bg-red-500/20 text-red-300"
                                         }`}
                                     >
-                                        {review.status === "active"
-                                            ? "Active"
-                                            : "Inactive"}
-                                    </button>
+                                        {review.status === "approved"
+                                            ? "Approved"
+                                            : review.status === "pending"
+                                            ? "Pending"
+                                            : "Rejected"}
+                                    </span>
                                 </td>
                                 <td className="py-4 px-4 text-slate-400 text-sm whitespace-nowrap">
                                     {new Date(
@@ -110,10 +113,56 @@ export function ReviewsTable({ reviews, onToggleStatus, onDelete }) {
                                     ).toLocaleDateString()}
                                 </td>
                                 <td className="py-4 px-4">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
+                                        {review.status === "pending" && (
+                                            <>
+                                                <GamingButton
+                                                    onClick={() =>
+                                                        onApprove(review)
+                                                    }
+                                                    className="text-green-400 hover:text-green-300 transition-colors p-1"
+                                                    variant="ghost"
+                                                    title="Approve review"
+                                                >
+                                                    ✓
+                                                </GamingButton>
+                                                <GamingButton
+                                                    onClick={() =>
+                                                        onReject(review)
+                                                    }
+                                                    className="text-red-400 hover:text-red-300 transition-colors p-1"
+                                                    variant="ghost"
+                                                    title="Reject review"
+                                                >
+                                                    ✗
+                                                </GamingButton>
+                                            </>
+                                        )}
+                                        {review.status === "approved" && (
+                                            <GamingButton
+                                                onClick={() => onReject(review)}
+                                                className="text-red-400 hover:text-red-300 transition-colors p-1"
+                                                variant="ghost"
+                                                title="Reject review"
+                                            >
+                                                ✗
+                                            </GamingButton>
+                                        )}
+                                        {review.status === "rejected" && (
+                                            <GamingButton
+                                                onClick={() =>
+                                                    onApprove(review)
+                                                }
+                                                className="text-green-400 hover:text-green-300 transition-colors p-1"
+                                                variant="ghost"
+                                                title="Approve review"
+                                            >
+                                                ✓
+                                            </GamingButton>
+                                        )}
                                         <GamingButton
                                             onClick={() => onDelete(review)}
-                                            className="text-red-400 hover:text-red-300 transition-colors p-1"
+                                            className="text-red-600 hover:text-red-500 transition-colors p-1"
                                             variant="ghost"
                                             title="Delete review"
                                         >
@@ -146,18 +195,21 @@ export function ReviewsTable({ reviews, onToggleStatus, onDelete }) {
                                     SKU: {review.sku}
                                 </div>
                             </div>
-                            <button
-                                onClick={() => onToggleStatus(review)}
+                            <span
                                 className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    review.status === "active"
+                                    review.status === "approved"
                                         ? "bg-green-500/20 text-green-300"
-                                        : "bg-gray-500/20 text-gray-300"
+                                        : review.status === "pending"
+                                        ? "bg-yellow-500/20 text-yellow-300"
+                                        : "bg-red-500/20 text-red-300"
                                 }`}
                             >
-                                {review.status === "active"
-                                    ? "Active"
-                                    : "Inactive"}
-                            </button>
+                                {review.status === "approved"
+                                    ? "Approved"
+                                    : review.status === "pending"
+                                    ? "Pending"
+                                    : "Rejected"}
+                            </span>
                         </div>
 
                         <div className="mt-2 flex items-center justify-between">
@@ -185,10 +237,50 @@ export function ReviewsTable({ reviews, onToggleStatus, onDelete }) {
                             {review.comment}
                         </p>
 
-                        <div className="mt-3 flex items-center justify-end">
+                        <div className="mt-3 flex items-center justify-end gap-1">
+                            {review.status === "pending" && (
+                                <>
+                                    <GamingButton
+                                        onClick={() => onApprove(review)}
+                                        className="text-green-400 hover:text-green-300 transition-colors p-1"
+                                        variant="ghost"
+                                        title="Approve review"
+                                    >
+                                        ✓
+                                    </GamingButton>
+                                    <GamingButton
+                                        onClick={() => onReject(review)}
+                                        className="text-red-400 hover:text-red-300 transition-colors p-1"
+                                        variant="ghost"
+                                        title="Reject review"
+                                    >
+                                        ✗
+                                    </GamingButton>
+                                </>
+                            )}
+                            {review.status === "approved" && (
+                                <GamingButton
+                                    onClick={() => onReject(review)}
+                                    className="text-red-400 hover:text-red-300 transition-colors p-1"
+                                    variant="ghost"
+                                    title="Reject review"
+                                >
+                                    ✗
+                                </GamingButton>
+                            )}
+                            {review.status === "rejected" && (
+                                <GamingButton
+                                    onClick={() => onApprove(review)}
+                                    className="text-green-400 hover:text-green-300 transition-colors p-1"
+                                    variant="ghost"
+                                    title="Approve review"
+                                >
+                                    ✓
+                                </GamingButton>
+                            )}
                             <GamingButton
                                 variant="ghost"
-                                className="text-red-400"
+                                className="text-red-600 hover:text-red-500 transition-colors p-1"
                                 onClick={() => onDelete(review)}
                                 title="Delete review"
                             >

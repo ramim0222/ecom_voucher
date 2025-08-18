@@ -9,6 +9,7 @@ export function VoucherCard({
     image,
     platform,
     rating,
+    reviewsCount,
     className,
     ...props
 }) {
@@ -46,7 +47,7 @@ export function VoucherCard({
                     {title}
                 </h3>
 
-                {rating && (
+                {rating > 0 && reviewsCount > 0 ? (
                     <div className="flex items-center gap-1">
                         <div className="flex text-accent">
                             {[...Array(5)].map((_, i) => (
@@ -55,7 +56,7 @@ export function VoucherCard({
                                     className={
                                         i < Math.floor(rating)
                                             ? "text-accent"
-                                            : "text-muted"
+                                            : "text-muted-foreground/30"
                                     }
                                 >
                                     ★
@@ -63,10 +64,11 @@ export function VoucherCard({
                             ))}
                         </div>
                         <span className="text-sm text-muted-foreground ml-1">
-                            ({rating})
+                            ({rating}) • {reviewsCount} review
+                            {reviewsCount !== 1 ? "s" : ""}
                         </span>
                     </div>
-                )}
+                ) : null}
 
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

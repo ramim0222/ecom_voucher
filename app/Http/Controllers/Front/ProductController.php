@@ -19,10 +19,27 @@ class ProductController extends Controller
         }
 
         $products = $query
-            ->with('codes')
+            ->with(['codes', 'reviews' => function($query) {
+                $query->where('status', 'approved');
+            }])
             ->orderBy('sort_order')
             ->orderByDesc('id')
-            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image']);
+            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image'])
+            ->map(function ($product) {
+                // Calculate review statistics
+                $approvedReviews = $product->reviews;
+                $reviewsCount = $approvedReviews->count();
+                $averageRating = $reviewsCount > 0 ? $approvedReviews->avg('rating') : 0;
+
+                // Add computed fields
+                $product->reviews_count = $reviewsCount;
+                $product->average_rating = round($averageRating, 1);
+
+                // Remove the reviews relationship to avoid sending unnecessary data
+                unset($product->reviews);
+
+                return $product;
+            });
 
         return Inertia::render('Product/Index', [
             'products' => $products,
