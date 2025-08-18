@@ -102,6 +102,16 @@ export function Header() {
                             </Link>
                         )}
 
+                        {/* wishlist button */}
+                        {isAuthenticated && (
+                            <Link
+                                href={route("wishlist")}
+                                className="relative p-2 hover:bg-muted rounded-lg transition-colors"
+                            >
+                                <span className="text-xl">💖</span>
+                            </Link>
+                        )}
+
                         {isAuthenticated ? (
                             <GamingButton
                                 variant="primary"

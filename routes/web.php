@@ -35,7 +35,9 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 
 
 
-
+Route::get('/wishlist', function () {
+    return Inertia::render('Wishlist');
+})->name('wishlist');
 
 
 
