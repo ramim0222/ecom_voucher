@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\Front\CartController;
+use App\Http\Controllers\Front\WishlistController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -29,15 +30,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-// Public cart add route (handles authentication redirect internally)
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-
-
-
-
-Route::get('/wishlist', function () {
-    return Inertia::render('Wishlist');
-})->name('wishlist');
 
 
 
@@ -56,19 +48,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return $next($request);
         }
     ], function () {
+        //Dashboard routes
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard/Dashboard');
         })->name('dashboard');
 
+        //Dashboard Profile routes
         Route::get('/dashboard/profile', [ProfileController::class, 'dashboard'])->name('dashboard.profile');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
         Route::put('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+
+        // Review routes
         Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+        // Cart routes
         Route::get('/cart', [CartController::class, 'cart'])->name('cart');
+        Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
         Route::patch('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
         Route::delete('/cart/{cart}', [CartController::class, 'remove'])->name('cart.remove');
         Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+
+        // Wishlist routes
+        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+        Route::post('/wishlist/add', [WishlistController::class, 'add'])->name('wishlist.add');
+        Route::delete('/wishlist/{wishlist}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+        Route::delete('/wishlist', [WishlistController::class, 'clear'])->name('wishlist.clear');
+        Route::post('/wishlist/{wishlist}/move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
+        Route::post('/wishlist/move-all', [WishlistController::class, 'moveAllToCart'])->name('wishlist.move-all');
+        Route::delete('/wishlist/product/{product}', [WishlistController::class, 'removeByProduct'])->name('wishlist.remove-by-product');
+
+
+
 
         Route::get('/dashboard/orders', function () {
             return Inertia::render('Dashboard/Orders');

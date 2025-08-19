@@ -5,38 +5,101 @@ import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { WishlistItem } from "@/Components/Wishlist/WishlistItem";
 import { WishlistSummary } from "@/Components/Wishlist/WishlistSummary";
+import { router, usePage } from "@inertiajs/react";
 
 export default function WishlistPage({
     wishlistItems: initialWishlistItems = [],
 }) {
     const [wishlistItems, setWishlistItems] = useState(initialWishlistItems);
+    const { props } = usePage();
+    const { flash } = props;
 
     // Update local state when props change
     useEffect(() => {
         setWishlistItems(initialWishlistItems);
     }, [initialWishlistItems]);
 
-    const moveToCart = (item) => {
-        // This would typically call an API to move item from wishlist to cart
-        // For now, we'll just remove it from wishlist
-        setWishlistItems(
-            wishlistItems.filter((wishlistItem) => wishlistItem.id !== item.id)
-        );
+    // Show flash messages (optional toast system could hook here)
+    useEffect(() => {
+        if (flash?.error) {
+            alert("Error: " + flash.error);
+        }
+    }, [flash]);
 
-        // You can implement the actual cart addition logic here
-        console.log("Moving to cart:", item);
+    const moveToCart = (item) => {
+        if (!item || item.stock === 0) {
+            alert("This item is out of stock.");
+            return;
+        }
+
+        // Optimistic UI: remove from wishlist immediately
+        const previous = wishlistItems;
+        setWishlistItems(previous.filter((w) => w.id !== item.id));
+
+        router.post(
+            `/wishlist/${item.id}/move-to-cart`,
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    // Revert on error
+                    setWishlistItems(previous);
+                },
+                onFinish: () => {
+                    // Optionally reload counts or server truth
+                    router.reload({ only: ["wishlistItems"] });
+                },
+            }
+        );
     };
 
     const removeItem = (id) => {
-        setWishlistItems(wishlistItems.filter((item) => item.id !== id));
+        const previous = wishlistItems;
+        setWishlistItems(previous.filter((item) => item.id !== id));
+
+        router.delete(`/wishlist/${id}`, {
+            preserveScroll: true,
+            onError: () => {
+                setWishlistItems(previous);
+            },
+            onFinish: () => {
+                router.reload({ only: ["wishlistItems"] });
+            },
+        });
     };
 
     const moveAllToCart = () => {
         const inStockItems = wishlistItems.filter((item) => item.stock > 0);
         if (inStockItems.length === 0) return;
 
-        // Move all in-stock items to cart
-        inStockItems.forEach((item) => moveToCart(item));
+        // Optimistic UI: remove in-stock items locally
+        const previous = wishlistItems;
+        const remaining = previous.filter((item) => item.stock <= 0);
+        setWishlistItems(remaining);
+
+        router.post(
+            "/wishlist/move-all",
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setWishlistItems(previous);
+                },
+                onFinish: () => {
+                    router.reload({ only: ["wishlistItems"] });
+                },
+            }
+        );
+    };
+
+    const clearWishlist = () => {
+        const previous = wishlistItems;
+        setWishlistItems([]);
+        router.delete("/wishlist", {
+            preserveScroll: true,
+            onError: () => setWishlistItems(previous),
+            onFinish: () => router.reload({ only: ["wishlistItems"] }),
+        });
     };
 
     const totalValue = wishlistItems.reduce((sum, item) => sum + item.price, 0);
@@ -111,7 +174,7 @@ export default function WishlistPage({
                             <GamingButton
                                 variant="secondary"
                                 size="lg"
-                                onClick={() => setWishlistItems([])}
+                                onClick={clearWishlist}
                             >
                                 Clear Wishlist
                             </GamingButton>

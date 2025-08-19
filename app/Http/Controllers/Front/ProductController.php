@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Product;
+use App\Models\Wishlist;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -92,10 +94,18 @@ class ProductController extends Controller
         // The stock is automatically calculated via the getStockAttribute() accessor in the Product model
         // and is included in JSON via the $appends array
 
+        $wishlistEntry = Auth::check()
+            ? Wishlist::where('user_id', Auth::id())
+                ->where('product_id', $product->id)
+                ->first()
+            : null;
+
         return Inertia::render('Product/Page', [
             'product' => $product,
             'reviews' => $approvedReviews,
             'userHasReviewed' => $userHasReviewed,
+            'userHasWishlisted' => (bool) $wishlistEntry,
+            'wishlistId' => $wishlistEntry?->id,
         ]);
     }
 }

@@ -10,9 +10,12 @@ export default function ProductDetailsPage({
     auth,
     reviews,
     userHasReviewed,
+    userHasWishlisted = false,
+    wishlistId = null,
 }) {
     const [quantity, setQuantity] = useState(1);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [isWishlisted, setIsWishlisted] = useState(userHasWishlisted);
 
     // Debug: Log product data to console
     console.log("Product data:", product);
@@ -66,6 +69,42 @@ export default function ProductDetailsPage({
                 },
             }
         );
+    };
+
+    const toggleWishlist = () => {
+        if (!auth.user) {
+            router.visit("/login");
+            return;
+        }
+
+        if (!isWishlisted) {
+            setIsWishlisted(true);
+            router.post(
+                "/wishlist/add",
+                { product_id: product.id },
+                {
+                    preserveScroll: true,
+                    onError: () => setIsWishlisted(false),
+                    onFinish: () => {
+                        // Optionally reload wishlist status if needed
+                        router.reload({
+                            only: ["userHasWishlisted", "wishlistId"],
+                        });
+                    },
+                }
+            );
+        } else {
+            setIsWishlisted(false);
+            router.delete(`/wishlist/product/${product.id}`, {
+                preserveScroll: true,
+                onError: () => setIsWishlisted(true),
+                onFinish: () => {
+                    router.reload({
+                        only: ["userHasWishlisted", "wishlistId"],
+                    });
+                },
+            });
+        }
     };
 
     return (
@@ -268,8 +307,17 @@ export default function ProductDetailsPage({
                                           ).toFixed(2)}`
                                         : "Login to Add to Cart"}
                                 </GamingButton>
-                                <GamingButton variant="ghost" size="lg">
-                                    ♡
+                                <GamingButton
+                                    variant="ghost"
+                                    size="lg"
+                                    onClick={toggleWishlist}
+                                    title={
+                                        isWishlisted
+                                            ? "Remove from Wishlist"
+                                            : "Add to Wishlist"
+                                    }
+                                >
+                                    {isWishlisted ? "♥" : "♡"}
                                 </GamingButton>
                             </div>
                         </div>
