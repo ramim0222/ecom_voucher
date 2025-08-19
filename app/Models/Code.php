@@ -16,4 +16,9 @@ class Code extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function orderItems()
+    {
+        return $this->belongsToMany(OrderItem::class, null, null, null, null, null, 'assigned_codes');
+    }
 }

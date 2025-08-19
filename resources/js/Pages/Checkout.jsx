@@ -1,32 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/Components/Layout/Header";
 import { CheckoutForm } from "@/Components/Checkout/CheckoutForm";
 import { OrderSummary } from "@/Components/Checkout/OrderSummary";
+import { usePage } from "@inertiajs/react";
 
-export default function CheckoutPage() {
+export default function CheckoutPage({ cartItems = [], user }) {
+    const { props } = usePage();
+
     const [orderData, setOrderData] = useState({
-        items: [
-            {
-                id: 1,
-                title: "Steam Wallet $50",
-                price: 45.99,
-                platform: "Steam",
-                quantity: 1,
-            },
-            {
-                id: 2,
-                title: "PlayStation Store $25",
-                price: 22.99,
-                platform: "PlayStation",
-                quantity: 2,
-            },
-        ],
-        subtotal: 91.97,
-        tax: 7.36,
-        total: 99.33,
+        items: [],
+        subtotal: 0,
+        tax: 0,
+        total: 0,
     });
+
+    useEffect(() => {
+        if (cartItems && cartItems.length > 0) {
+            const items = cartItems.map((item) => ({
+                id: item.id,
+                title: item.product.title,
+                price: parseFloat(item.price),
+                platform: item.product.category?.name || "Digital",
+                quantity: item.quantity,
+            }));
+
+            const subtotal = items.reduce(
+                (sum, item) => sum + item.price * item.quantity,
+                0
+            );
+            const tax = subtotal * 0.0; // No tax for now
+            const total = subtotal + tax;
+
+            setOrderData({
+                items,
+                subtotal,
+                tax,
+                total,
+            });
+        }
+    }, [cartItems]);
 
     const [currentStep, setCurrentStep] = useState(1);
 
@@ -92,6 +106,7 @@ export default function CheckoutPage() {
                             currentStep={currentStep}
                             onStepChange={setCurrentStep}
                             orderData={orderData}
+                            user={user}
                         />
                     </div>
 

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Cart;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -86,7 +88,25 @@ class IndexController extends Controller
 
     public function checkout()
     {
-        return Inertia::render('Checkout');
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('message', 'Please log in to proceed to checkout.');
+        }
+
+        $user = Auth::user();
+
+        // Get cart items with product and category information
+        $cartItems = Cart::where('user_id', $user->id)
+            ->with(['product.category'])
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty. Please add items to continue.');
+        }
+
+        return Inertia::render('Checkout', [
+            'cartItems' => $cartItems,
+            'user' => $user,
+        ]);
     }
 
 }

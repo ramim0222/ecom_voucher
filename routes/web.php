@@ -8,6 +8,7 @@ use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\Front\CartController;
 use App\Http\Controllers\Front\WishlistController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -78,12 +79,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/wishlist/move-all', [WishlistController::class, 'moveAllToCart'])->name('wishlist.move-all');
         Route::delete('/wishlist/product/{product}', [WishlistController::class, 'removeByProduct'])->name('wishlist.remove-by-product');
 
+        // Order routes
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/create-from-cart', [OrderController::class, 'createFromCart'])->name('orders.create-from-cart');
+        Route::post('/orders/create-from-products', [OrderController::class, 'createFromProducts'])->name('orders.create-from-products');
+        Route::post('/orders/{order}/payment', [OrderController::class, 'processPayment'])->name('orders.process-payment');
+        Route::post('/orders/{order}/simulate-payment', [OrderController::class, 'simulatePayment'])->name('orders.simulate-payment');
+        Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+        Route::post('/orders/check-availability', [OrderController::class, 'checkAvailability'])->name('orders.check-availability');
 
-
-
-        Route::get('/dashboard/orders', function () {
-            return Inertia::render('Dashboard/Orders');
-        });
+        Route::get('/dashboard/orders', [OrderController::class, 'index'])->name('dashboard.orders');
 
     });
 });
@@ -123,13 +128,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/products/{product}/codes', [AdminProductController::class, 'getCodes'])->name('admin.products.codes.get');
         Route::post('/admin/products/{product}/codes/bulk-delete', [AdminProductController::class, 'bulkDeleteCodes'])->name('admin.products.codes.bulk-delete');
 
-        Route::get('/admin/orders', function () {
-            return Inertia::render('Admin/Orders/Index');
-        });
-
-        Route::get('/admin/orders/{id}', function ($id) {
-            return Inertia::render('Admin/Orders/Page', ['id' => $id]);
-        });
+        // Admin Order routes
+        Route::get('/admin/orders', [OrderController::class, 'adminIndex'])->name('admin.orders.index');
+        Route::get('/admin/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+        Route::post('/admin/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('admin.orders.cancel');
 
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
         Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');

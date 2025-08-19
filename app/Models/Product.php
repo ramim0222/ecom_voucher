@@ -72,4 +72,14 @@ class Product extends Model
     {
         return $this->hasMany(Wishlist::class);
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasManyThrough(Order::class, OrderItem::class);
+    }
 }
