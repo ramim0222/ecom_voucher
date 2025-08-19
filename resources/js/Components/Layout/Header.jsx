@@ -66,12 +66,6 @@ export function Header() {
                                 href="#"
                                 className="text-foreground hover:text-accent transition-colors"
                             >
-                                Deals
-                            </Link>
-                            <Link
-                                href="#"
-                                className="text-foreground hover:text-accent transition-colors"
-                            >
                                 Support
                             </Link>
                         </nav>

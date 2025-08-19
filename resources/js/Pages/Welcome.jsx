@@ -1,12 +1,23 @@
 import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { VoucherCard } from "@/Components/ui/VoucherCard";
+import { useEffect, useState } from "react";
 
 export default function HomePage({
     featuredProducts = [],
     discountedProducts = [],
     categories = [],
 }) {
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
+    useEffect(() => {
+        const onScroll = () => setShowScrollTop(window.scrollY > 300);
+        window.addEventListener("scroll", onScroll);
+        onScroll();
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
     return (
         <div className="min-h-screen">
             <Header />
@@ -29,9 +40,6 @@ export default function HomePage({
                             onClick={() => (window.location.href = "/products")}
                         >
                             Explore Vouchers
-                        </GamingButton>
-                        <GamingButton variant="secondary" size="lg">
-                            View Deals
                         </GamingButton>
                     </div>
                 </div>
@@ -225,6 +233,15 @@ export default function HomePage({
                     </div>
                 </div>
             </section>
+            {showScrollTop && (
+                <button
+                    onClick={scrollToTop}
+                    aria-label="Move to top"
+                    className="fixed bottom-6 right-6 z-50 bg-accent text-accent-foreground rounded-full shadow-lg hover:opacity-90 transition-opacity p-3 md:p-4"
+                >
+                    ↑
+                </button>
+            )}
         </div>
     );
 }
