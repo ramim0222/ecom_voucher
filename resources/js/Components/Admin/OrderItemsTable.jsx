@@ -10,9 +10,6 @@ export function OrderItemsTable({ items }) {
                             Product
                         </th>
                         <th className="text-left py-3 px-4 font-medium text-slate-300">
-                            SKU
-                        </th>
-                        <th className="text-left py-3 px-4 font-medium text-slate-300">
                             Price
                         </th>
                         <th className="text-left py-3 px-4 font-medium text-slate-300">
@@ -33,8 +30,9 @@ export function OrderItemsTable({ items }) {
                                 <div className="flex items-center gap-3">
                                     <img
                                         src={
-                                            item.product_image ||
-                                            "/placeholder.svg"
+                                            item.product_image
+                                                ? `/storage/${item.product_image}`
+                                                : "/placeholder.svg"
                                         }
                                         alt={item.product_title}
                                         className="w-12 h-12 rounded-lg object-cover bg-slate-700"
@@ -108,11 +106,6 @@ export function OrderItemsTable({ items }) {
                                             )}
                                     </div>
                                 </div>
-                            </td>
-                            <td className="py-4 px-4">
-                                <code className="bg-slate-700/50 px-2 py-1 rounded text-sm text-slate-300">
-                                    {item.sku}
-                                </code>
                             </td>
                             <td className="py-4 px-4 text-white">
                                 ${parseFloat(item.unit_price || 0).toFixed(2)}
