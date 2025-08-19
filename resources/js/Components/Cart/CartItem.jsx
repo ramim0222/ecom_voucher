@@ -83,12 +83,6 @@ export function CartItem({ item, onUpdateQuantity, onRemove }) {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {item.originalPrice &&
-                                typeof item.originalPrice === "number" && (
-                                    <span className="text-sm text-muted-foreground line-through">
-                                        ${item.originalPrice.toFixed(2)}
-                                    </span>
-                                )}
                             <span className="text-xl font-bold text-accent">
                                 $
                                 {(

@@ -2,7 +2,11 @@ import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { VoucherCard } from "@/Components/ui/VoucherCard";
 
-export default function HomePage({ featuredProducts = [], categories = [] }) {
+export default function HomePage({
+    featuredProducts = [],
+    discountedProducts = [],
+    categories = [],
+}) {
     return (
         <div className="min-h-screen">
             <Header />
@@ -83,6 +87,70 @@ export default function HomePage({ featuredProducts = [], categories = [] }) {
                         <div className="text-center py-12">
                             <p className="text-muted-foreground text-lg">
                                 No featured products available at the moment.
+                            </p>
+                            <GamingButton
+                                variant="accent"
+                                className="mt-4"
+                                onClick={() =>
+                                    (window.location.href = "/products")
+                                }
+                            >
+                                Browse All Products
+                            </GamingButton>
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* Discounted Vouchers */}
+            <section className="py-16 px-4">
+                <div className="container mx-auto">
+                    <div className="text-center mb-12">
+                        <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">
+                            Biggest Discounts
+                        </h2>
+                        <p className="text-muted-foreground text-lg">
+                            Save more on these top discounted vouchers
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {discountedProducts.map((product) => (
+                            <VoucherCard
+                                key={product.id}
+                                title={product.title}
+                                price={product.price}
+                                originalPrice={product.original_price}
+                                discount={
+                                    product.original_price &&
+                                    product.original_price > product.price
+                                        ? Math.round(
+                                              ((product.original_price -
+                                                  product.price) /
+                                                  product.original_price) *
+                                                  100
+                                          )
+                                        : null
+                                }
+                                image={
+                                    product.product_image
+                                        ? `/storage/${product.product_image}`
+                                        : null
+                                }
+                                platform={product.category?.name || ""}
+                                rating={product.average_rating}
+                                reviewsCount={product.reviews_count}
+                                onClick={() =>
+                                    (window.location.href = `/products/${product.id}`)
+                                }
+                            />
+                        ))}
+                    </div>
+
+                    {discountedProducts.length === 0 && (
+                        <div className="text-center py-12">
+                            <p className="text-muted-foreground text-lg">
+                                No discounted products available at the moment.
                             </p>
                             <GamingButton
                                 variant="accent"

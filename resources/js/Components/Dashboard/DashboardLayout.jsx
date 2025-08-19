@@ -9,9 +9,8 @@ export function DashboardLayout({ children }) {
 
     const menuItems = [
         { href: "/dashboard", label: "Dashboard", icon: "🏠" },
-        { href: "/dashboard/orders", label: "Orders", icon: "📦" },
         { href: "/dashboard/profile", label: "Profile", icon: "👤" },
-        { href: "/", label: "Back to Store", icon: "🛒" },
+        { href: "/dashboard/orders", label: "Orders", icon: "📦" },
     ];
 
     const handleLogout = () => {
@@ -35,17 +34,6 @@ export function DashboardLayout({ children }) {
                 }`}
             >
                 <div className="flex flex-col h-full p-6">
-                    <div className="flex items-center gap-2 mb-8">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-lg">
-                                G
-                            </span>
-                        </div>
-                        <span className="font-heading font-bold text-xl">
-                            GameVault
-                        </span>
-                    </div>
-
                     <nav className="flex-1 space-y-2">
                         {menuItems.map((item) => (
                             <Link

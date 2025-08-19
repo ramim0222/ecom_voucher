@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use App\Models\Category;
+use App\Models\Cart;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -36,6 +37,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'cartCount' => fn () => $request->user() ? (int) Cart::where('user_id', $request->user()->id)->sum('quantity') : 0,
             'categories' => fn () => Category::query()
                 ->orderBy('name')
                 ->get(['id', 'name', 'logo', 'status'])

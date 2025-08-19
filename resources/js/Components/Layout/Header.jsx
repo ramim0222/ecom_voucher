@@ -3,7 +3,7 @@ import { usePage, Link } from "@inertiajs/react";
 import Dropdown from "@/Components/Dropdown";
 
 export function Header() {
-    const { auth, categories = [] } = usePage().props;
+    const { auth, categories = [], cartCount = 0 } = usePage().props;
     const isAuthenticated = !!auth.user;
 
     return (
@@ -97,7 +97,7 @@ export function Header() {
                             >
                                 <span className="text-xl">🛒</span>
                                 <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                    0
+                                    {cartCount}
                                 </span>
                             </Link>
                         )}

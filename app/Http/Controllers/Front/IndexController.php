@@ -40,6 +40,31 @@ class IndexController extends Controller
                 return $product;
             });
 
+        // Get discounted products (original_price > price), highest discount first
+        $discountedProducts = Product::where('status', 'active')
+            ->whereNotNull('original_price')
+            ->whereColumn('original_price', '>', 'price')
+            ->with(['category', 'reviews' => function($query) {
+                $query->where('status', 'approved');
+            }])
+            // Order by discount percentage desc, then most recent
+            ->orderByRaw('(original_price - price) / NULLIF(original_price, 0) DESC')
+            ->orderByDesc('id')
+            ->take(6)
+            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image', 'is_featured'])
+            ->map(function ($product) {
+                $approvedReviews = $product->reviews;
+                $reviewsCount = $approvedReviews->count();
+                $averageRating = $reviewsCount > 0 ? $approvedReviews->avg('rating') : 0;
+
+                $product->reviews_count = $reviewsCount;
+                $product->average_rating = round($averageRating, 1);
+
+                unset($product->reviews);
+
+                return $product;
+            });
+
         // Get categories for category display
         $categories = Category::where('status', 'active')
             ->orderBy('id')
@@ -52,6 +77,7 @@ class IndexController extends Controller
             'laravelVersion' => Application::VERSION,
             'phpVersion' => PHP_VERSION,
             'featuredProducts' => $featuredProducts,
+            'discountedProducts' => $discountedProducts,
             'categories' => $categories,
         ]);
     }
