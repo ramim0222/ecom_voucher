@@ -3,7 +3,6 @@ import { router } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { OrderItemsTable } from "@/Components/Admin/OrderItemsTable";
-import { OrderActivityLog } from "@/Components/Admin/OrderActivityLog";
 
 export default function AdminOrderDetailsPage({ order }) {
     const [loading, setLoading] = useState(false);
@@ -27,7 +26,7 @@ export default function AdminOrderDetailsPage({ order }) {
         });
     };
 
-    const handleStatusChange = async (newValue, reason = "") => {
+    const handleStatusChange = async (newValue) => {
         setLoading(true);
 
         const endpoint =
@@ -37,8 +36,8 @@ export default function AdminOrderDetailsPage({ order }) {
 
         const data =
             statusModal.type === "status"
-                ? { status: newValue, reason }
-                : { payment_status: newValue, notes: reason };
+                ? { status: newValue }
+                : { payment_status: newValue };
 
         try {
             await router.patch(endpoint, data, {
@@ -50,7 +49,8 @@ export default function AdminOrderDetailsPage({ order }) {
                         title: "",
                         currentValue: "",
                     });
-                    // Show success message
+                    // Refresh the page to show updated data
+                    router.reload();
                 },
                 onError: (errors) => {
                     console.error("Status update failed:", errors);
@@ -189,33 +189,6 @@ export default function AdminOrderDetailsPage({ order }) {
                         >
                             💳 Update Payment
                         </GamingButton>
-                        {order.payment_status === "paid" &&
-                            order.status !== "refunded" && (
-                                <GamingButton
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                        if (
-                                            confirm(
-                                                `Process a full refund for order ${
-                                                    order.order_number
-                                                }? This action will refund $${parseFloat(
-                                                    order.total_amount || 0
-                                                ).toFixed(2)} to the customer.`
-                                            )
-                                        ) {
-                                            handleStatusChange(
-                                                "refunded",
-                                                "Full refund processed by admin"
-                                            );
-                                        }
-                                    }}
-                                    className="text-red-400 hover:text-red-300"
-                                    disabled={loading}
-                                >
-                                    💰 Process Refund
-                                </GamingButton>
-                            )}
                     </div>
                 </div>
 
@@ -420,14 +393,6 @@ export default function AdminOrderDetailsPage({ order }) {
                         <p className="text-slate-300">{order.notes}</p>
                     </div>
                 )}
-
-                {/* Activity Log */}
-                <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700 p-6">
-                    <h3 className="font-heading font-semibold text-lg text-white mb-4">
-                        Activity Log
-                    </h3>
-                    <OrderActivityLog orderId={order.id} />
-                </div>
             </div>
 
             {/* Status Update Modal */}
@@ -464,7 +429,6 @@ function StatusUpdateModal({
     loading,
 }) {
     const [selectedValue, setSelectedValue] = useState(currentValue);
-    const [reason, setReason] = useState("");
 
     const statusOptions =
         type === "status"
@@ -484,7 +448,7 @@ function StatusUpdateModal({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onConfirm(selectedValue, reason);
+        onConfirm(selectedValue);
     };
 
     if (!isOpen) return null;
@@ -513,19 +477,6 @@ function StatusUpdateModal({
                                 </option>
                             ))}
                         </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                            Reason (Optional)
-                        </label>
-                        <textarea
-                            value={reason}
-                            onChange={(e) => setReason(e.target.value)}
-                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            rows="3"
-                            placeholder="Enter reason for status change..."
-                        />
                     </div>
 
                     <div className="flex gap-3 pt-4">

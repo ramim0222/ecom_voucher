@@ -108,7 +108,11 @@ export default function OrderShow({ order }) {
                                                 </p>
                                                 {item.assigned_codes &&
                                                     item.assigned_codes.length >
-                                                        0 && (
+                                                        0 &&
+                                                    (order.payment_status ===
+                                                        "paid" ||
+                                                        order.status ===
+                                                            "completed") && (
                                                         <div className="mt-2">
                                                             <p className="text-sm font-medium text-green-600 mb-1">
                                                                 Your Codes:

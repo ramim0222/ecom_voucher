@@ -97,76 +97,6 @@ export default function AdminOrders({ orders, filters = {} }) {
                     </div>
                 </div>
 
-                {/* Filters */}
-                <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
-                    <div className="flex flex-col lg:flex-row gap-4">
-                        {/* Search */}
-                        <form onSubmit={handleSearch} className="flex-1">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    placeholder="Search by order number, customer name or email..."
-                                    value={currentFilters.search}
-                                    onChange={(e) =>
-                                        setCurrentFilters({
-                                            ...currentFilters,
-                                            search: e.target.value,
-                                        })
-                                    }
-                                    className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                />
-                                <GamingButton
-                                    type="submit"
-                                    variant="primary"
-                                    size="sm"
-                                >
-                                    Search
-                                </GamingButton>
-                            </div>
-                        </form>
-
-                        {/* Status Filters */}
-                        <div className="flex gap-2">
-                            <select
-                                value={currentFilters.status}
-                                onChange={(e) =>
-                                    handleFilterChange("status", e.target.value)
-                                }
-                                className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            >
-                                {filterOptions.map((option) => (
-                                    <option
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <select
-                                value={currentFilters.payment_status}
-                                onChange={(e) =>
-                                    handleFilterChange(
-                                        "payment_status",
-                                        e.target.value
-                                    )
-                                }
-                                className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                            >
-                                {paymentFilterOptions.map((option) => (
-                                    <option
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Orders Table */}
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
                     {loading && (
@@ -294,32 +224,73 @@ export default function AdminOrders({ orders, filters = {} }) {
                     </div>
 
                     {/* Pagination */}
-                    {orders.links && orders.links.length > 3 && (
+                    {orders.links && orders.links.length > 1 && (
                         <div className="mt-6 flex items-center justify-center gap-2">
-                            {orders.links.map((link, index) => (
+                            {/* Previous Page */}
+                            {orders.prev_page_url && (
                                 <button
-                                    key={index}
                                     onClick={() => {
-                                        if (link.url) {
-                                            router.visit(link.url, {
-                                                preserveState: true,
-                                                preserveScroll: true,
-                                            });
-                                        }
+                                        router.visit(orders.prev_page_url, {
+                                            preserveState: true,
+                                            preserveScroll: true,
+                                        });
                                     }}
-                                    disabled={!link.url}
-                                    className={`px-3 py-1 rounded text-sm ${
-                                        link.active
-                                            ? "bg-orange-500 text-white"
-                                            : link.url
-                                            ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                                            : "bg-slate-800 text-slate-500 cursor-not-allowed"
-                                    }`}
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
+                                    className="px-3 py-2 rounded text-sm bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+                                >
+                                    ← Previous
+                                </button>
+                            )}
+
+                            {/* Page Numbers */}
+                            {orders.links.map((link, index) => {
+                                // Skip the "Previous" and "Next" links, only show page numbers
+                                if (
+                                    link.label === "&laquo; Previous" ||
+                                    link.label === "Next &raquo;"
+                                ) {
+                                    return null;
+                                }
+
+                                return (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            if (link.url) {
+                                                router.visit(link.url, {
+                                                    preserveState: true,
+                                                    preserveScroll: true,
+                                                });
+                                            }
+                                        }}
+                                        disabled={!link.url}
+                                        className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                                            link.active
+                                                ? "bg-orange-500 text-white"
+                                                : link.url
+                                                ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                                : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                                        }`}
+                                        dangerouslySetInnerHTML={{
+                                            __html: link.label,
+                                        }}
+                                    />
+                                );
+                            })}
+
+                            {/* Next Page */}
+                            {orders.next_page_url && (
+                                <button
+                                    onClick={() => {
+                                        router.visit(orders.next_page_url, {
+                                            preserveState: true,
+                                            preserveScroll: true,
+                                        });
                                     }}
-                                />
-                            ))}
+                                    className="px-3 py-2 rounded text-sm bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
+                                >
+                                    Next →
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>

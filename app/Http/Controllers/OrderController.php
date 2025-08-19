@@ -377,7 +377,7 @@ class OrderController extends Controller
             });
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->paginate(15);
+        $orders = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return Inertia::render('Admin/Orders/Index', [
             'orders' => $orders,
@@ -462,52 +462,37 @@ class OrderController extends Controller
 
         $validator = Validator::make($request->all(), [
             'status' => 'required|string|in:pending,processing,completed,cancelled,refunded',
-            'reason' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return back()->withErrors($validator);
         }
 
         try {
             $newStatus = $request->input('status');
-            $reason = $request->input('reason');
 
             // Handle special status changes
             if ($newStatus === 'completed' && $order->status !== 'completed') {
                 // If marking as completed, ensure payment is also completed
                 if ($order->payment_status !== 'paid') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Cannot mark order as completed unless payment is completed.',
-                    ], 400);
+                    return back()->with('error', 'Cannot mark order as completed unless payment is completed.');
                 }
                 $order->markAsCompleted();
             } elseif ($newStatus === 'cancelled') {
                 // Use the existing cancel method logic
-                $success = $this->orderService->cancelOrder($order, $reason);
+                $success = $this->orderService->cancelOrder($order);
                 if (!$success) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Failed to cancel order.',
-                    ], 400);
+                    return back()->with('error', 'Failed to cancel order.');
                 }
             } else {
                 // Regular status update
                 $order->update(['status' => $newStatus]);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Order status updated successfully.',
-                'order' => $this->orderService->getOrderSummary($order),
-            ]);
+            return back()->with('success', 'Order status updated successfully.');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -522,26 +507,21 @@ class OrderController extends Controller
 
         $validator = Validator::make($request->all(), [
             'payment_status' => 'required|string|in:pending,paid,failed,refunded',
-            'payment_reference' => 'nullable|string',
-            'notes' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return back()->withErrors($validator);
         }
 
         try {
             $newPaymentStatus = $request->input('payment_status');
-            $paymentReference = $request->input('payment_reference');
-            $notes = $request->input('notes');
 
             $updateData = ['payment_status' => $newPaymentStatus];
 
             if ($newPaymentStatus === 'paid') {
                 // Mark as paid and auto-process
-                $order->markAsPaid($paymentReference, [
+                $order->markAsPaid(null, [
                     'admin_updated' => true,
-                    'admin_notes' => $notes,
                     'updated_by' => Auth::user()->full_name,
                     'updated_at' => now()->toISOString(),
                 ]);
@@ -553,30 +533,17 @@ class OrderController extends Controller
             } elseif ($newPaymentStatus === 'refunded') {
                 $updateData['payment_completed_at'] = null;
                 $updateData['status'] = 'refunded';
-                if ($paymentReference) {
-                    $updateData['payment_reference'] = $paymentReference;
-                }
                 $order->update($updateData);
             } else {
                 // Failed or pending
                 $updateData['payment_completed_at'] = null;
-                if ($paymentReference) {
-                    $updateData['payment_reference'] = $paymentReference;
-                }
                 $order->update($updateData);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Payment status updated successfully.',
-                'order' => $this->orderService->getOrderSummary($order),
-            ]);
+            return back()->with('success', 'Payment status updated successfully.');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return back()->with('error', $e->getMessage());
         }
     }
 }

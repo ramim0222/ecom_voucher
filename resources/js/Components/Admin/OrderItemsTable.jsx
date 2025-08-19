@@ -50,10 +50,60 @@ export function OrderItemsTable({ items }) {
                                         )}
                                         {item.assigned_codes &&
                                             item.assigned_codes.length > 0 && (
-                                                <div className="text-xs text-green-400 mt-1">
-                                                    ✓{" "}
-                                                    {item.assigned_codes.length}{" "}
-                                                    codes assigned
+                                                <div className="mt-2">
+                                                    <div className="text-xs text-green-400 mb-1">
+                                                        ✓{" "}
+                                                        {
+                                                            item.assigned_codes
+                                                                .length
+                                                        }{" "}
+                                                        codes assigned
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        {item.assigned_codes.map(
+                                                            (
+                                                                code,
+                                                                codeIndex
+                                                            ) => (
+                                                                <div
+                                                                    key={
+                                                                        codeIndex
+                                                                    }
+                                                                    className="bg-green-900/20 border border-green-700 rounded px-2 py-1 text-xs font-mono text-green-300 flex items-center justify-between"
+                                                                >
+                                                                    <span className="select-all">
+                                                                        {code}
+                                                                    </span>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            navigator.clipboard.writeText(
+                                                                                code
+                                                                            );
+                                                                        }}
+                                                                        className="ml-2 px-1 py-0.5 text-xs bg-green-600 hover:bg-green-500 text-white rounded transition-colors flex items-center gap-1"
+                                                                        title="Copy code"
+                                                                    >
+                                                                        <svg
+                                                                            className="w-2.5 h-2.5"
+                                                                            fill="none"
+                                                                            stroke="currentColor"
+                                                                            viewBox="0 0 24 24"
+                                                                        >
+                                                                            <path
+                                                                                strokeLinecap="round"
+                                                                                strokeLinejoin="round"
+                                                                                strokeWidth={
+                                                                                    2
+                                                                                }
+                                                                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                                                            />
+                                                                        </svg>
+                                                                        Copy
+                                                                    </button>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
                                                 </div>
                                             )}
                                     </div>
