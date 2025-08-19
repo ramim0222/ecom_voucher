@@ -130,8 +130,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Admin Order routes
         Route::get('/admin/orders', [OrderController::class, 'adminIndex'])->name('admin.orders.index');
-        Route::get('/admin/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+        Route::get('/admin/orders/{order}', [OrderController::class, 'adminShow'])->name('admin.orders.show');
         Route::post('/admin/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('admin.orders.cancel');
+        Route::patch('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
+        Route::patch('/admin/orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('admin.orders.update-payment-status');
 
         Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
         Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');

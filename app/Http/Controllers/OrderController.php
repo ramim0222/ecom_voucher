@@ -384,4 +384,199 @@ class OrderController extends Controller
             'filters' => $request->only(['status', 'payment_status', 'search']),
         ]);
     }
+
+    /**
+     * Admin: Show specific order details
+     */
+    public function adminShow(Order $order)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Admin access required.');
+        }
+
+        // Load relationships and add actual codes
+        $order->load(['orderItems.product.category', 'user']);
+
+        // Add assigned codes as actual code values
+        $order->orderItems->transform(function ($item) {
+            if ($item->assigned_codes && count($item->assigned_codes) > 0) {
+                $item->actual_codes = Code::whereIn('id', $item->assigned_codes)
+                    ->pluck('code')
+                    ->toArray();
+            } else {
+                $item->actual_codes = [];
+            }
+            return $item;
+        });
+
+        return Inertia::render('Admin/Orders/Page', [
+            'order' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'payment_status' => $order->payment_status,
+                'payment_method' => $order->payment_method,
+                'payment_reference' => $order->payment_reference,
+                'subtotal' => $order->subtotal,
+                'discount_amount' => $order->discount_amount,
+                'tax_amount' => $order->tax_amount,
+                'total_amount' => $order->total_amount,
+                'created_at' => $order->created_at,
+                'payment_completed_at' => $order->payment_completed_at,
+                'billing_address' => $order->billing_address,
+                'notes' => $order->notes,
+                'customer' => [
+                    'id' => $order->user->id,
+                    'name' => $order->user->full_name,
+                    'email' => $order->user->email,
+                    'phone' => $order->user->phone_number,
+                    'first_name' => $order->user->first_name,
+                    'last_name' => $order->user->last_name,
+                ],
+                'items' => $order->orderItems->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'product_id' => $item->product_id,
+                        'product_title' => $item->product->title,
+                        'product_image' => $item->product->product_image,
+                        'sku' => 'SKU-' . $item->product_id,
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                        'total_price' => $item->total_price,
+                        'assigned_codes' => $item->actual_codes,
+                        'category' => $item->product->category->name ?? 'Uncategorized',
+                    ];
+                }),
+            ],
+        ]);
+    }
+
+    /**
+     * Admin: Update order status
+     */
+    public function updateStatus(Request $request, Order $order)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Admin access required.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|string|in:pending,processing,completed,cancelled,refunded',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $newStatus = $request->input('status');
+            $reason = $request->input('reason');
+
+            // Handle special status changes
+            if ($newStatus === 'completed' && $order->status !== 'completed') {
+                // If marking as completed, ensure payment is also completed
+                if ($order->payment_status !== 'paid') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot mark order as completed unless payment is completed.',
+                    ], 400);
+                }
+                $order->markAsCompleted();
+            } elseif ($newStatus === 'cancelled') {
+                // Use the existing cancel method logic
+                $success = $this->orderService->cancelOrder($order, $reason);
+                if (!$success) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to cancel order.',
+                    ], 400);
+                }
+            } else {
+                // Regular status update
+                $order->update(['status' => $newStatus]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order status updated successfully.',
+                'order' => $this->orderService->getOrderSummary($order),
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    /**
+     * Admin: Update payment status
+     */
+    public function updatePaymentStatus(Request $request, Order $order)
+    {
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Admin access required.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'payment_status' => 'required|string|in:pending,paid,failed,refunded',
+            'payment_reference' => 'nullable|string',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $newPaymentStatus = $request->input('payment_status');
+            $paymentReference = $request->input('payment_reference');
+            $notes = $request->input('notes');
+
+            $updateData = ['payment_status' => $newPaymentStatus];
+
+            if ($newPaymentStatus === 'paid') {
+                // Mark as paid and auto-process
+                $order->markAsPaid($paymentReference, [
+                    'admin_updated' => true,
+                    'admin_notes' => $notes,
+                    'updated_by' => Auth::user()->full_name,
+                    'updated_at' => now()->toISOString(),
+                ]);
+
+                // Auto-assign codes if payment is completed
+                if ($order->status === 'processing') {
+                    $this->orderService->assignCodesToOrder($order);
+                }
+            } elseif ($newPaymentStatus === 'refunded') {
+                $updateData['payment_completed_at'] = null;
+                $updateData['status'] = 'refunded';
+                if ($paymentReference) {
+                    $updateData['payment_reference'] = $paymentReference;
+                }
+                $order->update($updateData);
+            } else {
+                // Failed or pending
+                $updateData['payment_completed_at'] = null;
+                if ($paymentReference) {
+                    $updateData['payment_reference'] = $paymentReference;
+                }
+                $order->update($updateData);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment status updated successfully.',
+                'order' => $this->orderService->getOrderSummary($order),
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
 }

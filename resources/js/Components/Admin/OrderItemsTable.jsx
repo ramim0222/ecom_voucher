@@ -32,14 +32,30 @@ export function OrderItemsTable({ items }) {
                             <td className="py-4 px-4">
                                 <div className="flex items-center gap-3">
                                     <img
-                                        src={item.image || "/placeholder.svg"}
-                                        alt={item.name}
+                                        src={
+                                            item.product_image ||
+                                            "/placeholder.svg"
+                                        }
+                                        alt={item.product_title}
                                         className="w-12 h-12 rounded-lg object-cover bg-slate-700"
                                     />
                                     <div>
                                         <div className="font-medium text-white">
-                                            {item.name}
+                                            {item.product_title}
                                         </div>
+                                        {item.category && (
+                                            <div className="text-xs text-slate-400">
+                                                {item.category}
+                                            </div>
+                                        )}
+                                        {item.assigned_codes &&
+                                            item.assigned_codes.length > 0 && (
+                                                <div className="text-xs text-green-400 mt-1">
+                                                    ✓{" "}
+                                                    {item.assigned_codes.length}{" "}
+                                                    codes assigned
+                                                </div>
+                                            )}
                                     </div>
                                 </div>
                             </td>
@@ -49,13 +65,13 @@ export function OrderItemsTable({ items }) {
                                 </code>
                             </td>
                             <td className="py-4 px-4 text-white">
-                                ${item.price.toFixed(2)}
+                                ${parseFloat(item.unit_price || 0).toFixed(2)}
                             </td>
                             <td className="py-4 px-4 text-slate-300">
-                                {item.quantity}
+                                {item.quantity || 0}
                             </td>
                             <td className="py-4 px-4 text-white font-medium">
-                                ${item.subtotal.toFixed(2)}
+                                ${parseFloat(item.total_price || 0).toFixed(2)}
                             </td>
                         </tr>
                     ))}

@@ -1,125 +1,73 @@
-"use client";
-
 import { useState } from "react";
+import { router } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { OrderItemsTable } from "@/Components/Admin/OrderItemsTable";
 import { OrderActivityLog } from "@/Components/Admin/OrderActivityLog";
-import { OrderActionModal } from "@/Components/Admin/OrderActionModal";
 
-export default function AdminOrderDetailsPage({ params }) {
-    const orderId = params?.id || "ORD-2024-001";
-
-    // Mock order data - in real app, this would be fetched based on orderId
-    const [order] = useState({
-        id: orderId,
-        orderNumber: orderId,
-        date: "2024-01-20T10:30:00Z",
-        customer: {
-            id: 1,
-            name: "John Doe",
-            email: "john.doe@example.com",
-            phone: "+1 (555) 123-4567",
-            avatar: "/diverse-user-avatars.png",
-        },
-        billingAddress: {
-            street: "123 Gaming Street",
-            city: "San Francisco",
-            state: "CA",
-            zipCode: "94102",
-            country: "United States",
-        },
-        items: [
-            {
-                id: 1,
-                name: "Steam $50 Gift Card",
-                sku: "STEAM-50-USD",
-                price: 50.0,
-                quantity: 1,
-                subtotal: 50.0,
-                image: "/steam-voucher-card.png",
-            },
-            {
-                id: 2,
-                name: "PlayStation Plus 1 Month Subscription",
-                sku: "PSN-PLUS-1M",
-                price: 39.99,
-                quantity: 1,
-                subtotal: 39.99,
-                image: "/playstation-voucher-card.png",
-            },
-        ],
-        subtotal: 89.99,
-        tax: 7.2,
-        shipping: 0.0,
-        discount: 0.0,
-        total: 97.19,
-        paymentStatus: "paid",
-        paymentMethod: "Credit Card (**** 4242)",
-        deliveryStatus: "processing",
-        notes: "Customer requested expedited delivery",
-    });
-
-    const [actionModal, setActionModal] = useState({
+export default function AdminOrderDetailsPage({ order }) {
+    const [loading, setLoading] = useState(false);
+    const [statusModal, setStatusModal] = useState({
         isOpen: false,
         type: "",
         title: "",
-        message: "",
+        currentValue: "",
     });
 
-    const handleAdminAction = (actionType) => {
-        const actions = {
-            markDelivered: {
-                title: "Mark as Delivered",
-                message: `Mark order ${order.orderNumber} as delivered? This will notify the customer and update the order status.`,
-            },
-            refundOrder: {
-                title: "Refund Order",
-                message: `Process a full refund for order ${
-                    order.orderNumber
-                }? This action will refund $${order.total.toFixed(
-                    2
-                )} to the customer's payment method.`,
-            },
-            contactBuyer: {
-                title: "Contact Buyer",
-                message: `Send a message to ${order.customer.name} regarding order ${order.orderNumber}`,
-            },
-        };
-
-        setActionModal({
+    const handleStatusUpdate = (type) => {
+        setStatusModal({
             isOpen: true,
-            type: actionType,
-            ...actions[actionType],
+            type: type,
+            title:
+                type === "status"
+                    ? "Update Order Status"
+                    : "Update Payment Status",
+            currentValue:
+                type === "status" ? order.status : order.payment_status,
         });
     };
 
-    const handleConfirmAction = async (actionType, data) => {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    const handleStatusChange = async (newValue, reason = "") => {
+        setLoading(true);
 
-        switch (actionType) {
-            case "markDelivered":
-                alert("Order marked as delivered successfully");
-                break;
-            case "refundOrder":
-                alert(
-                    `Refund of $${order.total.toFixed(
-                        2
-                    )} processed successfully`
-                );
-                break;
-            case "contactBuyer":
-                alert(`Message sent to ${order.customer.email}`);
-                break;
+        const endpoint =
+            statusModal.type === "status"
+                ? route("admin.orders.update-status", order.id)
+                : route("admin.orders.update-payment-status", order.id);
+
+        const data =
+            statusModal.type === "status"
+                ? { status: newValue, reason }
+                : { payment_status: newValue, notes: reason };
+
+        try {
+            await router.patch(endpoint, data, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setStatusModal({
+                        isOpen: false,
+                        type: "",
+                        title: "",
+                        currentValue: "",
+                    });
+                    // Show success message
+                },
+                onError: (errors) => {
+                    console.error("Status update failed:", errors);
+                    alert("Failed to update status. Please try again.");
+                },
+            });
+        } catch (error) {
+            console.error("Status update error:", error);
+            alert("An error occurred. Please try again.");
+        } finally {
+            setLoading(false);
         }
-
-        setActionModal({ isOpen: false, type: "", title: "", message: "" });
     };
 
     const getStatusColor = (status) => {
         switch (status) {
-            case "delivered":
+            case "completed":
                 return "text-green-400 bg-green-400/20";
             case "processing":
                 return "text-yellow-400 bg-yellow-400/20";
@@ -127,10 +75,23 @@ export default function AdminOrderDetailsPage({ params }) {
                 return "text-blue-400 bg-blue-400/20";
             case "cancelled":
                 return "text-red-400 bg-red-400/20";
+            case "refunded":
+                return "text-purple-400 bg-purple-400/20";
+            default:
+                return "text-slate-400 bg-slate-400/20";
+        }
+    };
+
+    const getPaymentStatusColor = (status) => {
+        switch (status) {
             case "paid":
                 return "text-green-400 bg-green-400/20";
-            case "refunded":
+            case "pending":
+                return "text-yellow-400 bg-yellow-400/20";
+            case "failed":
                 return "text-red-400 bg-red-400/20";
+            case "refunded":
+                return "text-purple-400 bg-purple-400/20";
             default:
                 return "text-slate-400 bg-slate-400/20";
         }
@@ -144,7 +105,9 @@ export default function AdminOrderDetailsPage({ params }) {
                     <GamingButton
                         variant="ghost"
                         size="sm"
-                        onClick={() => (window.location.href = "/admin/orders")}
+                        onClick={() =>
+                            router.visit(route("admin.orders.index"))
+                        }
                         className="text-slate-300"
                     >
                         ← Back to Orders
@@ -164,30 +127,46 @@ export default function AdminOrderDetailsPage({ params }) {
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
                         <div>
                             <h2 className="font-heading font-bold text-xl text-white mb-2">
-                                {order.orderNumber}
+                                {order.order_number}
                             </h2>
-                            <div className="flex items-center gap-4 text-sm">
+                            <div className="flex items-center gap-4 text-sm flex-wrap">
                                 <span className="text-slate-400">
                                     Placed on{" "}
-                                    {new Date(order.date).toLocaleDateString()}{" "}
+                                    {new Date(
+                                        order.created_at
+                                    ).toLocaleDateString()}{" "}
                                     at{" "}
-                                    {new Date(order.date).toLocaleTimeString()}
+                                    {new Date(
+                                        order.created_at
+                                    ).toLocaleTimeString()}
                                 </span>
-                                <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                        order.paymentStatus
+                                <button
+                                    onClick={() => handleStatusUpdate("status")}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium hover:opacity-80 transition-opacity ${getStatusColor(
+                                        order.status
                                     )}`}
                                 >
-                                    Payment: {order.paymentStatus}
-                                </span>
+                                    Status: {order.status}
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        handleStatusUpdate("payment_status")
+                                    }
+                                    className={`px-2 py-1 rounded-full text-xs font-medium hover:opacity-80 transition-opacity ${getPaymentStatusColor(
+                                        order.payment_status
+                                    )}`}
+                                >
+                                    Payment: {order.payment_status}
+                                </button>
                             </div>
                         </div>
                         <div className="text-right">
                             <div className="text-2xl font-bold text-white">
-                                ${order.total.toFixed(2)}
+                                $
+                                {parseFloat(order.total_amount || 0).toFixed(2)}
                             </div>
                             <div className="text-slate-400 text-sm">
-                                {order.items.length} items
+                                {order.items?.length || 0} items
                             </div>
                         </div>
                     </div>
@@ -195,14 +174,48 @@ export default function AdminOrderDetailsPage({ params }) {
                     {/* Admin Actions */}
                     <div className="flex flex-wrap gap-3 pt-6 border-t border-slate-700">
                         <GamingButton
-                            variant="ghost"
+                            variant="primary"
                             size="sm"
-                            onClick={() => handleAdminAction("refundOrder")}
-                            className="text-red-400 hover:text-red-300"
-                            disabled={order.paymentStatus === "refunded"}
+                            onClick={() => handleStatusUpdate("status")}
+                            disabled={loading}
                         >
-                            💰 Refund Order
+                            📝 Update Status
                         </GamingButton>
+                        <GamingButton
+                            variant="primary"
+                            size="sm"
+                            onClick={() => handleStatusUpdate("payment_status")}
+                            disabled={loading}
+                        >
+                            💳 Update Payment
+                        </GamingButton>
+                        {order.payment_status === "paid" &&
+                            order.status !== "refunded" && (
+                                <GamingButton
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        if (
+                                            confirm(
+                                                `Process a full refund for order ${
+                                                    order.order_number
+                                                }? This action will refund $${parseFloat(
+                                                    order.total_amount || 0
+                                                ).toFixed(2)} to the customer.`
+                                            )
+                                        ) {
+                                            handleStatusChange(
+                                                "refunded",
+                                                "Full refund processed by admin"
+                                            );
+                                        }
+                                    }}
+                                    className="text-red-400 hover:text-red-300"
+                                    disabled={loading}
+                                >
+                                    💰 Process Refund
+                                </GamingButton>
+                            )}
                     </div>
                 </div>
 
@@ -215,23 +228,12 @@ export default function AdminOrderDetailsPage({ params }) {
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                                    {order.customer.avatar ? (
-                                        <img
-                                            src={
-                                                order.customer.avatar ||
-                                                "/placeholder.svg"
-                                            }
-                                            alt={order.customer.name}
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                    ) : (
-                                        <span className="text-white font-bold text-sm">
-                                            {order.customer.name
-                                                .split(" ")
-                                                .map((n) => n[0])
-                                                .join("")}
-                                        </span>
-                                    )}
+                                    <span className="text-white font-bold text-sm">
+                                        {order.customer.name
+                                            .split(" ")
+                                            .map((n) => n[0])
+                                            .join("")}
+                                    </span>
                                 </div>
                                 <div>
                                     <div className="text-white font-medium">
@@ -243,14 +245,16 @@ export default function AdminOrderDetailsPage({ params }) {
                                 </div>
                             </div>
                             <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">
-                                        Phone:
-                                    </span>
-                                    <span className="text-white">
-                                        {order.customer.phone}
-                                    </span>
-                                </div>
+                                {order.customer.phone && (
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">
+                                            Phone:
+                                        </span>
+                                        <span className="text-white">
+                                            {order.customer.phone}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between">
                                     <span className="text-slate-400">
                                         Customer ID:
@@ -265,7 +269,9 @@ export default function AdminOrderDetailsPage({ params }) {
                                 size="sm"
                                 className="w-full text-slate-300"
                                 onClick={() =>
-                                    (window.location.href = `/admin/users/${order.customer.id}`)
+                                    router.visit(
+                                        `/admin/users/${order.customer.id}`
+                                    )
                                 }
                             >
                                 View Customer Profile
@@ -279,17 +285,25 @@ export default function AdminOrderDetailsPage({ params }) {
                             Billing Address
                         </h3>
                         <div className="space-y-2 text-sm">
-                            <div className="text-white">
-                                {order.billingAddress.street}
-                            </div>
-                            <div className="text-white">
-                                {order.billingAddress.city},{" "}
-                                {order.billingAddress.state}{" "}
-                                {order.billingAddress.zipCode}
-                            </div>
-                            <div className="text-white">
-                                {order.billingAddress.country}
-                            </div>
+                            {order.billing_address ? (
+                                <>
+                                    <div className="text-white">
+                                        {order.billing_address.address}
+                                    </div>
+                                    <div className="text-white">
+                                        {order.billing_address.city},{" "}
+                                        {order.billing_address.state}{" "}
+                                        {order.billing_address.zip}
+                                    </div>
+                                    <div className="text-white">
+                                        {order.billing_address.country}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-slate-400">
+                                    No billing address provided
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -302,46 +316,86 @@ export default function AdminOrderDetailsPage({ params }) {
                             <div className="flex justify-between text-sm">
                                 <span className="text-slate-400">Method:</span>
                                 <span className="text-white">
-                                    {order.paymentMethod}
+                                    {order.payment_method || "Not specified"}
                                 </span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-slate-400">Status:</span>
                                 <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                        order.paymentStatus
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(
+                                        order.payment_status
                                     )}`}
                                 >
-                                    {order.paymentStatus}
+                                    {order.payment_status}
                                 </span>
                             </div>
+                            {order.payment_reference && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-400">
+                                        Reference:
+                                    </span>
+                                    <span className="text-white text-xs">
+                                        {order.payment_reference}
+                                    </span>
+                                </div>
+                            )}
+                            {order.payment_completed_at && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-400">
+                                        Paid At:
+                                    </span>
+                                    <span className="text-white text-xs">
+                                        {new Date(
+                                            order.payment_completed_at
+                                        ).toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
                             <div className="pt-3 border-t border-slate-700 space-y-2">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-slate-400">
                                         Subtotal:
                                     </span>
                                     <span className="text-white">
-                                        ${order.subtotal.toFixed(2)}
+                                        $
+                                        {parseFloat(
+                                            order.subtotal || 0
+                                        ).toFixed(2)}
                                     </span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-400">Tax:</span>
-                                    <span className="text-white">
-                                        ${order.tax.toFixed(2)}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-400">
-                                        Shipping:
-                                    </span>
-                                    <span className="text-white">
-                                        ${order.shipping.toFixed(2)}
-                                    </span>
-                                </div>
+                                {order.tax_amount > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-slate-400">
+                                            Tax:
+                                        </span>
+                                        <span className="text-white">
+                                            $
+                                            {parseFloat(
+                                                order.tax_amount || 0
+                                            ).toFixed(2)}
+                                        </span>
+                                    </div>
+                                )}
+                                {order.discount_amount > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-slate-400">
+                                            Discount:
+                                        </span>
+                                        <span className="text-green-400">
+                                            -$
+                                            {parseFloat(
+                                                order.discount_amount || 0
+                                            ).toFixed(2)}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between font-medium pt-2 border-t border-slate-700">
                                     <span className="text-white">Total:</span>
                                     <span className="text-white">
-                                        ${order.total.toFixed(2)}
+                                        $
+                                        {parseFloat(
+                                            order.total_amount || 0
+                                        ).toFixed(2)}
                                     </span>
                                 </div>
                             </div>
@@ -357,6 +411,16 @@ export default function AdminOrderDetailsPage({ params }) {
                     <OrderItemsTable items={order.items} />
                 </div>
 
+                {/* Notes */}
+                {order.notes && (
+                    <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700 p-6">
+                        <h3 className="font-heading font-semibold text-lg text-white mb-4">
+                            Order Notes
+                        </h3>
+                        <p className="text-slate-300">{order.notes}</p>
+                    </div>
+                )}
+
                 {/* Activity Log */}
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700 p-6">
                     <h3 className="font-heading font-semibold text-lg text-white mb-4">
@@ -366,23 +430,123 @@ export default function AdminOrderDetailsPage({ params }) {
                 </div>
             </div>
 
-            {/* Order Action Modal */}
-            <OrderActionModal
-                isOpen={actionModal.isOpen}
-                onClose={() =>
-                    setActionModal({
-                        isOpen: false,
-                        type: "",
-                        title: "",
-                        message: "",
-                    })
-                }
-                onConfirm={handleConfirmAction}
-                type={actionModal.type}
-                title={actionModal.title}
-                message={actionModal.message}
-                order={order}
-            />
+            {/* Status Update Modal */}
+            {statusModal.isOpen && (
+                <StatusUpdateModal
+                    isOpen={statusModal.isOpen}
+                    onClose={() =>
+                        setStatusModal({
+                            isOpen: false,
+                            type: "",
+                            title: "",
+                            currentValue: "",
+                        })
+                    }
+                    onConfirm={handleStatusChange}
+                    type={statusModal.type}
+                    title={statusModal.title}
+                    currentValue={statusModal.currentValue}
+                    loading={loading}
+                />
+            )}
         </AdminLayout>
+    );
+}
+
+// Status Update Modal Component
+function StatusUpdateModal({
+    isOpen,
+    onClose,
+    onConfirm,
+    type,
+    title,
+    currentValue,
+    loading,
+}) {
+    const [selectedValue, setSelectedValue] = useState(currentValue);
+    const [reason, setReason] = useState("");
+
+    const statusOptions =
+        type === "status"
+            ? [
+                  { value: "pending", label: "Pending" },
+                  { value: "processing", label: "Processing" },
+                  { value: "completed", label: "Completed" },
+                  { value: "cancelled", label: "Cancelled" },
+                  { value: "refunded", label: "Refunded" },
+              ]
+            : [
+                  { value: "pending", label: "Pending" },
+                  { value: "paid", label: "Paid" },
+                  { value: "failed", label: "Failed" },
+                  { value: "refunded", label: "Refunded" },
+              ];
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onConfirm(selectedValue, reason);
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 w-full max-w-md mx-4">
+                <h2 className="text-xl font-bold text-white mb-4">{title}</h2>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            {type === "status"
+                                ? "Order Status"
+                                : "Payment Status"}
+                        </label>
+                        <select
+                            value={selectedValue}
+                            onChange={(e) => setSelectedValue(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            required
+                        >
+                            {statusOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Reason (Optional)
+                        </label>
+                        <textarea
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            rows="3"
+                            placeholder="Enter reason for status change..."
+                        />
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                            disabled={loading}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading || selectedValue === currentValue}
+                            className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loading ? "Updating..." : "Update Status"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     );
 }

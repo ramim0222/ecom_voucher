@@ -1,53 +1,328 @@
-"use client";
-
 import { useState } from "react";
+import { router } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
-import { OrdersTable } from "@/Components/Admin/OrdersTable";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export default function AdminOrders() {
-    const [filter, setFilter] = useState("all");
+export default function AdminOrders({ orders, filters = {} }) {
+    const [currentFilters, setCurrentFilters] = useState({
+        status: filters.status || "",
+        payment_status: filters.payment_status || "",
+        search: filters.search || "",
+    });
+
+    const [loading, setLoading] = useState(false);
 
     const filterOptions = [
-        { value: "all", label: "All Orders" },
+        { value: "", label: "All Orders" },
         { value: "pending", label: "Pending" },
         { value: "processing", label: "Processing" },
-        { value: "delivered", label: "Delivered" },
+        { value: "completed", label: "Completed" },
         { value: "cancelled", label: "Cancelled" },
+        { value: "refunded", label: "Refunded" },
     ];
+
+    const paymentFilterOptions = [
+        { value: "", label: "All Payments" },
+        { value: "pending", label: "Pending" },
+        { value: "paid", label: "Paid" },
+        { value: "failed", label: "Failed" },
+        { value: "refunded", label: "Refunded" },
+    ];
+
+    const handleFilterChange = (filterName, value) => {
+        setLoading(true);
+        const newFilters = { ...currentFilters, [filterName]: value };
+        setCurrentFilters(newFilters);
+
+        router.get(route("admin.orders.index"), newFilters, {
+            preserveState: true,
+            preserveScroll: true,
+            onFinish: () => setLoading(false),
+        });
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        setLoading(true);
+        router.get(route("admin.orders.index"), currentFilters, {
+            preserveState: true,
+            preserveScroll: true,
+            onFinish: () => setLoading(false),
+        });
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "completed":
+                return "text-green-400 bg-green-400/20";
+            case "processing":
+                return "text-yellow-400 bg-yellow-400/20";
+            case "pending":
+                return "text-blue-400 bg-blue-400/20";
+            case "cancelled":
+                return "text-red-400 bg-red-400/20";
+            case "refunded":
+                return "text-purple-400 bg-purple-400/20";
+            default:
+                return "text-slate-400 bg-slate-400/20";
+        }
+    };
+
+    const getPaymentStatusColor = (status) => {
+        switch (status) {
+            case "paid":
+                return "text-green-400 bg-green-400/20";
+            case "pending":
+                return "text-yellow-400 bg-yellow-400/20";
+            case "failed":
+                return "text-red-400 bg-red-400/20";
+            case "refunded":
+                return "text-purple-400 bg-purple-400/20";
+            default:
+                return "text-slate-400 bg-slate-400/20";
+        }
+    };
 
     return (
         <AdminLayout>
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 className="font-heading font-bold text-3xl mb-2">
+                        <h1 className="font-heading font-bold text-3xl mb-2 text-white">
                             Orders Management
                         </h1>
-                        <p className="text-muted-foreground">
+                        <p className="text-slate-400">
                             Monitor and manage customer orders
                         </p>
                     </div>
+                </div>
 
-                    <div className="flex gap-2">
-                        {filterOptions.map((option) => (
-                            <GamingButton
-                                key={option.value}
-                                variant={
-                                    filter === option.value
-                                        ? "primary"
-                                        : "ghost"
+                {/* Filters */}
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
+                    <div className="flex flex-col lg:flex-row gap-4">
+                        {/* Search */}
+                        <form onSubmit={handleSearch} className="flex-1">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Search by order number, customer name or email..."
+                                    value={currentFilters.search}
+                                    onChange={(e) =>
+                                        setCurrentFilters({
+                                            ...currentFilters,
+                                            search: e.target.value,
+                                        })
+                                    }
+                                    className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                />
+                                <GamingButton
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                >
+                                    Search
+                                </GamingButton>
+                            </div>
+                        </form>
+
+                        {/* Status Filters */}
+                        <div className="flex gap-2">
+                            <select
+                                value={currentFilters.status}
+                                onChange={(e) =>
+                                    handleFilterChange("status", e.target.value)
                                 }
-                                size="sm"
-                                onClick={() => setFilter(option.value)}
+                                className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                             >
-                                {option.label}
-                            </GamingButton>
-                        ))}
+                                {filterOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <select
+                                value={currentFilters.payment_status}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        "payment_status",
+                                        e.target.value
+                                    )
+                                }
+                                className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            >
+                                {paymentFilterOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <OrdersTable filter={filter} />
+                {/* Orders Table */}
+                <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
+                    {loading && (
+                        <div className="text-center py-4">
+                            <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-orange-500 border-t-transparent"></div>
+                            <span className="ml-2 text-slate-400">
+                                Loading...
+                            </span>
+                        </div>
+                    )}
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="border-b border-slate-700">
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Order ID
+                                    </th>
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Customer
+                                    </th>
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Items
+                                    </th>
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Total
+                                    </th>
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Status
+                                    </th>
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Payment
+                                    </th>
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Date
+                                    </th>
+                                    <th className="text-left py-3 text-slate-400 font-medium">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orders.data && orders.data.length > 0 ? (
+                                    orders.data.map((order) => (
+                                        <tr
+                                            key={order.id}
+                                            className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors"
+                                        >
+                                            <td className="py-3 text-white font-medium">
+                                                {order.order_number}
+                                            </td>
+                                            <td className="py-3">
+                                                <div>
+                                                    <p className="text-white">
+                                                        {order.user.first_name}{" "}
+                                                        {order.user.last_name}
+                                                    </p>
+                                                    <p className="text-slate-400 text-sm">
+                                                        {order.user.email}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td className="py-3 text-slate-300">
+                                                {order.order_items?.length || 0}
+                                            </td>
+                                            <td className="py-3 text-white font-medium">
+                                                $
+                                                {parseFloat(
+                                                    order.total_amount || 0
+                                                ).toFixed(2)}
+                                            </td>
+                                            <td className="py-3">
+                                                <span
+                                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                                        order.status
+                                                    )}`}
+                                                >
+                                                    {order.status}
+                                                </span>
+                                            </td>
+                                            <td className="py-3">
+                                                <span
+                                                    className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(
+                                                        order.payment_status
+                                                    )}`}
+                                                >
+                                                    {order.payment_status}
+                                                </span>
+                                            </td>
+                                            <td className="py-3 text-slate-400">
+                                                {new Date(
+                                                    order.created_at
+                                                ).toLocaleDateString()}
+                                            </td>
+                                            <td className="py-3">
+                                                <GamingButton
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        router.visit(
+                                                            route(
+                                                                "admin.orders.show",
+                                                                order.id
+                                                            )
+                                                        )
+                                                    }
+                                                >
+                                                    View Details
+                                                </GamingButton>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan="8"
+                                            className="py-8 text-center text-slate-400"
+                                        >
+                                            No orders found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Pagination */}
+                    {orders.links && orders.links.length > 3 && (
+                        <div className="mt-6 flex items-center justify-center gap-2">
+                            {orders.links.map((link, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => {
+                                        if (link.url) {
+                                            router.visit(link.url, {
+                                                preserveState: true,
+                                                preserveScroll: true,
+                                            });
+                                        }
+                                    }}
+                                    disabled={!link.url}
+                                    className={`px-3 py-1 rounded text-sm ${
+                                        link.active
+                                            ? "bg-orange-500 text-white"
+                                            : link.url
+                                            ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                            : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                                    }`}
+                                    dangerouslySetInnerHTML={{
+                                        __html: link.label,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </AdminLayout>
     );

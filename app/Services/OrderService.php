@@ -237,6 +237,14 @@ class OrderService
     }
 
     /**
+     * Public method to assign codes to order (for admin use)
+     */
+    public function assignCodesToOrder(Order $order): void
+    {
+        $this->assignCodesAtPayment($order);
+    }
+
+    /**
      * Assign codes immediately upon successful payment
      */
     protected function assignCodesAtPayment(Order $order): void
