@@ -71,7 +71,11 @@ class OrderItem extends Model
             return collect();
         }
 
-        return Code::whereIn('id', $this->assigned_codes)->get();
+        try {
+            return \App\Models\Code::whereIn('id', $this->assigned_codes)->get();
+        } catch (\Exception $e) {
+            return collect();
+        }
     }
 
     /**
@@ -83,8 +87,12 @@ class OrderItem extends Model
             return [];
         }
 
-        return Code::whereIn('id', $this->assigned_codes)
-            ->pluck('code')
-            ->toArray();
+        try {
+            return \App\Models\Code::whereIn('id', $this->assigned_codes)
+                ->pluck('code')
+                ->toArray();
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 }

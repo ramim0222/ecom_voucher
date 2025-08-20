@@ -15,6 +15,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Front\IndexController;
+use App\Http\Controllers\Front\DashboardController as FrontDashboardController;
 
 Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
@@ -41,9 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     ], function () {
         //Dashboard routes
-        Route::get('/dashboard', function () {
-            return Inertia::render('Dashboard/Dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [FrontDashboardController::class, 'index'])->name('dashboard');
 
         //Dashboard Profile routes
         Route::get('/dashboard/profile', [ProfileController::class, 'dashboard'])->name('dashboard.profile');
