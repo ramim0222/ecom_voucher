@@ -1,10 +1,16 @@
-export function TopProducts() {
-    const products = [
-        { name: "Steam Wallet $50", sales: 234, revenue: "$10,530" },
-        { name: "PlayStation Store $25", sales: 189, revenue: "$4,725" },
-        { name: "Xbox Game Pass 3 Months", sales: 156, revenue: "$4,680" },
-        { name: "Nintendo eShop $20", sales: 134, revenue: "$2,680" },
-    ];
+export function TopProducts({ topProducts }) {
+    if (!topProducts || topProducts.length === 0) {
+        return (
+            <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
+                <h3 className="font-heading font-semibold text-xl mb-6 text-white">
+                    Top Products
+                </h3>
+                <div className="text-center py-8 text-slate-400">
+                    <p>No product data available</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
@@ -12,22 +18,33 @@ export function TopProducts() {
                 Top Products
             </h3>
             <div className="space-y-4">
-                {products.map((product, index) => (
+                {topProducts.map((product, index) => (
                     <div
-                        key={index}
+                        key={product.id}
                         className="flex items-center justify-between"
                     >
-                        <div>
-                            <p className="font-medium text-white">
-                                {product.name}
-                            </p>
-                            <p className="text-sm text-slate-400">
-                                {product.sales} sales
-                            </p>
+                        <div className="flex items-center space-x-3">
+                            <img
+                                src={product.image}
+                                alt={product.title}
+                                className="w-10 h-10 rounded-lg object-cover bg-slate-700"
+                            />
+                            <div>
+                                <p className="font-medium text-white">
+                                    {product.title}
+                                </p>
+                                <p className="text-sm text-slate-400">
+                                    {product.total_orders} orders •{" "}
+                                    {product.category}
+                                </p>
+                            </div>
                         </div>
                         <div className="text-right">
                             <p className="font-bold text-orange-400">
-                                {product.revenue}
+                                ${product.total_revenue}
+                            </p>
+                            <p className="text-sm text-slate-400">
+                                ${product.price} each
                             </p>
                         </div>
                     </div>

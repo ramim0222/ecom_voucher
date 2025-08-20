@@ -109,4 +109,16 @@ class IndexController extends Controller
         ]);
     }
 
+    public function support()
+    {
+        // Get approved reviews for customer satisfaction metrics
+        $reviews = \App\Models\Review::with(['user', 'product'])
+            ->where('status', 'approved')
+            ->get(['id', 'user_id', 'product_id', 'rating', 'review', 'status']);
+
+        return Inertia::render('Support', [
+            'reviews' => $reviews
+        ]);
+    }
+
 }

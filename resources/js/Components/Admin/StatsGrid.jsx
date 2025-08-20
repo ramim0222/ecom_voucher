@@ -1,34 +1,38 @@
-export function StatsGrid() {
-    const stats = [
+export function StatsGrid({ stats }) {
+    if (!stats) return null;
+
+    const statCards = [
         {
             label: "Total Revenue",
-            value: "$12,456",
-            change: "+12.5%",
-            positive: true,
+            value: `$${stats.totalRevenue?.toLocaleString() || "0"}`,
+            change: `${stats.monthGrowth >= 0 ? "+" : ""}${
+                stats.monthGrowth || 0
+            }%`,
+            positive: stats.monthGrowth >= 0,
         },
         {
             label: "Total Orders",
-            value: "1,234",
-            change: "+8.2%",
+            value: stats.totalOrders?.toLocaleString() || "0",
+            change: `Today: ${stats.todayOrders || 0}`,
             positive: true,
         },
         {
-            label: "Active Users",
-            value: "5,678",
-            change: "+15.3%",
+            label: "Total Customers",
+            value: stats.totalCustomers?.toLocaleString() || "0",
+            change: `Products: ${stats.totalProducts || 0}`,
             positive: true,
         },
         {
-            label: "Products Sold",
-            value: "2,345",
-            change: "-2.1%",
-            positive: false,
+            label: "Today's Revenue",
+            value: `$${stats.todayRevenue?.toLocaleString() || "0"}`,
+            change: `Reviews: ${stats.totalReviews || 0}`,
+            positive: true,
         },
     ];
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
+            {statCards.map((stat, index) => (
                 <div
                     key={index}
                     className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700"

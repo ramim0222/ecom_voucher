@@ -85,4 +85,12 @@ class ProfileController extends Controller
         return back()->with('status', 'preferences-updated');
     }
 
+    /**
+     * Display the admin profile page.
+     */
+    public function admin(Request $request): Response
+    {
+        return Inertia::render('Admin/Profile');
+    }
+
 }

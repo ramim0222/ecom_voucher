@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\Front\CartController;
@@ -16,20 +17,10 @@ use Inertia\Inertia;
 use App\Http\Controllers\Front\IndexController;
 
 Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
-
-
-
 Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
-
-
-
 Route::get('/products', [FrontProductController::class, 'products'])->name('products');
 Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('product');
-
-// Review routes
-Route::middleware(['auth', 'verified'])->group(function () {
-
-});
+Route::get('/support', [IndexController::class, 'support'])->name('support');
 
 
 
@@ -106,14 +97,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ], function () {
 
 
-        Route::get('/admin', function () {
-            return Inertia::render('Admin/Dashboard');
-        })->name('admin');
+        Route::get('/admin', [DashboardController::class, 'index'])->name('admin');
 
-        Route::get('/admin/profile', function () {
-            return Inertia::render('Admin/Profile');
-        })->name('admin.profile');
-
+        Route::get('/admin/profile', [ProfileController::class, 'admin'])->name('admin.profile');
         Route::patch('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
 
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');

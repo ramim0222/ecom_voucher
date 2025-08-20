@@ -1,40 +1,23 @@
-export function RecentOrders() {
-    const orders = [
-        {
-            id: "ORD-2024-001",
-            customer: "John Doe",
-            total: "$99.33",
-            status: "delivered",
-            date: "2024-01-15",
-        },
-        {
-            id: "ORD-2024-002",
-            customer: "Jane Smith",
-            total: "$29.99",
-            status: "processing",
-            date: "2024-01-15",
-        },
-        {
-            id: "ORD-2024-003",
-            customer: "Mike Johnson",
-            total: "$18.99",
-            status: "pending",
-            date: "2024-01-14",
-        },
-        {
-            id: "ORD-2024-004",
-            customer: "Sarah Wilson",
-            total: "$45.99",
-            status: "delivered",
-            date: "2024-01-14",
-        },
-    ];
+export function RecentOrders({ recentOrders }) {
+    if (!recentOrders || recentOrders.length === 0) {
+        return (
+            <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
+                <h3 className="font-heading font-semibold text-xl text-white mb-6">
+                    Recent Orders
+                </h3>
+                <div className="text-center py-8 text-slate-400">
+                    <p>No recent orders found</p>
+                </div>
+            </div>
+        );
+    }
 
     const statusColors = {
-        delivered: "text-green-400 bg-green-400/20",
+        completed: "text-green-400 bg-green-400/20",
         processing: "text-yellow-400 bg-yellow-400/20",
         pending: "text-blue-400 bg-blue-400/20",
         cancelled: "text-red-400 bg-red-400/20",
+        refunded: "text-purple-400 bg-purple-400/20",
     };
 
     return (
@@ -73,31 +56,37 @@ export function RecentOrders() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order) => (
+                        {recentOrders.map((order) => (
                             <tr
                                 key={order.id}
                                 className="border-b border-slate-700/50"
                             >
                                 <td className="py-3 text-white font-medium">
-                                    {order.id}
+                                    {order.order_number}
                                 </td>
                                 <td className="py-3 text-slate-300">
-                                    {order.customer}
+                                    <div>
+                                        <div>{order.customer_name}</div>
+                                        <div className="text-xs text-slate-500">
+                                            {order.customer_email}
+                                        </div>
+                                    </div>
                                 </td>
                                 <td className="py-3 text-white font-medium">
-                                    {order.total}
+                                    ${order.total_amount}
                                 </td>
                                 <td className="py-3">
                                     <span
                                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            statusColors[order.status]
+                                            statusColors[order.status] ||
+                                            "text-slate-400 bg-slate-400/20"
                                         }`}
                                     >
                                         {order.status}
                                     </span>
                                 </td>
                                 <td className="py-3 text-slate-400">
-                                    {new Date(order.date).toLocaleDateString()}
+                                    {order.created_at}
                                 </td>
                             </tr>
                         ))}
