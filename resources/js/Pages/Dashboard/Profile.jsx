@@ -107,24 +107,24 @@ export default function ProfilePage({ user, status }) {
             <Head title="Profile Settings" />
             <Header />
             <DashboardLayout>
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
                     <div>
-                        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">
+                        <h1 className="font-heading font-bold text-xl sm:text-2xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-4xl mb-2 sm:mb-3 md:mb-3 lg:mb-4 xl:mb-5 2xl:mb-6">
                             Account Settings
                         </h1>
-                        <p className="text-muted-foreground">
+                        <p className="text-muted-foreground text-sm sm:text-sm md:text-base lg:text-base xl:text-base 2xl:text-lg">
                             Manage your account information and preferences
                         </p>
                     </div>
 
-                    <div className="glass-card rounded-xl p-6">
+                    <div className="glass-card rounded-xl p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 2xl:p-10">
                         {/* Tab Navigation */}
-                        <div className="flex border-b border-border mb-6">
+                        <div className="flex flex-col sm:flex-row border-b border-border mb-4 sm:mb-5 md:mb-6 lg:mb-6 xl:mb-8 2xl:mb-10">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`px-4 py-2 font-medium transition-colors ${
+                                    className={`px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 font-medium transition-colors text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base ${
                                         activeTab === tab.id
                                             ? "border-b-2 border-accent text-accent"
                                             : "text-muted-foreground hover:text-foreground"
@@ -139,11 +139,12 @@ export default function ProfilePage({ user, status }) {
                         {activeTab === "profile" && (
                             <form
                                 onSubmit={handleProfileSubmit}
-                                className="space-y-6"
+                                className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10"
                             >
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Name Fields */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                        <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                             First Name
                                         </label>
                                         <input
@@ -155,16 +156,16 @@ export default function ProfilePage({ user, status }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                            className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         />
                                         {profileErrors.first_name && (
-                                            <p className="text-red-500 text-sm mt-1">
+                                            <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                                 {profileErrors.first_name}
                                             </p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                        <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                             Last Name
                                         </label>
                                         <input
@@ -176,18 +177,19 @@ export default function ProfilePage({ user, status }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                            className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         />
                                         {profileErrors.last_name && (
-                                            <p className="text-red-500 text-sm mt-1">
+                                            <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                                 {profileErrors.last_name}
                                             </p>
                                         )}
                                     </div>
                                 </div>
 
+                                {/* Email Field */}
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
+                                    <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                         Email Address
                                     </label>
                                     <input
@@ -199,18 +201,19 @@ export default function ProfilePage({ user, status }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                     />
                                     {profileErrors.email && (
-                                        <p className="text-red-500 text-sm mt-1">
+                                        <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                             {profileErrors.email}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Phone and Date of Birth */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                        <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                             Phone Number
                                         </label>
                                         <input
@@ -222,16 +225,16 @@ export default function ProfilePage({ user, status }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                            className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         />
                                         {profileErrors.phone_number && (
-                                            <p className="text-red-500 text-sm mt-1">
+                                            <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                                 {profileErrors.phone_number}
                                             </p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                        <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                             Date of Birth
                                         </label>
                                         <div className="relative">
@@ -287,7 +290,7 @@ export default function ProfilePage({ user, status }) {
                                                         e.target.value
                                                     );
                                                 }}
-                                                className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary text-foreground pr-12"
+                                                className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-foreground pr-8 sm:pr-10 md:pr-12 lg:pr-12 xl:pr-16 2xl:pr-20 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                             />
                                             <button
                                                 type="button"
@@ -305,10 +308,10 @@ export default function ProfilePage({ user, status }) {
                                                         }
                                                     }
                                                 }}
-                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground hover:text-primary transition-colors"
+                                                className="absolute right-2 sm:right-3 md:right-3 lg:right-3 xl:right-4 2xl:right-6 top-1/2 transform -translate-y-1/2 text-foreground hover:text-primary transition-colors"
                                             >
                                                 <svg
-                                                    className="w-5 h-5"
+                                                    className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7"
                                                     fill="none"
                                                     stroke="currentColor"
                                                     viewBox="0 0 24 24"
@@ -324,15 +327,16 @@ export default function ProfilePage({ user, status }) {
                                             </button>
                                         </div>
                                         {profileErrors.date_of_birth && (
-                                            <p className="text-red-500 text-sm mt-1">
+                                            <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                                 {profileErrors.date_of_birth}
                                             </p>
                                         )}
                                     </div>
                                 </div>
 
+                                {/* Street Address */}
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
+                                    <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                         Street Address
                                     </label>
                                     <input
@@ -345,18 +349,19 @@ export default function ProfilePage({ user, status }) {
                                             )
                                         }
                                         placeholder="Enter your street address"
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                     />
                                     {profileErrors.street_address && (
-                                        <p className="text-red-500 text-sm mt-1">
+                                        <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                             {profileErrors.street_address}
                                         </p>
                                     )}
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* City, State, ZIP */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                        <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                             City
                                         </label>
                                         <input
@@ -369,16 +374,16 @@ export default function ProfilePage({ user, status }) {
                                                 )
                                             }
                                             placeholder="Enter your city"
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                            className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         />
                                         {profileErrors.city && (
-                                            <p className="text-red-500 text-sm mt-1">
+                                            <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                                 {profileErrors.city}
                                             </p>
                                         )}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                        <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                             State/Province
                                         </label>
                                         <input
@@ -391,16 +396,16 @@ export default function ProfilePage({ user, status }) {
                                                 )
                                             }
                                             placeholder="Enter your state/province"
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                            className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         />
                                         {profileErrors.state && (
-                                            <p className="text-red-500 text-sm mt-1">
+                                            <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                                 {profileErrors.state}
                                             </p>
                                         )}
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                    <div className="sm:col-span-2 lg:col-span-1">
+                                        <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                             ZIP/Postal Code
                                         </label>
                                         <input
@@ -413,18 +418,19 @@ export default function ProfilePage({ user, status }) {
                                                 )
                                             }
                                             placeholder="Enter your ZIP/postal code"
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                            className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         />
                                         {profileErrors.zip && (
-                                            <p className="text-red-500 text-sm mt-1">
+                                            <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                                 {profileErrors.zip}
                                             </p>
                                         )}
                                     </div>
                                 </div>
 
+                                {/* Country */}
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
+                                    <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                         Country
                                     </label>
                                     <select
@@ -435,7 +441,7 @@ export default function ProfilePage({ user, status }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                     >
                                         <option value="Bangladesh">
                                             Bangladesh
@@ -452,7 +458,7 @@ export default function ProfilePage({ user, status }) {
                                         </option>
                                     </select>
                                     {profileErrors.country && (
-                                        <p className="text-red-500 text-sm mt-1">
+                                        <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                             {profileErrors.country}
                                         </p>
                                     )}
@@ -463,6 +469,7 @@ export default function ProfilePage({ user, status }) {
                                     variant="primary"
                                     size="lg"
                                     disabled={profileProcessing}
+                                    className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base px-3 sm:px-4 md:px-4 lg:px-6 xl:px-8 2xl:px-10 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5"
                                 >
                                     {profileProcessing
                                         ? "Saving..."
@@ -475,10 +482,10 @@ export default function ProfilePage({ user, status }) {
                         {activeTab === "password" && (
                             <form
                                 onSubmit={handlePasswordSubmit}
-                                className="space-y-6"
+                                className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10"
                             >
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
+                                    <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                         Current Password
                                     </label>
                                     <input
@@ -490,18 +497,18 @@ export default function ProfilePage({ user, status }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         placeholder="Enter current password"
                                     />
                                     {passwordErrors.current_password && (
-                                        <p className="text-red-500 text-sm mt-1">
+                                        <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                             {passwordErrors.current_password}
                                         </p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
+                                    <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                         New Password
                                     </label>
                                     <input
@@ -513,18 +520,18 @@ export default function ProfilePage({ user, status }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         placeholder="Enter new password"
                                     />
                                     {passwordErrors.password && (
-                                        <p className="text-red-500 text-sm mt-1">
+                                        <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                             {passwordErrors.password}
                                         </p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">
+                                    <label className="block text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium mb-1 sm:mb-2 md:mb-2 lg:mb-2 xl:mb-3 2xl:mb-4">
                                         Confirm New Password
                                     </label>
                                     <input
@@ -538,11 +545,11 @@ export default function ProfilePage({ user, status }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
+                                        className="w-full bg-input border border-border rounded-lg px-2 sm:px-3 md:px-4 lg:px-4 xl:px-6 2xl:px-8 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5 focus:outline-none focus:ring-2 focus:ring-primary text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base"
                                         placeholder="Confirm new password"
                                     />
                                     {passwordErrors.password_confirmation && (
-                                        <p className="text-red-500 text-sm mt-1">
+                                        <p className="text-red-500 text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base mt-1 sm:mt-1.5 md:mt-2 lg:mt-2 xl:mt-3 2xl:mt-4">
                                             {
                                                 passwordErrors.password_confirmation
                                             }
@@ -555,6 +562,7 @@ export default function ProfilePage({ user, status }) {
                                     variant="primary"
                                     size="lg"
                                     disabled={passwordProcessing}
+                                    className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base px-3 sm:px-4 md:px-4 lg:px-6 xl:px-8 2xl:px-10 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5"
                                 >
                                     {passwordProcessing
                                         ? "Changing..."
@@ -567,14 +575,14 @@ export default function ProfilePage({ user, status }) {
                         {activeTab === "preferences" && (
                             <form
                                 onSubmit={handlePreferencesSubmit}
-                                className="space-y-6"
+                                className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10"
                             >
                                 <div>
-                                    <h3 className="font-heading font-semibold text-lg mb-4">
+                                    <h3 className="font-heading font-semibold text-base sm:text-lg md:text-lg lg:text-lg xl:text-xl 2xl:text-2xl mb-3 sm:mb-4 md:mb-4 lg:mb-6 xl:mb-8 2xl:mb-10">
                                         Notification Preferences
                                     </h3>
-                                    <div className="space-y-4">
-                                        <label className="flex items-center gap-3 cursor-pointer">
+                                    <div className="space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
+                                        <label className="flex items-start sm:items-center gap-2 sm:gap-3 cursor-pointer">
                                             <input
                                                 type="checkbox"
                                                 checked={
@@ -586,20 +594,20 @@ export default function ProfilePage({ user, status }) {
                                                         e.target.checked
                                                     )
                                                 }
-                                                className="rounded border-border"
+                                                className="mt-1 sm:mt-0 rounded border-border w-3 h-3 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6"
                                             />
                                             <div>
-                                                <span className="font-medium">
+                                                <span className="font-medium text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base">
                                                     Promotional Emails
                                                 </span>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base text-muted-foreground">
                                                     Receive promotional offers
                                                     and deals
                                                 </p>
                                             </div>
                                         </label>
 
-                                        <label className="flex items-center gap-3 cursor-pointer">
+                                        <label className="flex items-start sm:items-center gap-2 sm:gap-3 cursor-pointer">
                                             <input
                                                 type="checkbox"
                                                 checked={
@@ -611,13 +619,13 @@ export default function ProfilePage({ user, status }) {
                                                         e.target.checked
                                                     )
                                                 }
-                                                className="rounded border-border"
+                                                className="mt-1 sm:mt-0 rounded border-border w-3 h-3 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-5 xl:h-5 2xl:w-6 2xl:h-6"
                                             />
                                             <div>
-                                                <span className="font-medium">
+                                                <span className="font-medium text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base">
                                                     Other Updates
                                                 </span>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base text-muted-foreground">
                                                     Receive updates about your
                                                     orders and account
                                                 </p>
@@ -631,6 +639,7 @@ export default function ProfilePage({ user, status }) {
                                     variant="primary"
                                     size="lg"
                                     disabled={preferencesProcessing}
+                                    className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base px-3 sm:px-4 md:px-4 lg:px-6 xl:px-8 2xl:px-10 py-2 sm:py-2.5 md:py-3 lg:py-3 xl:py-4 2xl:py-5"
                                 >
                                     {preferencesProcessing
                                         ? "Saving..."
