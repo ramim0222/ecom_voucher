@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export function ProductsTable({
@@ -40,7 +39,17 @@ export function ProductsTable({
                         </tr>
                     </thead>
                     <tbody>
-                        {products.map((product) => (
+                        {products.map((product) => {
+                            const price = Number(product.price);
+                            const originalPrice = Number(
+                                product.original_price
+                            );
+                            const hasDiscount =
+                                !Number.isNaN(originalPrice) &&
+                                !Number.isNaN(price) &&
+                                originalPrice > price;
+
+                            return (
                             <tr
                                 key={product.id}
                                 className="border-b border-slate-700/50"
@@ -73,10 +82,15 @@ export function ProductsTable({
                                     </div>
                                 </td>
                                 <td className="py-3">
-                                    <div>
+                                    <div className="flex items-center gap-2 flex-wrap">
                                         <p className="text-white font-medium">
                                             {product.title}
                                         </p>
+                                        {product.is_featured && (
+                                            <span className="bg-accent/20 text-accent px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap">
+                                                ⭐ Featured
+                                            </span>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="py-3 text-slate-300">
@@ -85,15 +99,16 @@ export function ProductsTable({
                                 <td className="py-3">
                                     <div className="flex items-center gap-2">
                                         <span className="text-white font-medium">
-                                            ${product.price}
+                                            $
+                                            {Number.isNaN(price)
+                                                ? product.price
+                                                : price.toFixed(2)}
                                         </span>
-                                        {product.original_price &&
-                                            product.original_price >
-                                                product.price && (
-                                                <span className="text-slate-400 line-through text-sm">
-                                                    ${product.original_price}
-                                                </span>
-                                            )}
+                                        {hasDiscount && (
+                                            <span className="text-slate-400 line-through text-sm">
+                                                ${originalPrice.toFixed(2)}
+                                            </span>
+                                        )}
                                     </div>
                                 </td>
                                 <td className="py-3">
@@ -155,7 +170,8 @@ export function ProductsTable({
                                     </div>
                                 </td>
                             </tr>
-                        ))}
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
