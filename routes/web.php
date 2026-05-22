@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MarketingController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\Front\CartController;
@@ -129,6 +131,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/reviews', [AdminReviewController::class, 'index'])->name('admin.reviews');
         Route::patch('/admin/reviews/{review}/status', [AdminReviewController::class, 'updateStatus'])->name('admin.reviews.update-status');
         Route::delete('/admin/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+        Route::get('/admin/settings', [SettingsController::class, 'index'])->name('admin.settings');
+
+        Route::prefix('admin/settings/marketing')->group(function () {
+            Route::get('/meta', [MarketingController::class, 'indexMeta'])->name('admin.settings.marketing.meta');
+            Route::get('/google', [MarketingController::class, 'indexGoogle'])->name('admin.settings.marketing.google');
+            Route::get('/tiktok', [MarketingController::class, 'indexTiktok'])->name('admin.settings.marketing.tiktok');
+            Route::put('/meta', [MarketingController::class, 'updateMeta'])->name('admin.settings.marketing.meta.update');
+            Route::put('/google', [MarketingController::class, 'updateGoogle'])->name('admin.settings.marketing.google.update');
+            Route::put('/tiktok', [MarketingController::class, 'updateTiktok'])->name('admin.settings.marketing.tiktok.update');
+        });
 
     });
 });
