@@ -1,3 +1,5 @@
+import { router } from "@inertiajs/react";
+
 export function RecentOrders({ recentOrders }) {
     if (!recentOrders || recentOrders.length === 0) {
         return (
@@ -20,18 +22,26 @@ export function RecentOrders({ recentOrders }) {
         refunded: "text-purple-400 bg-purple-400/20",
     };
 
+    const paymentColors = {
+        paid: "text-green-400 bg-green-400/20",
+        pending: "text-yellow-400 bg-yellow-400/20",
+        failed: "text-red-400 bg-red-400/20",
+        refunded: "text-purple-400 bg-purple-400/20",
+    };
+
     return (
         <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
             <div className="flex items-center justify-between mb-6">
                 <h3 className="font-heading font-semibold text-xl text-white">
                     Recent Orders
                 </h3>
-                <a
-                    href="/admin/orders"
+                <button
+                    type="button"
+                    onClick={() => router.visit(route("admin.orders.index"))}
                     className="text-orange-400 hover:text-orange-300 text-sm"
                 >
                     View All
-                </a>
+                </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -51,6 +61,9 @@ export function RecentOrders({ recentOrders }) {
                                 Status
                             </th>
                             <th className="text-left py-3 text-slate-400 font-medium">
+                                Payment
+                            </th>
+                            <th className="text-left py-3 text-slate-400 font-medium">
                                 Date
                             </th>
                         </tr>
@@ -59,7 +72,12 @@ export function RecentOrders({ recentOrders }) {
                         {recentOrders.map((order) => (
                             <tr
                                 key={order.id}
-                                className="border-b border-slate-700/50"
+                                className="border-b border-slate-700/50 hover:bg-slate-700/20 transition-colors cursor-pointer"
+                                onClick={() =>
+                                    router.visit(
+                                        route("admin.orders.show", order.id)
+                                    )
+                                }
                             >
                                 <td className="py-3 text-white font-medium">
                                     {order.order_number}
@@ -73,7 +91,10 @@ export function RecentOrders({ recentOrders }) {
                                     </div>
                                 </td>
                                 <td className="py-3 text-white font-medium">
-                                    Tk {order.total_amount}
+                                    Tk{" "}
+                                    {parseFloat(order.total_amount || 0).toFixed(
+                                        2
+                                    )}
                                 </td>
                                 <td className="py-3">
                                     <span
@@ -83,6 +104,18 @@ export function RecentOrders({ recentOrders }) {
                                         }`}
                                     >
                                         {order.status}
+                                    </span>
+                                </td>
+                                <td className="py-3">
+                                    <span
+                                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                            paymentColors[
+                                                order.payment_status
+                                            ] ||
+                                            "text-slate-400 bg-slate-400/20"
+                                        }`}
+                                    >
+                                        {order.payment_status}
                                     </span>
                                 </td>
                                 <td className="py-3 text-slate-400">

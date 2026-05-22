@@ -34,8 +34,8 @@ export function AdminLayout({ children }) {
 
             {/* Sidebar */}
             <aside
-                className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-800/50 backdrop-blur-xl border-r border-slate-700 transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
-                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed inset-y-0 left-0 z-50 w-64 h-screen overflow-y-auto bg-slate-800/50 backdrop-blur-xl border-r border-slate-700 transform transition-transform duration-200 ease-in-out ${
+                    isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 }`}
             >
                 <div className="flex flex-col h-full p-6">
@@ -80,7 +80,7 @@ export function AdminLayout({ children }) {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 lg:ml-0">
+            <main className="flex-1 min-h-screen lg:ml-64">
                 {/* Mobile Header */}
                 <div className="lg:hidden flex items-center justify-between p-4 bg-slate-800/50 backdrop-blur-xl border-b border-slate-700">
                     <GamingButton
