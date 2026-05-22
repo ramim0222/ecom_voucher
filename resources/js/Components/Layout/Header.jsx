@@ -1,11 +1,13 @@
 import { GamingButton } from "@/Components/ui/GamingButton";
-import { usePage, Link } from "@inertiajs/react";
+import { usePage, Link, router } from "@inertiajs/react";
 import Dropdown from "@/Components/Dropdown";
 import { useState } from "react";
 
 export function Header() {
     const { auth, categories = [], cartCount = 0 } = usePage().props;
     const isAuthenticated = !!auth.user;
+    const isAdmin = auth.user?.role === "admin";
+    const dashboardRoute = isAdmin ? route("admin") : route("dashboard");
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const toggleMobileMenu = () => {
@@ -121,9 +123,7 @@ export function Header() {
                             <GamingButton
                                 variant="primary"
                                 size="sm"
-                                onClick={() => {
-                                    window.location.href = "/dashboard";
-                                }}
+                                onClick={() => router.visit(dashboardRoute)}
                                 className="text-xs sm:text-sm md:text-base px-2 sm:px-3 md:px-4 py-1.5 sm:py-2"
                             >
                                 Dashboard
