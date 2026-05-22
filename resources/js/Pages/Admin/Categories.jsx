@@ -7,8 +7,13 @@ import { CategoriesTable } from "@/Components/Admin/CategoriesTable";
 import { CategoryModal } from "@/Components/Admin/CategoryModal";
 import { DeleteConfirmModal } from "@/Components/Admin/DeleteConfirmModal";
 import { router } from "@inertiajs/react";
+import {
+    formatValidationErrors,
+    useToast,
+} from "@/Components/Admin/ToastProvider";
 
 export default function AdminCategoriesPage({ categories }) {
+    const { addToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -71,7 +76,7 @@ export default function AdminCategoriesPage({ categories }) {
                         setSelectedCategory(null);
                     },
                     onError: (errors) => {
-                        console.error("Update failed:", errors);
+                        addToast(formatValidationErrors(errors), "error");
                     },
                 }
             );
@@ -82,7 +87,7 @@ export default function AdminCategoriesPage({ categories }) {
                     setIsModalOpen(false);
                 },
                 onError: (errors) => {
-                    console.error("Creation failed:", errors);
+                    addToast(formatValidationErrors(errors), "error");
                 },
             });
         }
@@ -95,7 +100,7 @@ export default function AdminCategoriesPage({ categories }) {
                 setSelectedCategory(null);
             },
             onError: (errors) => {
-                console.error("Deletion failed:", errors);
+                addToast(formatValidationErrors(errors), "error");
             },
         });
     };

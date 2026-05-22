@@ -3,11 +3,41 @@
 import { useState, useEffect } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
+function getFieldError(errors, field) {
+    if (!errors) {
+        return null;
+    }
+
+    if (errors[field]) {
+        return Array.isArray(errors[field]) ? errors[field][0] : errors[field];
+    }
+
+    const nestedError = Object.entries(errors).find(([key]) =>
+        key.startsWith(`${field}.`)
+    );
+
+    if (!nestedError) {
+        return null;
+    }
+
+    const [, message] = nestedError;
+    return Array.isArray(message) ? message[0] : message;
+}
+
+function FieldError({ message }) {
+    if (!message) {
+        return null;
+    }
+
+    return <p className="text-red-400 text-sm mt-1">{message}</p>;
+}
+
 export function ProductModal({
     isOpen,
     onClose,
     product,
     categories = [],
+    errors = {},
     onSave,
 }) {
     const [formData, setFormData] = useState({
@@ -56,7 +86,14 @@ export function ProductModal({
                 product_image: null,
             });
         }
-    }, [product]);
+    }, [product, isOpen]);
+
+    const inputClassName = (field) =>
+        `w-full bg-slate-700 border rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+            getFieldError(errors, field)
+                ? "border-red-500"
+                : "border-slate-600"
+        }`;
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -105,9 +142,10 @@ export function ProductModal({
                                     title: e.target.value,
                                 })
                             }
-                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className={inputClassName("title")}
                             required
                         />
+                        <FieldError message={getFieldError(errors, "title")} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-2 text-slate-300">
@@ -122,7 +160,10 @@ export function ProductModal({
                                     product_image: e.target.files[0],
                                 })
                             }
-                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className={inputClassName("product_image")}
+                        />
+                        <FieldError
+                            message={getFieldError(errors, "product_image")}
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -138,7 +179,7 @@ export function ProductModal({
                                         category_id: e.target.value,
                                     })
                                 }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className={inputClassName("category_id")}
                                 required
                             >
                                 <option value="">Select Category</option>
@@ -151,6 +192,9 @@ export function ProductModal({
                                     </option>
                                 ))}
                             </select>
+                            <FieldError
+                                message={getFieldError(errors, "category_id")}
+                            />
                         </div>
 
                         <div>
@@ -165,11 +209,12 @@ export function ProductModal({
                                         status: e.target.value,
                                     })
                                 }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className={inputClassName("status")}
                             >
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>
+                            <FieldError message={getFieldError(errors, "status")} />
                         </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
@@ -187,9 +232,10 @@ export function ProductModal({
                                         price: e.target.value,
                                     })
                                 }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className={inputClassName("price")}
                                 required
                             />
+                            <FieldError message={getFieldError(errors, "price")} />
                         </div>
 
                         <div>
@@ -206,7 +252,10 @@ export function ProductModal({
                                         original_price: e.target.value,
                                     })
                                 }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className={inputClassName("original_price")}
+                            />
+                            <FieldError
+                                message={getFieldError(errors, "original_price")}
                             />
                         </div>
 
@@ -224,8 +273,11 @@ export function ProductModal({
                                         buying_price: e.target.value,
                                     })
                                 }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className={inputClassName("buying_price")}
                                 required
+                            />
+                            <FieldError
+                                message={getFieldError(errors, "buying_price")}
                             />
                         </div>
                     </div>
@@ -243,7 +295,10 @@ export function ProductModal({
                                     sort_order: e.target.value,
                                 })
                             }
-                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className={inputClassName("sort_order")}
+                        />
+                        <FieldError
+                            message={getFieldError(errors, "sort_order")}
                         />
                     </div>
                     <div>
@@ -259,7 +314,10 @@ export function ProductModal({
                                 })
                             }
                             rows={4}
-                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className={inputClassName("description")}
+                        />
+                        <FieldError
+                            message={getFieldError(errors, "description")}
                         />
                     </div>
 
@@ -280,8 +338,9 @@ export function ProductModal({
                             }
                             rows={4}
                             placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
-                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className={inputClassName("features")}
                         />
+                        <FieldError message={getFieldError(errors, "features")} />
                     </div>
 
                     <div>
@@ -299,6 +358,9 @@ export function ProductModal({
                             />
                             Featured Product
                         </label>
+                        <FieldError
+                            message={getFieldError(errors, "is_featured")}
+                        />
                     </div>
 
                     <div className="flex gap-4 pt-4">

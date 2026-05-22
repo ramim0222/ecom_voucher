@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { FlashToastListener } from "@/Components/Admin/ToastProvider";
 import { router } from "@inertiajs/react";
 
 export function AdminLayout({ children }) {
@@ -22,6 +23,7 @@ export function AdminLayout({ children }) {
 
     return (
         <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+            <FlashToastListener />
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div

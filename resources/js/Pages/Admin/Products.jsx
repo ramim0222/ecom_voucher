@@ -8,9 +8,15 @@ import { ProductModal } from "@/Components/Admin/ProductModal";
 import CodeUploadModal from "@/Components/Admin/CodeUploadModal";
 import ViewCodesModal from "@/Components/Admin/ViewCodesModal";
 import { router } from "@inertiajs/react";
+import {
+    formatValidationErrors,
+    useToast,
+} from "@/Components/Admin/ToastProvider";
 
 export default function AdminProducts({ products = [], categories = [] }) {
+    const { addToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalErrors, setModalErrors] = useState({});
     const [editingProduct, setEditingProduct] = useState(null);
     const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
     const [selectedProductForCodes, setSelectedProductForCodes] =
@@ -21,11 +27,13 @@ export default function AdminProducts({ products = [], categories = [] }) {
 
     const handleAddProduct = () => {
         setEditingProduct(null);
+        setModalErrors({});
         setIsModalOpen(true);
     };
 
     const handleEditProduct = (product) => {
         setEditingProduct(product);
+        setModalErrors({});
         setIsModalOpen(true);
     };
 
@@ -70,27 +78,25 @@ export default function AdminProducts({ products = [], categories = [] }) {
             formData.append("_method", "PUT");
             router.post(`/admin/products/${editingProduct.id}`, formData, {
                 onSuccess: () => {
+                    setModalErrors({});
                     setIsModalOpen(false);
                     setEditingProduct(null);
                 },
                 onError: (errors) => {
-                    console.error("Update failed:", errors);
-                    alert(
-                        "Failed to update product. Please check the form and try again."
-                    );
+                    setModalErrors(errors);
+                    addToast(formatValidationErrors(errors), "error");
                 },
             });
         } else {
             // Create new product
             router.post("/admin/products", formData, {
                 onSuccess: () => {
+                    setModalErrors({});
                     setIsModalOpen(false);
                 },
                 onError: (errors) => {
-                    console.error("Create failed:", errors);
-                    alert(
-                        "Failed to create product. Please check the form and try again."
-                    );
+                    setModalErrors(errors);
+                    addToast(formatValidationErrors(errors), "error");
                 },
             });
         }
@@ -103,7 +109,7 @@ export default function AdminProducts({ products = [], categories = [] }) {
                     // Product deleted successfully
                 },
                 onError: (errors) => {
-                    console.error("Delete failed:", errors);
+                    addToast(formatValidationErrors(errors), "error");
                 },
             });
         }
@@ -125,8 +131,7 @@ export default function AdminProducts({ products = [], categories = [] }) {
                     window.location.reload();
                 },
                 onError: (errors) => {
-                    console.error("Code upload failed:", errors);
-                    alert("Failed to upload codes. Please try again.");
+                    addToast(formatValidationErrors(errors), "error");
                 },
             }
         );
@@ -173,9 +178,13 @@ export default function AdminProducts({ products = [], categories = [] }) {
 
                 <ProductModal
                     isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        setModalErrors({});
+                    }}
                     product={editingProduct}
                     categories={categories}
+                    errors={modalErrors}
                     onSave={handleSaveProduct}
                 />
 

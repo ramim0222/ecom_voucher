@@ -4,6 +4,7 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+import { ToastProvider } from '@/Components/Admin/ToastProvider';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -16,11 +17,20 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         if (import.meta.env.SSR) {
-            hydrateRoot(el, <App {...props} />);
+            hydrateRoot(
+                el,
+                <ToastProvider>
+                    <App {...props} />
+                </ToastProvider>,
+            );
             return;
         }
 
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+            <ToastProvider>
+                <App {...props} />
+            </ToastProvider>,
+        );
     },
     progress: {
         color: '#4B5563',
