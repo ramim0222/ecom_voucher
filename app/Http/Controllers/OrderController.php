@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Code;
+use App\Services\MetaConversionApiService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -143,6 +144,8 @@ class OrderController extends Controller
 
             $order = $this->orderService->createOrderFromCart($user, $orderData);
 
+            MetaConversionApiService::trackPurchase($order, $request);
+
             return redirect()->route('orders.show', $order->id)
                 ->with('success', 'Order created successfully!');
 
@@ -181,6 +184,8 @@ class OrderController extends Controller
             ]);
 
             $order = $this->orderService->createOrderFromProducts($user, $products, $orderData);
+
+            MetaConversionApiService::trackPurchase($order, $request);
 
             return response()->json([
                 'success' => true,
@@ -224,6 +229,8 @@ class OrderController extends Controller
             );
 
             if ($success) {
+                MetaConversionApiService::trackPurchase($order->fresh(), $request);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Payment processed successfully!',

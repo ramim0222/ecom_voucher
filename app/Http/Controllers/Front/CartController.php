@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Services\MetaConversionApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -79,6 +80,8 @@ class CartController extends Controller
                 'price' => $product->price,
             ]);
         }
+
+        MetaConversionApiService::trackAddToCart($product, (int) $request->quantity, $request);
 
         return back()->with('success', 'Product added to cart successfully!');
     }

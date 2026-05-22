@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Cart;
+use App\Services\MetaConversionApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Application;
@@ -86,7 +87,7 @@ class IndexController extends Controller
 
 
 
-    public function checkout()
+    public function checkout(Request $request)
     {
         if (!Auth::check()) {
             return redirect()->route('login')->with('message', 'Please log in to proceed to checkout.');
@@ -102,6 +103,8 @@ class IndexController extends Controller
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart')->with('error', 'Your cart is empty. Please add items to continue.');
         }
+
+        MetaConversionApiService::trackInitiateCheckout($cartItems, $request);
 
         return Inertia::render('Checkout', [
             'cartItems' => $cartItems,

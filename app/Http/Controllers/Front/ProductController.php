@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Product;
 use App\Models\Wishlist;
+use App\Services\MetaConversionApiService;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
@@ -49,7 +50,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function product($id)
+    public function product(Request $request, $id)
     {
         $product = Product::with(['category', 'reviews.user'])->find($id);
 
@@ -99,6 +100,8 @@ class ProductController extends Controller
                 ->where('product_id', $product->id)
                 ->first()
             : null;
+
+        MetaConversionApiService::trackViewContent($product, $request);
 
         return Inertia::render('Product/Page', [
             'product' => $product,
