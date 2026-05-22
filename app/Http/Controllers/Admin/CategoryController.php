@@ -11,11 +11,27 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::all();
+        $search = $request->input('search', '');
+
+        $categories = Category::query()
+            ->withCount('products')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString();
+
         return Inertia::render('Admin/Categories', [
-            'categories' => $categories
+            'categories' => $categories,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

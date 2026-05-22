@@ -3,7 +3,7 @@ import { router } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
-export default function AdminOrders({ orders, filters = {} }) {
+export default function AdminOrders({ orders = { data: [] }, filters = {} }) {
     const [currentFilters, setCurrentFilters] = useState({
         status: filters.status || "",
         payment_status: filters.payment_status || "",
@@ -29,26 +29,24 @@ export default function AdminOrders({ orders, filters = {} }) {
         { value: "refunded", label: "Refunded" },
     ];
 
-    const handleFilterChange = (filterName, value) => {
+    const applyFilters = (newFilters) => {
         setLoading(true);
-        const newFilters = { ...currentFilters, [filterName]: value };
         setCurrentFilters(newFilters);
 
         router.get(route("admin.orders.index"), newFilters, {
             preserveState: true,
             preserveScroll: true,
+            replace: true,
             onFinish: () => setLoading(false),
         });
     };
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        router.get(route("admin.orders.index"), currentFilters, {
-            preserveState: true,
-            preserveScroll: true,
-            onFinish: () => setLoading(false),
-        });
+    const handleFilterChange = (filterName, value) => {
+        applyFilters({ ...currentFilters, [filterName]: value });
+    };
+
+    const handleSearchChange = (value) => {
+        applyFilters({ ...currentFilters, search: value });
     };
 
     const getStatusColor = (status) => {
@@ -97,8 +95,67 @@ export default function AdminOrders({ orders, filters = {} }) {
                     </div>
                 </div>
 
-                {/* Orders Table */}
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-6">
+                        <div className="relative flex-1 max-w-md">
+                            <input
+                                type="text"
+                                placeholder="Search by order ID, name, or email..."
+                                value={currentFilters.search}
+                                onChange={(e) =>
+                                    handleSearchChange(e.target.value)
+                                }
+                                className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 pl-10 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            <span className="absolute left-3 top-2.5 text-slate-400">
+                                🔍
+                            </span>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <select
+                                value={currentFilters.status}
+                                onChange={(e) =>
+                                    handleFilterChange("status", e.target.value)
+                                }
+                                className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            >
+                                {filterOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <select
+                                value={currentFilters.payment_status}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        "payment_status",
+                                        e.target.value
+                                    )
+                                }
+                                className="bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            >
+                                {paymentFilterOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="text-slate-400 text-sm whitespace-nowrap">
+                            {orders.total ?? 0} orders
+                        </div>
+                    </div>
+
                     {loading && (
                         <div className="text-center py-4">
                             <div className="inline-block animate-spin rounded-full h-6 w-6 border-2 border-orange-500 border-t-transparent"></div>
@@ -223,74 +280,88 @@ export default function AdminOrders({ orders, filters = {} }) {
                         </table>
                     </div>
 
-                    {/* Pagination */}
                     {orders.links && orders.links.length > 1 && (
-                        <div className="mt-6 flex items-center justify-center gap-2">
-                            {/* Previous Page */}
-                            {orders.prev_page_url && (
-                                <button
-                                    onClick={() => {
-                                        router.visit(orders.prev_page_url, {
-                                            preserveState: true,
-                                            preserveScroll: true,
-                                        });
-                                    }}
-                                    className="px-3 py-2 rounded text-sm bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
-                                >
-                                    ← Previous
-                                </button>
-                            )}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-6 border-t border-slate-700">
+                            <div className="text-slate-400 text-sm">
+                                {orders.from && orders.to && orders.total ? (
+                                    <>
+                                        Showing {orders.from} to {orders.to} of{" "}
+                                        {orders.total} orders
+                                    </>
+                                ) : null}
+                            </div>
+                            <div className="flex items-center justify-center gap-2 flex-wrap">
+                                {orders.prev_page_url && (
+                                    <GamingButton
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            router.visit(orders.prev_page_url, {
+                                                preserveState: true,
+                                                preserveScroll: true,
+                                            })
+                                        }
+                                        className="text-slate-300"
+                                    >
+                                        Previous
+                                    </GamingButton>
+                                )}
 
-                            {/* Page Numbers */}
-                            {orders.links.map((link, index) => {
-                                // Skip the "Previous" and "Next" links, only show page numbers
-                                if (
-                                    link.label === "&laquo; Previous" ||
-                                    link.label === "Next &raquo;"
-                                ) {
-                                    return null;
-                                }
+                                {orders.links.map((link, index) => {
+                                    if (
+                                        link.label === "&laquo; Previous" ||
+                                        link.label === "Next &raquo;"
+                                    ) {
+                                        return null;
+                                    }
 
-                                return (
-                                    <button
-                                        key={index}
-                                        onClick={() => {
-                                            if (link.url) {
-                                                router.visit(link.url, {
-                                                    preserveState: true,
-                                                    preserveScroll: true,
-                                                });
+                                    return (
+                                        <GamingButton
+                                            key={index}
+                                            variant={
+                                                link.active ? "primary" : "ghost"
                                             }
-                                        }}
-                                        disabled={!link.url}
-                                        className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                                            link.active
-                                                ? "bg-orange-500 text-white"
-                                                : link.url
-                                                ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                                                : "bg-slate-800 text-slate-500 cursor-not-allowed"
-                                        }`}
-                                        dangerouslySetInnerHTML={{
-                                            __html: link.label,
-                                        }}
-                                    />
-                                );
-                            })}
+                                            size="sm"
+                                            onClick={() => {
+                                                if (link.url) {
+                                                    router.visit(link.url, {
+                                                        preserveState: true,
+                                                        preserveScroll: true,
+                                                    });
+                                                }
+                                            }}
+                                            disabled={!link.url}
+                                            className={
+                                                link.active
+                                                    ? ""
+                                                    : "text-slate-300"
+                                            }
+                                        >
+                                            <span
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
+                                        </GamingButton>
+                                    );
+                                })}
 
-                            {/* Next Page */}
-                            {orders.next_page_url && (
-                                <button
-                                    onClick={() => {
-                                        router.visit(orders.next_page_url, {
-                                            preserveState: true,
-                                            preserveScroll: true,
-                                        });
-                                    }}
-                                    className="px-3 py-2 rounded text-sm bg-slate-700 text-slate-300 hover:bg-slate-600 transition-colors"
-                                >
-                                    Next →
-                                </button>
-                            )}
+                                {orders.next_page_url && (
+                                    <GamingButton
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            router.visit(orders.next_page_url, {
+                                                preserveState: true,
+                                                preserveScroll: true,
+                                            })
+                                        }
+                                        className="text-slate-300"
+                                    >
+                                        Next
+                                    </GamingButton>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

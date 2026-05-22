@@ -12,32 +12,29 @@ import {
     useToast,
 } from "@/Components/Admin/ToastProvider";
 
-export default function AdminCategoriesPage({ categories }) {
+export default function AdminCategoriesPage({
+    categories = { data: [] },
+    filters = {},
+}) {
     const { addToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [searchTerm, setSearchTerm] = useState(filters.search || "");
 
-    // Filter categories based on search
-    const filteredCategories = categories.filter(
-        (category) =>
-            category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (category.description &&
-                category.description
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()))
-    );
+    const handleSearchChange = (value) => {
+        setSearchTerm(value);
 
-    // Pagination
-    const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedCategories = filteredCategories.slice(
-        startIndex,
-        startIndex + itemsPerPage
-    );
+        router.get(
+            route("admin.categories.index"),
+            { search: value },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
+    };
 
     const handleAddCategory = () => {
         setSelectedCategory(null);
@@ -65,7 +62,6 @@ export default function AdminCategoriesPage({ categories }) {
         }
 
         if (selectedCategory) {
-            // Edit existing category
             formData.append("_method", "PUT");
             router.post(
                 route("admin.categories.update", selectedCategory.id),
@@ -81,7 +77,6 @@ export default function AdminCategoriesPage({ categories }) {
                 }
             );
         } else {
-            // Add new category
             router.post(route("admin.categories.store"), formData, {
                 onSuccess: () => {
                     setIsModalOpen(false);
@@ -108,7 +103,6 @@ export default function AdminCategoriesPage({ categories }) {
     return (
         <AdminLayout>
             <div className="space-y-6">
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="font-heading font-bold text-2xl text-white">
@@ -124,7 +118,6 @@ export default function AdminCategoriesPage({ categories }) {
                     </GamingButton>
                 </div>
 
-                {/* Search and Stats */}
                 <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl border border-slate-700 p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                         <div className="relative flex-1 max-w-md">
@@ -132,7 +125,9 @@ export default function AdminCategoriesPage({ categories }) {
                                 type="text"
                                 placeholder="Search categories..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) =>
+                                    handleSearchChange(e.target.value)
+                                }
                                 className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 pl-10 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                             <span className="absolute left-3 top-2.5 text-slate-400">
@@ -140,81 +135,112 @@ export default function AdminCategoriesPage({ categories }) {
                             </span>
                         </div>
                         <div className="text-slate-400 text-sm">
-                            {filteredCategories.length} of {categories.length}{" "}
-                            categories
+                            {categories.total ?? 0} categories
                         </div>
                     </div>
 
-                    {/* Categories Table */}
                     <CategoriesTable
-                        categories={paginatedCategories}
+                        categories={categories.data ?? []}
                         onEdit={handleEditCategory}
                         onDelete={handleDeleteCategory}
                     />
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700">
+                    {categories.links && categories.links.length > 1 && (
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 pt-6 border-t border-slate-700">
                             <div className="text-slate-400 text-sm">
-                                Showing {startIndex + 1} to{" "}
-                                {Math.min(
-                                    startIndex + itemsPerPage,
-                                    filteredCategories.length
-                                )}{" "}
-                                of {filteredCategories.length} results
+                                {categories.from &&
+                                categories.to &&
+                                categories.total ? (
+                                    <>
+                                        Showing {categories.from} to{" "}
+                                        {categories.to} of {categories.total}{" "}
+                                        results
+                                    </>
+                                ) : null}
                             </div>
-                            <div className="flex items-center gap-2">
-                                <GamingButton
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                        setCurrentPage(currentPage - 1)
-                                    }
-                                    disabled={currentPage === 1}
-                                    className="text-slate-300"
-                                >
-                                    Previous
-                                </GamingButton>
-                                {Array.from(
-                                    { length: totalPages },
-                                    (_, i) => i + 1
-                                ).map((page) => (
+                            <div className="flex items-center justify-center gap-2 flex-wrap">
+                                {categories.prev_page_url && (
                                     <GamingButton
-                                        key={page}
-                                        variant={
-                                            currentPage === page
-                                                ? "accent"
-                                                : "ghost"
-                                        }
+                                        variant="ghost"
                                         size="sm"
-                                        onClick={() => setCurrentPage(page)}
-                                        className={
-                                            currentPage === page
-                                                ? ""
-                                                : "text-slate-300"
+                                        onClick={() =>
+                                            router.visit(
+                                                categories.prev_page_url,
+                                                {
+                                                    preserveState: true,
+                                                    preserveScroll: true,
+                                                }
+                                            )
                                         }
+                                        className="text-slate-300"
                                     >
-                                        {page}
+                                        Previous
                                     </GamingButton>
-                                ))}
-                                <GamingButton
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                        setCurrentPage(currentPage + 1)
+                                )}
+
+                                {categories.links.map((link, index) => {
+                                    if (
+                                        link.label === "&laquo; Previous" ||
+                                        link.label === "Next &raquo;"
+                                    ) {
+                                        return null;
                                     }
-                                    disabled={currentPage === totalPages}
-                                    className="text-slate-300"
-                                >
-                                    Next
-                                </GamingButton>
+
+                                    return (
+                                        <GamingButton
+                                            key={index}
+                                            variant={
+                                                link.active ? "accent" : "ghost"
+                                            }
+                                            size="sm"
+                                            onClick={() => {
+                                                if (link.url) {
+                                                    router.visit(link.url, {
+                                                        preserveState: true,
+                                                        preserveScroll: true,
+                                                    });
+                                                }
+                                            }}
+                                            disabled={!link.url}
+                                            className={
+                                                link.active
+                                                    ? ""
+                                                    : "text-slate-300"
+                                            }
+                                        >
+                                            <span
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
+                                        </GamingButton>
+                                    );
+                                })}
+
+                                {categories.next_page_url && (
+                                    <GamingButton
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            router.visit(
+                                                categories.next_page_url,
+                                                {
+                                                    preserveState: true,
+                                                    preserveScroll: true,
+                                                }
+                                            )
+                                        }
+                                        className="text-slate-300"
+                                    >
+                                        Next
+                                    </GamingButton>
+                                )}
                             </div>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Category Modal */}
             <CategoryModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -222,13 +248,12 @@ export default function AdminCategoriesPage({ categories }) {
                 category={selectedCategory}
             />
 
-            {/* Delete Confirmation Modal */}
             <DeleteConfirmModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleConfirmDelete}
                 title="Delete Category"
-                message={`Are you sure you want to delete "${selectedCategory?.name}"? This action cannot be undone and may affect ${selectedCategory?.productCount} products.`}
+                message={`Are you sure you want to delete "${selectedCategory?.name}"? This action cannot be undone and may affect ${selectedCategory?.products_count ?? 0} products.`}
             />
         </AdminLayout>
     );

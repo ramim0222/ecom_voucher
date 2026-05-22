@@ -12,10 +12,33 @@ class UserController extends Controller
     /**
      * Display a listing of users
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::where('role', 'customer')->get();
-        return Inertia::render('Admin/Users/Index', ['users' => $users]);
+        $search = $request->input('search', '');
+
+        $users = User::query()
+            ->where('role', 'customer')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->withCount('orders')
+            ->withSum(['orders as total_spent' => function ($query) {
+                $query->where('payment_status', 'paid');
+            }], 'total_amount')
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+            'filters' => [
+                'search' => $search,
+            ],
+        ]);
     }
 
     /**

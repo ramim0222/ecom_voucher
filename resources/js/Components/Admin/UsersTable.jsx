@@ -45,7 +45,7 @@ export function UsersTable({ users }) {
     };
 
     return (
-        <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-6 border border-slate-700">
+        <div>
             <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead>
@@ -87,10 +87,13 @@ export function UsersTable({ users }) {
                                     </div>
                                 </td>
                                 <td className="py-3 text-slate-300">
-                                    User order count
+                                    {user.orders_count ?? 0}
                                 </td>
                                 <td className="py-3 text-white font-medium">
-                                    User total spent
+                                    Tk{" "}
+                                    {Number(
+                                        user.total_spent ?? 0
+                                    ).toFixed(2)}
                                 </td>
                                 <td className="py-3">
                                     <span
@@ -141,6 +144,17 @@ export function UsersTable({ users }) {
                         ))}
                     </tbody>
                 </table>
+
+                {users.length === 0 && (
+                    <div className="text-center py-12">
+                        <div className="text-slate-400 text-lg mb-2">
+                            No users found
+                        </div>
+                        <p className="text-slate-500 text-sm">
+                            Try adjusting your search criteria
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Ban/Unban Confirmation Modal */}

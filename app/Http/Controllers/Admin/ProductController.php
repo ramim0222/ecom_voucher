@@ -15,14 +15,17 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'codes'])->get()->map(function ($product) {
-            // Calculate total_codes and sold_codes dynamically
-            $product->total_codes = $product->codes->count();
-            $product->sold_codes = $product->codes->where('status', 'sold')->count();
-            // Ensure stock attribute is available (it's auto-calculated via accessor)
-            $product->append('stock');
-            return $product;
-        });
+        $products = Product::with(['category', 'codes'])
+            ->orderBy('sort_order')
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->through(function ($product) {
+                $product->total_codes = $product->codes->count();
+                $product->sold_codes = $product->codes->where('status', 'sold')->count();
+                $product->append('stock');
+
+                return $product;
+            });
         $categories = Category::where('status', 'active')->get();
 
         return Inertia::render('Admin/Products', [
@@ -55,7 +58,7 @@ class ProductController extends Controller
             'original_price' => $request->original_price,
             'buying_price' => $request->buying_price,
             'description' => $request->description,
-            'features' => $request->features ? json_encode($request->features) : null,
+            'features' => $request->features ?: null,
             'is_featured' => $request->boolean('is_featured'),
             'sort_order' => $request->sort_order ?? 0,
         ];
@@ -97,7 +100,7 @@ class ProductController extends Controller
             'original_price' => $request->original_price,
             'buying_price' => $request->buying_price,
             'description' => $request->description,
-            'features' => $request->features ? json_encode($request->features) : null,
+            'features' => $request->features ?: null,
             'is_featured' => $request->boolean('is_featured'),
             'sort_order' => $request->sort_order ?? 0,
         ];

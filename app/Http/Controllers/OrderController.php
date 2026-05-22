@@ -377,7 +377,7 @@ class OrderController extends Controller
             });
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->paginate(10);
+        $orders = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
         return Inertia::render('Admin/Orders/Index', [
             'orders' => $orders,

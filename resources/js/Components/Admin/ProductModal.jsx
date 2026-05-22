@@ -32,6 +32,30 @@ function FieldError({ message }) {
     return <p className="text-red-400 text-sm mt-1">{message}</p>;
 }
 
+function normalizeFeatures(raw) {
+    if (Array.isArray(raw)) {
+        return raw;
+    }
+
+    if (typeof raw === "string") {
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        } catch {
+            // Fall through to newline split for plain text.
+        }
+
+        return raw
+            .split(/\r?\n/)
+            .map((feature) => feature.trim())
+            .filter((feature) => feature.length > 0);
+    }
+
+    return [];
+}
+
 export function ProductModal({
     isOpen,
     onClose,
@@ -63,9 +87,7 @@ export function ProductModal({
                 original_price: product.original_price?.toString() || "",
                 buying_price: product.buying_price?.toString() || "",
                 description: product.description || "",
-                features: Array.isArray(product.features)
-                    ? product.features.join("\n")
-                    : "",
+                features: normalizeFeatures(product.features).join("\n"),
                 status: product.status || "active",
                 is_featured: product.is_featured || false,
                 sort_order: product.sort_order?.toString() || "",

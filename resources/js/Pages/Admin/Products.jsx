@@ -13,7 +13,10 @@ import {
     useToast,
 } from "@/Components/Admin/ToastProvider";
 
-export default function AdminProducts({ products = [], categories = [] }) {
+export default function AdminProducts({
+    products = { data: [] },
+    categories = [],
+}) {
     const { addToast } = useToast();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalErrors, setModalErrors] = useState({});
@@ -169,12 +172,99 @@ export default function AdminProducts({ products = [], categories = [] }) {
                 </div>
 
                 <ProductsTable
-                    products={products}
+                    products={products.data ?? []}
                     onEdit={handleEditProduct}
                     onAddCode={handleAddCode}
                     onViewCodes={handleViewCodes}
                     onDelete={handleDeleteProduct}
                 />
+
+                {products.links && products.links.length > 1 && (
+                    <div className="bg-slate-800/50 backdrop-blur-xl rounded-xl p-4 border border-slate-700">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div className="text-slate-400 text-sm">
+                                {products.from && products.to && products.total ? (
+                                    <>
+                                        Showing {products.from} to {products.to} of{" "}
+                                        {products.total} products
+                                    </>
+                                ) : null}
+                            </div>
+                            <div className="flex items-center justify-center gap-2 flex-wrap">
+                                {products.prev_page_url && (
+                                    <GamingButton
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            router.visit(products.prev_page_url, {
+                                                preserveState: true,
+                                                preserveScroll: true,
+                                            })
+                                        }
+                                        className="text-slate-300"
+                                    >
+                                        Previous
+                                    </GamingButton>
+                                )}
+
+                                {products.links.map((link, index) => {
+                                    if (
+                                        link.label === "&laquo; Previous" ||
+                                        link.label === "Next &raquo;"
+                                    ) {
+                                        return null;
+                                    }
+
+                                    return (
+                                        <GamingButton
+                                            key={index}
+                                            variant={
+                                                link.active ? "primary" : "ghost"
+                                            }
+                                            size="sm"
+                                            onClick={() => {
+                                                if (link.url) {
+                                                    router.visit(link.url, {
+                                                        preserveState: true,
+                                                        preserveScroll: true,
+                                                    });
+                                                }
+                                            }}
+                                            disabled={!link.url}
+                                            className={
+                                                link.active
+                                                    ? ""
+                                                    : "text-slate-300"
+                                            }
+                                        >
+                                            <span
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
+                                        </GamingButton>
+                                    );
+                                })}
+
+                                {products.next_page_url && (
+                                    <GamingButton
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            router.visit(products.next_page_url, {
+                                                preserveState: true,
+                                                preserveScroll: true,
+                                            })
+                                        }
+                                        className="text-slate-300"
+                                    >
+                                        Next
+                                    </GamingButton>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <ProductModal
                     isOpen={isModalOpen}
