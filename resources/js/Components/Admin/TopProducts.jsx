@@ -41,10 +41,10 @@ export function TopProducts({ topProducts }) {
                         </div>
                         <div className="text-right">
                             <p className="font-bold text-orange-400">
-                                ${product.total_revenue}
+                                Tk {product.total_revenue}
                             </p>
                             <p className="text-sm text-slate-400">
-                                ${product.price} each
+                                Tk {product.price} each
                             </p>
                         </div>
                     </div>

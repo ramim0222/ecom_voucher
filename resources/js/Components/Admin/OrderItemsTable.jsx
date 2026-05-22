@@ -108,13 +108,13 @@ export function OrderItemsTable({ items }) {
                                 </div>
                             </td>
                             <td className="py-4 px-4 text-white">
-                                ${parseFloat(item.unit_price || 0).toFixed(2)}
+                                Tk {parseFloat(item.unit_price || 0).toFixed(2)}
                             </td>
                             <td className="py-4 px-4 text-slate-300">
                                 {item.quantity || 0}
                             </td>
                             <td className="py-4 px-4 text-white font-medium">
-                                ${parseFloat(item.total_price || 0).toFixed(2)}
+                                Tk {parseFloat(item.total_price || 0).toFixed(2)}
                             </td>
                         </tr>
                     ))}

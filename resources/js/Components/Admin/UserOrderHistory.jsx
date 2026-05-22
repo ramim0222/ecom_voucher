@@ -112,7 +112,7 @@ export function UserOrderHistory({ userId }) {
                                 <div className="flex items-center gap-4">
                                     <div className="text-right">
                                         <div className="text-white font-medium">
-                                            ${order.total.toFixed(2)}
+                                            Tk {order.total.toFixed(2)}
                                         </div>
                                         <div className="text-slate-400 text-sm">
                                             {order.items.length} items
@@ -148,7 +148,7 @@ export function UserOrderHistory({ userId }) {
                                                 </span>
                                             </div>
                                             <span className="text-slate-300">
-                                                ${item.price.toFixed(2)}
+                                                Tk {item.price.toFixed(2)}
                                             </span>
                                         </div>
                                     ))}

@@ -163,7 +163,7 @@ export default function AdminOrders({ orders, filters = {} }) {
                                                 {order.order_items?.length || 0}
                                             </td>
                                             <td className="py-3 text-white font-medium">
-                                                $
+                                                Tk{" "}
                                                 {parseFloat(
                                                     order.total_amount || 0
                                                 ).toFixed(2)}

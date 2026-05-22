@@ -73,11 +73,11 @@ export function VoucherCard({
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <span className="text-xl font-bold text-accent">
-                            ${price}
+                            Tk {price}
                         </span>
                         {originalPrice && (
                             <span className="text-sm text-muted-foreground line-through">
-                                ${originalPrice}
+                                Tk {originalPrice}
                             </span>
                         )}
                     </div>

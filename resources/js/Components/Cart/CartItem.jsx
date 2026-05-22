@@ -84,7 +84,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }) {
 
                         <div className="flex items-center gap-2">
                             <span className="text-xl font-bold text-accent">
-                                $
+                                Tk{" "}
                                 {(
                                     (item.price || 0) * (item.quantity || 1)
                                 ).toFixed(2)}

@@ -4,7 +4,7 @@ export function StatsGrid({ stats }) {
     const statCards = [
         {
             label: "Total Revenue",
-            value: `$${stats.totalRevenue?.toLocaleString() || "0"}`,
+            value: `Tk ${stats.totalRevenue?.toLocaleString() || "0"}`,
             change: `${stats.monthGrowth >= 0 ? "+" : ""}${
                 stats.monthGrowth || 0
             }%`,
@@ -24,7 +24,7 @@ export function StatsGrid({ stats }) {
         },
         {
             label: "Today's Revenue",
-            value: `$${stats.todayRevenue?.toLocaleString() || "0"}`,
+            value: `Tk ${stats.todayRevenue?.toLocaleString() || "0"}`,
             change: `Reviews: ${stats.totalReviews || 0}`,
             positive: true,
         },

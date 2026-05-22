@@ -104,7 +104,7 @@ export default function OrderShow({ order }) {
                                                 </h4>
                                                 <p className="text-sm text-muted-foreground">
                                                     Quantity: {item.quantity} ×
-                                                    ${item.unit_price}
+                                                    Tk {item.unit_price}
                                                 </p>
                                                 {item.assigned_codes &&
                                                     item.assigned_codes.length >
@@ -189,7 +189,7 @@ export default function OrderShow({ order }) {
                                             </div>
                                             <div className="text-right">
                                                 <span className="font-semibold">
-                                                    ${item.total_price}
+                                                    Tk {item.total_price}
                                                 </span>
                                             </div>
                                         </div>
@@ -265,27 +265,27 @@ export default function OrderShow({ order }) {
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between">
                                         <span>Subtotal</span>
-                                        <span>${order.subtotal}</span>
+                                        <span>Tk {order.subtotal}</span>
                                     </div>
                                     {order.discount_amount > 0 && (
                                         <div className="flex justify-between text-green-600">
                                             <span>Discount</span>
                                             <span>
-                                                -${order.discount_amount}
+                                                -Tk {order.discount_amount}
                                             </span>
                                         </div>
                                     )}
                                     {order.tax_amount > 0 && (
                                         <div className="flex justify-between">
                                             <span>Tax</span>
-                                            <span>${order.tax_amount}</span>
+                                            <span>Tk {order.tax_amount}</span>
                                         </div>
                                     )}
                                     <hr className="border-border" />
                                     <div className="flex justify-between text-lg font-bold">
                                         <span>Total</span>
                                         <span className="text-accent">
-                                            ${order.total_amount}
+                                            Tk {order.total_amount}
                                         </span>
                                     </div>
                                 </div>

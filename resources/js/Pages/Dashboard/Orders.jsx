@@ -237,7 +237,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                                                 )}
                                                                         </div>
                                                                         <span className="font-medium">
-                                                                            $
+                                                                            Tk{" "}
                                                                             {
                                                                                 item.total_price
                                                                             }
@@ -401,7 +401,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                     <div className="flex flex-col gap-3 pt-2">
                                                         <div className="text-center">
                                                             <div className="text-xl sm:text-2xl font-bold text-accent">
-                                                                $
+                                                                Tk{" "}
                                                                 {
                                                                     order.total_amount
                                                                 }
@@ -509,7 +509,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                         </div>
                                                         <div className="text-right">
                                                             <div className="text-xl font-bold text-accent">
-                                                                $
+                                                                Tk{" "}
                                                                 {
                                                                     order.total_amount
                                                                 }
@@ -589,7 +589,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                                                         )}
                                                                                 </div>
                                                                                 <span className="font-medium">
-                                                                                    $
+                                                                                    Tk{" "}
                                                                                     {
                                                                                         item.total_price
                                                                                     }
@@ -900,7 +900,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                                                     )}
                                                                             </div>
                                                                             <span className="font-medium">
-                                                                                $
+                                                                                Tk{" "}
                                                                                 {
                                                                                     item.total_price
                                                                                 }
@@ -1065,7 +1065,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                     <div className="text-right min-w-[200px]">
                                                         <div className="mb-6">
                                                             <div className="text-3xl font-bold text-accent">
-                                                                $
+                                                                Tk{" "}
                                                                 {
                                                                     order.total_amount
                                                                 }

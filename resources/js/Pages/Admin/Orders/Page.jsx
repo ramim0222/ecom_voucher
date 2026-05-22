@@ -162,7 +162,7 @@ export default function AdminOrderDetailsPage({ order }) {
                         </div>
                         <div className="text-right">
                             <div className="text-2xl font-bold text-white">
-                                $
+                                Tk{" "}
                                 {parseFloat(order.total_amount || 0).toFixed(2)}
                             </div>
                             <div className="text-slate-400 text-sm">
@@ -330,7 +330,7 @@ export default function AdminOrderDetailsPage({ order }) {
                                         Subtotal:
                                     </span>
                                     <span className="text-white">
-                                        $
+                                        Tk{" "}
                                         {parseFloat(
                                             order.subtotal || 0
                                         ).toFixed(2)}
@@ -342,7 +342,7 @@ export default function AdminOrderDetailsPage({ order }) {
                                             Tax:
                                         </span>
                                         <span className="text-white">
-                                            $
+                                            Tk{" "}
                                             {parseFloat(
                                                 order.tax_amount || 0
                                             ).toFixed(2)}
@@ -355,7 +355,7 @@ export default function AdminOrderDetailsPage({ order }) {
                                             Discount:
                                         </span>
                                         <span className="text-green-400">
-                                            -$
+                                            -Tk{" "}
                                             {parseFloat(
                                                 order.discount_amount || 0
                                             ).toFixed(2)}
@@ -365,7 +365,7 @@ export default function AdminOrderDetailsPage({ order }) {
                                 <div className="flex justify-between font-medium pt-2 border-t border-slate-700">
                                     <span className="text-white">Total:</span>
                                     <span className="text-white">
-                                        $
+                                        Tk{" "}
                                         {parseFloat(
                                             order.total_amount || 0
                                         ).toFixed(2)}

@@ -99,14 +99,14 @@ export function ProductsTable({
                                 <td className="py-3">
                                     <div className="flex items-center gap-2">
                                         <span className="text-white font-medium">
-                                            $
+                                            Tk{" "}
                                             {Number.isNaN(price)
                                                 ? product.price
                                                 : price.toFixed(2)}
                                         </span>
                                         {hasDiscount && (
                                             <span className="text-slate-400 line-through text-sm">
-                                                ${originalPrice.toFixed(2)}
+                                                Tk {originalPrice.toFixed(2)}
                                             </span>
                                         )}
                                     </div>

@@ -12,7 +12,7 @@ export function CartSummary({ subtotal, total, itemCount }) {
             <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
                     <span>Subtotal ({itemCount} items)</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>Tk {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Shipping</span>
@@ -21,7 +21,7 @@ export function CartSummary({ subtotal, total, itemCount }) {
                 <hr className="border-border" />
                 <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-accent">${total.toFixed(2)}</span>
+                    <span className="text-accent">Tk {total.toFixed(2)}</span>
                 </div>
             </div>
 

@@ -73,7 +73,7 @@ export function RecentOrders({ recentOrders }) {
                                     </div>
                                 </td>
                                 <td className="py-3 text-white font-medium">
-                                    ${order.total_amount}
+                                    Tk {order.total_amount}
                                 </td>
                                 <td className="py-3">
                                     <span

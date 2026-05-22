@@ -60,11 +60,11 @@ export function WishlistItem({ item, onMoveToCart, onRemove }) {
                             {item.originalPrice &&
                                 typeof item.originalPrice === "number" && (
                                     <span className="text-sm text-muted-foreground line-through">
-                                        ${item.originalPrice.toFixed(2)}
+                                        Tk {item.originalPrice.toFixed(2)}
                                     </span>
                                 )}
                             <span className="text-xl font-bold text-accent">
-                                ${item.price.toFixed(2)}
+                                Tk {item.price.toFixed(2)}
                             </span>
                         </div>
                     </div>

@@ -103,7 +103,7 @@ export function OrdersTable({ filter }) {
                                     {order.items}
                                 </td>
                                 <td className="py-3 text-white font-medium">
-                                    ${order.total.toFixed(2)}
+                                    Tk {order.total.toFixed(2)}
                                 </td>
                                 <td className="py-3">
                                     <select

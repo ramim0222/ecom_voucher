@@ -20,7 +20,7 @@ export function OrderSummary({ orderData }) {
                             </p>
                         </div>
                         <span className="font-medium">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            Tk {(item.price * item.quantity).toFixed(2)}
                         </span>
                     </div>
                 ))}
@@ -31,11 +31,11 @@ export function OrderSummary({ orderData }) {
             <div className="space-y-2 mb-6">
                 <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${orderData.subtotal.toFixed(2)}</span>
+                    <span>Tk {orderData.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Tax</span>
-                    <span>${orderData.tax.toFixed(2)}</span>
+                    <span>Tk {orderData.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Shipping</span>
@@ -45,7 +45,7 @@ export function OrderSummary({ orderData }) {
                 <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
                     <span className="text-accent">
-                        ${orderData.total.toFixed(2)}
+                        Tk {orderData.total.toFixed(2)}
                     </span>
                 </div>
             </div>

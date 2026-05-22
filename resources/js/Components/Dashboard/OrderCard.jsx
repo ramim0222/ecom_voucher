@@ -72,7 +72,7 @@ export function OrderCard({ order, detailed = false }) {
                                                 </span>
                                             </span>
                                             <span className="font-medium text-right">
-                                                $
+                                                Tk{" "}
                                                 {typeof item?.price === "number"
                                                     ? item.price.toFixed(2)
                                                     : "0.00"}
@@ -101,7 +101,7 @@ export function OrderCard({ order, detailed = false }) {
                     <div className="flex items-center justify-between pt-2">
                         <div className="text-left">
                             <p className="text-lg sm:text-xl font-bold text-accent">
-                                $
+                                Tk{" "}
                                 {typeof order?.total === "number"
                                     ? order.total.toFixed(2)
                                     : "0.00"}
@@ -171,7 +171,7 @@ export function OrderCard({ order, detailed = false }) {
                                                     </span>
                                                 </span>
                                                 <span className="font-medium">
-                                                    $
+                                                    Tk{" "}
                                                     {typeof item?.price ===
                                                     "number"
                                                         ? item.price.toFixed(2)
@@ -199,7 +199,7 @@ export function OrderCard({ order, detailed = false }) {
 
                         <div className="flex flex-col items-end gap-3 ml-6">
                             <p className="text-xl font-bold text-accent">
-                                $
+                                Tk{" "}
                                 {typeof order?.total === "number"
                                     ? order.total.toFixed(2)
                                     : "0.00"}
@@ -266,7 +266,7 @@ export function OrderCard({ order, detailed = false }) {
                                                     </span>
                                                 </span>
                                                 <span className="font-medium">
-                                                    $
+                                                    Tk{" "}
                                                     {typeof item?.price ===
                                                     "number"
                                                         ? item.price.toFixed(2)
@@ -296,7 +296,7 @@ export function OrderCard({ order, detailed = false }) {
                     <div className="flex items-center gap-6">
                         <div className="text-right">
                             <p className="text-xl font-bold text-accent">
-                                $
+                                Tk{" "}
                                 {typeof order?.total === "number"
                                     ? order.total.toFixed(2)
                                     : "0.00"}

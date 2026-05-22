@@ -201,12 +201,12 @@ export default function ProductDetailsPage({
                         <div className="space-y-3 sm:space-y-4 md:space-y-4 lg:space-y6 xl:space-y-8 2xl:space-y-10">
                             <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-4 lg:gap-6 xl:gap-8 2xl:gap-10">
                                 <span className="text-2xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-accent">
-                                    ${product.price}
+                                    Tk {product.price}
                                 </span>
                                 {product.original_price &&
                                     product.original_price > product.price && (
                                         <span className="text-lg sm:text-lg md:text-xl lg:text-xl xl:text-2xl 2xl:text-3xl text-muted-foreground line-through">
-                                            ${product.original_price}
+                                            Tk {product.original_price}
                                         </span>
                                     )}
                                 {discount > 0 && (
@@ -303,7 +303,7 @@ export default function ProductDetailsPage({
                                         : (product.stock || 0) === 0
                                         ? "Out of Stock"
                                         : auth.user
-                                        ? `Add to Cart - $${(
+                                        ? `Add to Cart - Tk ${(
                                               parseFloat(product.price) *
                                               quantity
                                           ).toFixed(2)}`

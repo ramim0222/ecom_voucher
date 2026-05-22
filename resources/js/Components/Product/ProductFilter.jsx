@@ -16,11 +16,11 @@ export function ProductFilters() {
         "Subscription Services",
     ];
     const priceRanges = [
-        { label: "Under $10", value: "0-10" },
-        { label: "$10 - $25", value: "10-25" },
-        { label: "$25 - $50", value: "25-50" },
-        { label: "$50 - $100", value: "50-100" },
-        { label: "Over $100", value: "100+" },
+        { label: "Under Tk 10", value: "0-10" },
+        { label: "Tk 10 - 25", value: "10-25" },
+        { label: "Tk 25 - 50", value: "25-50" },
+        { label: "Tk 50 - 100", value: "50-100" },
+        { label: "Over Tk 100", value: "100+" },
     ];
 
     return (

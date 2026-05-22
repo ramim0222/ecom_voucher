@@ -22,7 +22,7 @@ export function WishlistSummary({
                 <div className="flex justify-between">
                     <span>Total Value</span>
                     <span className="font-semibold text-accent">
-                        ${totalValue.toFixed(2)}
+                        Tk {totalValue.toFixed(2)}
                     </span>
                 </div>
                 <hr className="border-border" />

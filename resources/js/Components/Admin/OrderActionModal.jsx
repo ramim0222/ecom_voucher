@@ -103,7 +103,7 @@ export function OrderActionModal({
                                             Order Total:
                                         </span>
                                         <span className="text-white">
-                                            ${order?.total.toFixed(2)}
+                                            Tk {order?.total.toFixed(2)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
@@ -111,7 +111,7 @@ export function OrderActionModal({
                                             Refund Amount:
                                         </span>
                                         <span className="text-white">
-                                            ${order?.total.toFixed(2)}
+                                            Tk {order?.total.toFixed(2)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
