@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\Category;
 use App\Models\Cart;
 use App\Services\MetaConversionApiService;
 use Illuminate\Http\Request;
@@ -68,12 +67,6 @@ class IndexController extends Controller
                 return $product;
             });
 
-        // Featured categories for homepage grid (do not override shared nav categories)
-        $featuredCategories = Category::where('status', 'active')
-            ->orderBy('id')
-            ->take(4)
-            ->get(['id', 'name', 'logo']);
-
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
@@ -81,7 +74,6 @@ class IndexController extends Controller
             'phpVersion' => PHP_VERSION,
             'featuredProducts' => $featuredProducts,
             'discountedProducts' => $discountedProducts,
-            'featuredCategories' => $featuredCategories,
         ]);
     }
 

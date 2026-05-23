@@ -1,13 +1,15 @@
+import { CategorySlider } from "@/Components/Home/CategorySlider";
 import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { VoucherCard } from "@/Components/ui/VoucherCard";
+import { usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
 export default function HomePage({
     featuredProducts = [],
     discountedProducts = [],
-    featuredCategories = [],
 }) {
+    const { categories = [] } = usePage().props;
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     useEffect(() => {
@@ -182,56 +184,7 @@ export default function HomePage({
                         Browse by Platform
                     </h2>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
-                        {featuredCategories.length > 0
-                            ? featuredCategories.map((category) => (
-                                  <div
-                                      key={category.id}
-                                      className="glass-card rounded-xl p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 2xl:p-10 text-center hover-lift cursor-pointer group"
-                                      onClick={() =>
-                                          (window.location.href = `/products?category=${category.id}`)
-                                      }
-                                  >
-                                      <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 2xl:w-24 2xl:h-24 mx-auto mb-3 sm:mb-4 md:mb-4 lg:mb-4 xl:mb-6 2xl:mb-8 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary to-accent">
-                                          {category.logo ? (
-                                              <img
-                                                  src={`/storage/${category.logo}`}
-                                                  alt={category.name}
-                                                  className="w-full h-full object-cover"
-                                              />
-                                          ) : (
-                                              <span className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-bold text-white">
-                                                  {category.name[0]}
-                                              </span>
-                                          )}
-                                      </div>
-                                      <h3 className="font-heading font-semibold text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl 2xl:text-2xl group-hover:text-accent transition-colors">
-                                          {category.name}
-                                      </h3>
-                                  </div>
-                              ))
-                            : // Fallback to static categories if no categories in database
-                              ["Steam", "PlayStation", "Xbox", "Nintendo"].map(
-                                  (platform) => (
-                                      <div
-                                          key={platform}
-                                          className="glass-card rounded-xl p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 2xl:p-10 text-center hover-lift cursor-pointer group"
-                                          onClick={() =>
-                                              (window.location.href = `/products`)
-                                          }
-                                      >
-                                          <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-16 lg:h-16 xl:w-20 xl:h-20 2xl:w-24 2xl:h-24 mx-auto mb-3 sm:mb-4 md:mb-4 lg:mb-4 xl:mb-6 2xl:mb-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-                                              <span className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-4xl font-bold text-white">
-                                                  {platform[0]}
-                                              </span>
-                                          </div>
-                                          <h3 className="font-heading font-semibold text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl 2xl:text-2xl group-hover:text-accent transition-colors">
-                                              {platform}
-                                          </h3>
-                                      </div>
-                                  )
-                              )}
-                    </div>
+                    <CategorySlider categories={categories} />
                 </div>
             </section>
             {showScrollTop && (

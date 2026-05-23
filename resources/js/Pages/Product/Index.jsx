@@ -41,7 +41,9 @@ export default function ProductsPage({ products = [], activeCategory = null }) {
                             {activeCategory && (
                                 <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full">
                                     {categories.find(
-                                        (c) => c.id === activeCategory
+                                        (c) =>
+                                            Number(c.id) ===
+                                            Number(activeCategory)
                                     )?.name || "Selected"}
                                 </span>
                             )}
@@ -106,7 +108,9 @@ export default function ProductsPage({ products = [], activeCategory = null }) {
                                     }
                                     platform={
                                         categories.find(
-                                            (c) => c.id === product.category_id
+                                            (c) =>
+                                                Number(c.id) ===
+                                                Number(product.category_id)
                                         )?.name || ""
                                     }
                                     rating={product.average_rating}
