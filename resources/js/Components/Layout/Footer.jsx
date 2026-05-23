@@ -18,9 +18,11 @@ export function Footer() {
         { label: "Wishlist", href: route("wishlist") },
     ];
 
-    const supportLinks = [
-        { label: "Support", href: route("contact") },
-        { label: "Help Center", href: route("support") },
+    const legalLinks = [
+        { label: "FAQ", href: route("faq") },
+        { label: "Refund & Cancellation", href: route("refund-policy") },
+        { label: "Privacy Policy", href: route("privacy-policy") },
+        { label: "Terms & Conditions", href: route("terms") },
     ];
 
     const featuredCategories = (categories || []).slice(0, 6);
@@ -156,13 +158,13 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Support */}
+                    {/* Help & Legal */}
                     <div>
                         <h3 className="font-heading font-semibold text-sm sm:text-base mb-4">
-                            Support
+                            Help & Legal
                         </h3>
                         <ul className="space-y-2.5 mb-5">
-                            {supportLinks.map((link) => (
+                            {legalLinks.map((link) => (
                                 <li key={link.label}>
                                     <Link
                                         href={link.href}

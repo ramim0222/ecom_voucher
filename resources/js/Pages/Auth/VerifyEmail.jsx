@@ -152,7 +152,7 @@ export default function VerifyEmailPage({ status }) {
                         <p className="text-xs text-muted-foreground">
                             Still having trouble?{" "}
                             <Link
-                                href="/support"
+                                href={route("contact")}
                                 className="text-accent hover:text-accent/80 font-medium"
                             >
                                 Contact Support

@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BrandingController;
 use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\ContentPagesController;
+use App\Http\Controllers\Front\ContentPageController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
 use App\Http\Controllers\Front\CartController;
@@ -25,7 +27,11 @@ Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
 Route::get('/products', [FrontProductController::class, 'products'])->name('products');
 Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('product');
-Route::get('/support', [IndexController::class, 'support'])->name('support');
+Route::get('/faq', [ContentPageController::class, 'faq'])->name('faq');
+Route::get('/refund-policy', [ContentPageController::class, 'refund'])->name('refund-policy');
+Route::get('/privacy-policy', [ContentPageController::class, 'privacy'])->name('privacy-policy');
+Route::get('/terms', [ContentPageController::class, 'terms'])->name('terms');
+Route::redirect('/support', '/faq');
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
 
@@ -162,6 +168,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/meta', [MarketingController::class, 'updateMeta'])->name('admin.settings.marketing.meta.update');
             Route::put('/google', [MarketingController::class, 'updateGoogle'])->name('admin.settings.marketing.google.update');
             Route::put('/tiktok', [MarketingController::class, 'updateTiktok'])->name('admin.settings.marketing.tiktok.update');
+        });
+
+        Route::prefix('admin/settings/content')->group(function () {
+            Route::get('/faq', [ContentPagesController::class, 'editFaq'])->name('admin.settings.content.faq');
+            Route::put('/faq', [ContentPagesController::class, 'updateFaq'])->name('admin.settings.content.faq.update');
+            Route::get('/refund', [ContentPagesController::class, 'editRefund'])->name('admin.settings.content.refund');
+            Route::put('/refund', [ContentPagesController::class, 'updateRefund'])->name('admin.settings.content.refund.update');
+            Route::get('/privacy', [ContentPagesController::class, 'editPrivacy'])->name('admin.settings.content.privacy');
+            Route::put('/privacy', [ContentPagesController::class, 'updatePrivacy'])->name('admin.settings.content.privacy.update');
+            Route::get('/terms', [ContentPagesController::class, 'editTerms'])->name('admin.settings.content.terms');
+            Route::put('/terms', [ContentPagesController::class, 'updateTerms'])->name('admin.settings.content.terms.update');
         });
 
     });
