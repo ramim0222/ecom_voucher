@@ -99,18 +99,18 @@ export function Header() {
                             </button>
                         </div>
 
-                        {/* Cart - Responsive sizing */}
-                        {isAuthenticated && (
-                            <Link
-                                href={route("cart")}
-                                className="relative p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors"
-                            >
-                                <span className="text-lg sm:text-xl">🛒</span>
+                        {/* Cart - visible for guests and authenticated users */}
+                        <Link
+                            href={route("cart")}
+                            className="relative p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors"
+                        >
+                            <span className="text-lg sm:text-xl">🛒</span>
+                            {cartCount > 0 && (
                                 <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 bg-accent text-accent-foreground text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
                                     {cartCount}
                                 </span>
-                            </Link>
-                        )}
+                            )}
+                        </Link>
 
                         {/* Wishlist - Responsive sizing */}
                         {isAuthenticated && (

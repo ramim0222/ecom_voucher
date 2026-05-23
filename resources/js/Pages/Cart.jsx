@@ -5,11 +5,11 @@ import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { CartItem } from "@/Components/Cart/CartItem";
 import { CartSummary } from "@/Components/Cart/CartSummary";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 
 export default function CartPage({ cartItems: initialCartItems = [] }) {
     const { props } = usePage();
-    const { flash } = props;
+    const { flash, auth } = props;
     const [cartItems, setCartItems] = useState(initialCartItems);
 
     // Update local state when props change
@@ -135,6 +135,18 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
                         {cartItems.length}{" "}
                         {cartItems.length === 1 ? "item" : "items"} in your cart
                     </p>
+                    {!auth?.user && (
+                        <div className="mt-4 flex items-center gap-3 bg-primary/10 border border-primary/30 rounded-lg px-4 py-3 text-sm">
+                            <span>You are shopping as a guest.</span>
+                            <Link
+                                href={route("login")}
+                                className="text-accent hover:underline font-medium"
+                            >
+                                Sign in
+                            </Link>
+                            <span className="text-muted-foreground">to save your cart across devices.</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

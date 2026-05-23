@@ -54,19 +54,25 @@ class OrderController extends Controller
     }
 
     /**
-     * Show the order details
+     * Show the order details (works for auth users and guests via session)
      */
     public function show(Order $order)
     {
-        // Check if user owns the order or is admin
-        if ($order->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
-            abort(403, 'Unauthorized access to order.');
+        if ($order->user_id === null) {
+            // Guest order: verify access via session
+            if (session('guest_order_id') !== $order->id) {
+                abort(403, 'Unauthorized access to order.');
+            }
+        } else {
+            // User order: verify ownership or admin role
+            $user = Auth::user();
+            if (!$user || ($order->user_id !== $user->id && !$user->isAdmin())) {
+                abort(403, 'Unauthorized access to order.');
+            }
         }
 
-        // Load relationships and add actual codes
         $order->load(['orderItems.product', 'user']);
 
-        // Add assigned codes as actual code values
         $order->orderItems->transform(function ($item) {
             if ($item->assigned_codes && count($item->assigned_codes) > 0) {
                 $item->actual_codes = Code::whereIn('id', $item->assigned_codes)
@@ -77,6 +83,14 @@ class OrderController extends Controller
             }
             return $item;
         });
+
+        $customer = $order->user ? [
+            'name' => $order->user->full_name,
+            'email' => $order->user->email,
+        ] : [
+            'name' => ($order->billing_address['first_name'] ?? '') . ' ' . ($order->billing_address['last_name'] ?? ''),
+            'email' => $order->billing_address['email'] ?? '',
+        ];
 
         return Inertia::render('Orders/Show', [
             'order' => [
@@ -90,13 +104,116 @@ class OrderController extends Controller
                 'total_amount' => $order->total_amount,
                 'created_at' => $order->created_at,
                 'payment_completed_at' => $order->payment_completed_at,
-                'customer' => [
-                    'name' => $order->user->full_name,
-                    'email' => $order->user->email,
-                ],
+                'customer' => $customer,
                 'items' => $order->orderItems->map(function ($item) {
                     return [
                         'product_id' => $item->product_id,
+                        'product_title' => $item->product->title,
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                        'total_price' => $item->total_price,
+                        'assigned_codes' => $item->actual_codes,
+                    ];
+                }),
+            ],
+        ]);
+    }
+
+    /**
+     * Create order for a guest user (no login required)
+     */
+    public function createGuestOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'payment_method' => 'required|string',
+            'billing_address' => 'required|array',
+            'billing_address.first_name' => 'required|string|max:255',
+            'billing_address.last_name' => 'required|string|max:255',
+            'billing_address.email' => 'required|email',
+            'billing_address.phone' => 'required|string',
+            'billing_address.address' => 'required|string',
+            'billing_address.city' => 'required|string',
+            'billing_address.state' => 'required|string',
+            'billing_address.zip' => 'required|string',
+            'billing_address.country' => 'required|string',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $guestCart = session('guest_cart', []);
+
+        if (empty($guestCart)) {
+            return back()->with('error', 'Your cart is empty.');
+        }
+
+        $products = array_values(array_map(function ($item) {
+            return [
+                'product_id' => $item['product_id'],
+                'quantity' => $item['quantity'],
+            ];
+        }, $guestCart));
+
+        try {
+            $orderData = $request->only(['payment_method', 'billing_address', 'discount_amount', 'notes']);
+            $order = $this->orderService->createGuestOrder($products, $orderData);
+
+            session()->forget('guest_cart');
+            session(['guest_order_id' => $order->id]);
+
+            MetaConversionApiService::trackPurchase($order, $request);
+
+            return redirect()->route('orders.guest-confirmation')
+                ->with('success', 'Order placed successfully!');
+
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Show guest order confirmation page (session-gated)
+     */
+    public function guestConfirmation()
+    {
+        $orderId = session('guest_order_id');
+
+        if (!$orderId) {
+            return redirect()->route('welcome')->with('error', 'No order found. Orders are only viewable immediately after checkout.');
+        }
+
+        $order = Order::with(['orderItems.product'])->find($orderId);
+
+        if (!$order) {
+            return redirect()->route('welcome')->with('error', 'Order not found.');
+        }
+
+        $order->orderItems->transform(function ($item) {
+            $item->actual_codes = [];
+            if ($item->assigned_codes && count($item->assigned_codes) > 0) {
+                $item->actual_codes = Code::whereIn('id', $item->assigned_codes)
+                    ->pluck('code')
+                    ->toArray();
+            }
+            return $item;
+        });
+
+        return Inertia::render('Orders/GuestConfirmation', [
+            'order' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'payment_status' => $order->payment_status,
+                'subtotal' => $order->subtotal,
+                'discount_amount' => $order->discount_amount,
+                'total_amount' => $order->total_amount,
+                'created_at' => $order->created_at,
+                'billing_address' => $order->billing_address,
+                'items' => $order->orderItems->map(function ($item) {
+                    return [
                         'product_title' => $item->product->title,
                         'quantity' => $item->quantity,
                         'unit_price' => $item->unit_price,
@@ -206,7 +323,6 @@ class OrderController extends Controller
      */
     public function processPayment(Request $request, Order $order)
     {
-        // Check if user owns the order
         if ($order->user_id !== Auth::id()) {
             abort(403, 'Unauthorized access to order.');
         }
@@ -256,7 +372,6 @@ class OrderController extends Controller
      */
     public function simulatePayment(Request $request, Order $order)
     {
-        // Check if user owns the order
         if ($order->user_id !== Auth::id()) {
             abort(403, 'Unauthorized access to order.');
         }
@@ -288,8 +403,10 @@ class OrderController extends Controller
      */
     public function cancel(Request $request, Order $order)
     {
-        // Check if user owns the order or is admin
-        if ($order->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        $user = Auth::user();
+        $isGuest = $order->user_id === null && session('guest_order_id') === $order->id;
+
+        if (!$isGuest && (!$user || ($order->user_id !== $user->id && !$user->isAdmin()))) {
             abort(403, 'Unauthorized access to order.');
         }
 
@@ -416,6 +533,22 @@ class OrderController extends Controller
             return $item;
         });
 
+        $customer = $order->user ? [
+            'id' => $order->user->id,
+            'name' => $order->user->full_name,
+            'email' => $order->user->email,
+            'phone' => $order->user->phone_number,
+            'first_name' => $order->user->first_name,
+            'last_name' => $order->user->last_name,
+        ] : [
+            'id' => null,
+            'name' => ($order->billing_address['first_name'] ?? '') . ' ' . ($order->billing_address['last_name'] ?? ''),
+            'email' => $order->billing_address['email'] ?? '',
+            'phone' => $order->billing_address['phone'] ?? '',
+            'first_name' => $order->billing_address['first_name'] ?? '',
+            'last_name' => $order->billing_address['last_name'] ?? '',
+        ];
+
         return Inertia::render('Admin/Orders/Page', [
             'order' => [
                 'id' => $order->id,
@@ -432,14 +565,7 @@ class OrderController extends Controller
                 'payment_completed_at' => $order->payment_completed_at,
                 'billing_address' => $order->billing_address,
                 'notes' => $order->notes,
-                'customer' => [
-                    'id' => $order->user->id,
-                    'name' => $order->user->full_name,
-                    'email' => $order->user->email,
-                    'phone' => $order->user->phone_number,
-                    'first_name' => $order->user->first_name,
-                    'last_name' => $order->user->last_name,
-                ],
+                'customer' => $customer,
                 'items' => $order->orderItems->map(function ($item) {
                     return [
                         'id' => $item->id,

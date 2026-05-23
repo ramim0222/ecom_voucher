@@ -81,22 +81,61 @@ class IndexController extends Controller
 
     public function checkout(Request $request)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('message', 'Please log in to proceed to checkout.');
-        }
-
         $user = Auth::user();
 
-        // Get cart items with product and category information
-        $cartItems = Cart::where('user_id', $user->id)
-            ->with(['product.category'])
-            ->get();
+        if ($user) {
+            // Authenticated user: load cart from DB
+            $dbCartItems = Cart::where('user_id', $user->id)
+                ->with(['product.category'])
+                ->get();
 
-        if ($cartItems->isEmpty()) {
-            return redirect()->route('cart')->with('error', 'Your cart is empty. Please add items to continue.');
+            if ($dbCartItems->isEmpty()) {
+                return redirect()->route('cart')->with('error', 'Your cart is empty. Please add items to continue.');
+            }
+
+            $cartItems = $dbCartItems->map(function ($cartItem) {
+                return [
+                    'id' => $cartItem->product_id,
+                    'product_id' => $cartItem->product_id,
+                    'title' => $cartItem->product->title,
+                    'price' => (float) $cartItem->price,
+                    'platform' => $cartItem->product->category->name ?? 'Digital',
+                    'quantity' => (int) $cartItem->quantity,
+                    'stock' => (int) $cartItem->product->stock,
+                    'image' => $cartItem->product->product_image ? asset('storage/' . $cartItem->product->product_image) : '/placeholder.svg',
+                ];
+            });
+
+            MetaConversionApiService::trackInitiateCheckout($dbCartItems, $request);
+        } else {
+            // Guest user: load cart from session
+            $guestCart = session('guest_cart', []);
+
+            if (empty($guestCart)) {
+                return redirect()->route('cart')->with('error', 'Your cart is empty. Please add items to continue.');
+            }
+
+            $productIds = array_keys($guestCart);
+            $products = \App\Models\Product::with('category')->whereIn('id', $productIds)->get()->keyBy('id');
+
+            $cartItems = collect($guestCart)->map(function ($item, $productId) use ($products) {
+                $product = $products->get($productId);
+                if (!$product) {
+                    return null;
+                }
+
+                return [
+                    'id' => $productId,
+                    'product_id' => (int) $productId,
+                    'title' => $product->title,
+                    'price' => (float) $product->price,
+                    'platform' => $product->category->name ?? 'Digital',
+                    'quantity' => (int) $item['quantity'],
+                    'stock' => (int) $product->stock,
+                    'image' => $product->product_image ? asset('storage/' . $product->product_image) : '/placeholder.svg',
+                ];
+            })->filter()->values();
         }
-
-        MetaConversionApiService::trackInitiateCheckout($cartItems, $request);
 
         return Inertia::render('Checkout', [
             'cartItems' => $cartItems,

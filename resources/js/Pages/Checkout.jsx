@@ -19,10 +19,13 @@ export default function CheckoutPage({ cartItems = [], user }) {
     useEffect(() => {
         if (cartItems && cartItems.length > 0) {
             const items = cartItems.map((item) => ({
-                id: item.id,
-                title: item.product.title,
+                id: item.id ?? item.product_id,
+                title: item.title ?? item.product?.title ?? "Product",
                 price: parseFloat(item.price),
-                platform: item.product.category?.name || "Digital",
+                platform:
+                    item.platform ??
+                    item.product?.category?.name ??
+                    "Digital",
                 quantity: item.quantity,
             }));
 

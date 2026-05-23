@@ -87,6 +87,65 @@ class OrderService
     }
 
     /**
+     * Create order for a guest (no user account required)
+     */
+    public function createGuestOrder(array $products, array $orderData = []): Order
+    {
+        return DB::transaction(function () use ($products, $orderData) {
+            $subtotal = 0;
+            $validatedProducts = [];
+
+            foreach ($products as $productData) {
+                $product = Product::findOrFail($productData['product_id']);
+
+                $availableStock = $product->codes()
+                    ->where('status', 'available')
+                    ->lockForUpdate()
+                    ->count();
+
+                if ($availableStock < $productData['quantity']) {
+                    throw new \Exception("Insufficient stock for product: {$product->title}. Available: {$availableStock}, Requested: {$productData['quantity']}");
+                }
+
+                $validatedProducts[] = [
+                    'product' => $product,
+                    'quantity' => $productData['quantity'],
+                    'unit_price' => $product->price,
+                ];
+
+                $subtotal += $product->price * $productData['quantity'];
+            }
+
+            $order = Order::create([
+                'user_id' => null,
+                'subtotal' => $subtotal,
+                'discount_amount' => $orderData['discount_amount'] ?? 0,
+                'tax_amount' => $orderData['tax_amount'] ?? 0,
+                'total_amount' => $subtotal + ($orderData['tax_amount'] ?? 0) - ($orderData['discount_amount'] ?? 0),
+                'status' => 'pending',
+                'payment_method' => $orderData['payment_method'] ?? null,
+                'billing_address' => $orderData['billing_address'] ?? null,
+                'notes' => $orderData['notes'] ?? null,
+            ]);
+
+            foreach ($validatedProducts as $productData) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $productData['product']->id,
+                    'quantity' => $productData['quantity'],
+                    'unit_price' => $productData['unit_price'],
+                ]);
+            }
+
+            $this->autoCompleteOrder($order);
+
+            Log::info('Guest order created and auto-completed successfully', ['order_id' => $order->id]);
+
+            return $order;
+        });
+    }
+
+    /**
      * Create order from products directly
      */
     public function createOrderFromProducts(User $user, array $products, array $orderData = []): Order
@@ -336,9 +395,12 @@ class OrderService
             'total_amount' => $order->total_amount,
             'created_at' => $order->created_at,
             'payment_completed_at' => $order->payment_completed_at,
-            'customer' => [
+            'customer' => $order->user ? [
                 'name' => $order->user->full_name,
                 'email' => $order->user->email,
+            ] : [
+                'name' => ($order->billing_address['first_name'] ?? '') . ' ' . ($order->billing_address['last_name'] ?? ''),
+                'email' => $order->billing_address['email'] ?? '',
             ],
             'items' => $order->orderItems->map(function ($item) {
                 $assignedCodes = null;

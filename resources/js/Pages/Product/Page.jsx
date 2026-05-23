@@ -18,11 +18,6 @@ export default function ProductDetailsPage({
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [isWishlisted, setIsWishlisted] = useState(userHasWishlisted);
 
-    // Debug: Log product data to console
-    console.log("Product data:", product);
-    console.log("Product stock:", product.stock);
-    console.log("Product stock type:", typeof product.stock);
-
     const discount = product.original_price
         ? Math.round(
               ((product.original_price - product.price) /
@@ -32,12 +27,6 @@ export default function ProductDetailsPage({
         : 0;
 
     const addToCart = () => {
-        // Check if user is authenticated
-        if (!auth.user) {
-            router.visit("/login");
-            return;
-        }
-
         // Check if product is in stock
         if ((product.stock || 0) === 0) {
             alert("This product is out of stock.");
@@ -243,8 +232,7 @@ export default function ProductDetailsPage({
 
                         <div className="space-y-3 sm:space-y-4 md:space-y-4 lg:space-y6 xl:space-y-8 2xl:space-y-10">
                             {/* Quantity Selector */}
-                            {(product.stock > 0 ||
-                                true) /* Temporarily always show for debugging */ && (
+                            {product.stock > 0 && (
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 md:gap-4 lg:gap-6 xl:gap-8 2xl:gap-10">
                                     <label className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium">
                                         Quantity:
@@ -303,12 +291,10 @@ export default function ProductDetailsPage({
                                         ? "Adding to Cart..."
                                         : (product.stock || 0) === 0
                                         ? "Out of Stock"
-                                        : auth.user
-                                        ? `Add to Cart - Tk ${(
+                                        : `Add to Cart - Tk ${(
                                               parseFloat(product.price) *
                                               quantity
-                                          ).toFixed(2)}`
-                                        : "Login to Add to Cart"}
+                                          ).toFixed(2)}`}
                                 </GamingButton>
                                 <GamingButton
                                     variant="ghost"

@@ -41,7 +41,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'cartCount' => fn () => $request->user() ? (int) Cart::where('user_id', $request->user()->id)->sum('quantity') : 0,
+            'cartCount' => fn () => $request->user()
+                ? (int) Cart::where('user_id', $request->user()->id)->sum('quantity')
+                : (int) array_sum(array_column($request->session()->get('guest_cart', []), 'quantity')),
             'categories' => fn () => Category::query()
                 ->orderBy('name')
                 ->get(['id', 'name', 'logo', 'status'])

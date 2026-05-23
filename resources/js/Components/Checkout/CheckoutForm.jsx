@@ -124,13 +124,12 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
             return;
         }
 
-        // Create order from cart
-        post(route("orders.create-from-cart"), {
-            onSuccess: (page) => {
-                alert(
-                    "Order created successfully! Redirecting to order details..."
-                );
-            },
+        const endpoint = user
+            ? route("orders.create-from-cart")
+            : route("orders.guest-create");
+
+        post(endpoint, {
+            onSuccess: () => {},
             onError: (errors) => {
                 console.error("Order creation failed:", errors);
                 alert("Failed to create order. Please try again.");

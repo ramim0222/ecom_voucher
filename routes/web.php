@@ -25,6 +25,20 @@ Route::get('/products', [FrontProductController::class, 'products'])->name('prod
 Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('product');
 Route::get('/support', [IndexController::class, 'support'])->name('support');
 
+// Public cart routes (work for both auth and guest users)
+Route::get('/cart', [CartController::class, 'cart'])->name('cart');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/{productId}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+
+// Guest order routes
+Route::post('/orders/guest/create', [OrderController::class, 'createGuestOrder'])->name('orders.guest-create');
+Route::get('/orders/guest-confirmation', [OrderController::class, 'guestConfirmation'])->name('orders.guest-confirmation');
+
+// Order show (accessible by owner, admin, or guest via session)
+Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
 
 
 
@@ -55,13 +69,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Review routes
         Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-        // Cart routes
-        Route::get('/cart', [CartController::class, 'cart'])->name('cart');
-        Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-        Route::patch('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
-        Route::delete('/cart/{cart}', [CartController::class, 'remove'])->name('cart.remove');
-        Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
-
         // Wishlist routes
         Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
         Route::post('/wishlist/add', [WishlistController::class, 'add'])->name('wishlist.add');
@@ -71,8 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/wishlist/move-all', [WishlistController::class, 'moveAllToCart'])->name('wishlist.move-all');
         Route::delete('/wishlist/product/{product}', [WishlistController::class, 'removeByProduct'])->name('wishlist.remove-by-product');
 
-        // Order routes
-        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        // Order routes (auth required for creating/viewing user orders)
         Route::post('/orders/create-from-cart', [OrderController::class, 'createFromCart'])->name('orders.create-from-cart');
         Route::post('/orders/create-from-products', [OrderController::class, 'createFromProducts'])->name('orders.create-from-products');
         Route::post('/orders/{order}/payment', [OrderController::class, 'processPayment'])->name('orders.process-payment');
