@@ -27,11 +27,11 @@ export default function GuestConfirmation({ order }) {
             <Head title="Order Confirmed" />
             <SiteLayout>
 
-                <div className="container mx-auto px-4 py-8 max-w-3xl">
+                <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-3xl">
                     {/* Success Banner */}
                     <div className="glass-card rounded-xl p-8 mb-8 text-center border border-green-500/30">
                         <div className="text-5xl mb-4">✅</div>
-                        <h1 className="font-heading font-bold text-3xl mb-2">
+                        <h1 className="font-heading font-bold text-2xl sm:text-3xl mb-2">
                             Order Confirmed!
                         </h1>
                         <p className="text-muted-foreground mb-1">

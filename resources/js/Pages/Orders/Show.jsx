@@ -48,18 +48,18 @@ export default function OrderShow({ order }) {
             <Head title={`Order ${order.order_number}`} />
             <SiteLayout>
 
-                <div className="container mx-auto px-4 py-8">
+                <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
                     <div className="mb-8">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
-                                <h1 className="font-heading font-bold text-3xl md:text-4xl mb-2">
+                                <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-2">
                                     Order Details
                                 </h1>
                                 <p className="text-muted-foreground">
                                     Order #{order.order_number}
                                 </p>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 <span
                                     className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                                         order.status
@@ -95,9 +95,9 @@ export default function OrderShow({ order }) {
                                     {order.items.map((item, index) => (
                                         <div
                                             key={index}
-                                            className="flex items-center justify-between p-4 border border-border rounded-lg"
+                                            className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between p-4 border border-border rounded-lg"
                                         >
-                                            <div className="flex-1">
+                                            <div className="flex-1 min-w-0">
                                                 <h4 className="font-medium">
                                                     {item.product_title}
                                                 </h4>
@@ -186,7 +186,7 @@ export default function OrderShow({ order }) {
                                                         </div>
                                                     )}
                                             </div>
-                                            <div className="text-right">
+                                            <div className="text-left sm:text-right shrink-0">
                                                 <span className="font-semibold">
                                                     Tk {item.total_price}
                                                 </span>

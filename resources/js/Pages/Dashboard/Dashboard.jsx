@@ -19,7 +19,7 @@ export default function DashboardPage({ user, recentOrders, stats }) {
                     <div className="glass-card rounded-xl p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
-                                <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">
+                                <h1 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl mb-2">
                                     Welcome back, {user?.name || "Gamer"}!
                                 </h1>
                                 <p className="text-muted-foreground">

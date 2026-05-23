@@ -98,7 +98,7 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
     if (cartItems.length === 0) {
         return (
             <SiteLayout>
-                <div className="container mx-auto px-4 py-16 text-center">
+                <div className="container mx-auto px-3 sm:px-4 py-12 sm:py-16 text-center">
                     <div className="glass-card rounded-xl p-12 max-w-md mx-auto">
                         <div className="text-6xl mb-4">🛒</div>
                         <h1 className="font-heading font-bold text-2xl mb-4">
@@ -122,9 +122,9 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
     return (
         <SiteLayout>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
                 <div className="mb-8">
-                    <h1 className="font-heading font-bold text-3xl md:text-4xl mb-2">
+                    <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-2">
                         Shopping Cart
                     </h1>
                     <p className="text-muted-foreground">

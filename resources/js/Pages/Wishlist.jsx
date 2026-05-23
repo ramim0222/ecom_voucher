@@ -133,9 +133,9 @@ export default function WishlistPage({
     return (
         <SiteLayout>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
                 <div className="mb-8">
-                    <h1 className="font-heading font-bold text-3xl md:text-4xl mb-2">
+                    <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-2">
                         My Wishlist
                     </h1>
                     <p className="text-muted-foreground">

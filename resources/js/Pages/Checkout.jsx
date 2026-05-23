@@ -56,14 +56,14 @@ export default function CheckoutPage({ cartItems = [], user }) {
     return (
         <SiteLayout>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
                 <div className="mb-8">
-                    <h1 className="font-heading font-bold text-3xl md:text-4xl mb-4">
+                    <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-4">
                         Checkout
                     </h1>
 
                     {/* Progress Steps */}
-                    <div className="flex items-center justify-center mb-8">
+                    <div className="flex items-center justify-center mb-8 overflow-x-auto">
                         {steps.map((step, index) => (
                             <div
                                 key={step.number}
@@ -79,7 +79,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
                                     {step.completed ? "✓" : step.number}
                                 </div>
                                 <span
-                                    className={`ml-2 text-sm ${
+                                    className={`ml-2 text-sm hidden sm:inline ${
                                         currentStep >= step.number
                                             ? "text-foreground"
                                             : "text-muted-foreground"
@@ -89,7 +89,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
                                 </span>
                                 {index < steps.length - 1 && (
                                     <div
-                                        className={`w-16 h-0.5 mx-4 ${
+                                        className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${
                                             currentStep > step.number
                                                 ? "bg-primary"
                                                 : "bg-border"
