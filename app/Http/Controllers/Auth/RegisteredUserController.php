@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\GuestSessionMergeService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,10 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(
+        protected GuestSessionMergeService $guestSessionMergeService
+    ) {}
+
     /**
      * Display the registration view.
      */
@@ -75,6 +80,8 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        $this->guestSessionMergeService->merge($user, $request);
 
         \Log::info('User logged in and redirecting to dashboard');
 

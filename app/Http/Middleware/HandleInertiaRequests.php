@@ -7,6 +7,7 @@ use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use App\Models\Category;
 use App\Models\Cart;
+use App\Models\Wishlist;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -44,6 +45,9 @@ class HandleInertiaRequests extends Middleware
             'cartCount' => fn () => $request->user()
                 ? (int) Cart::where('user_id', $request->user()->id)->sum('quantity')
                 : (int) array_sum(array_column($request->session()->get('guest_cart', []), 'quantity')),
+            'wishlistCount' => fn () => $request->user()
+                ? (int) Wishlist::where('user_id', $request->user()->id)->count()
+                : (int) count($request->session()->get('guest_wishlist', [])),
             'categories' => fn () => Category::query()
                 ->orderBy('name')
                 ->get(['id', 'name', 'logo', 'status'])

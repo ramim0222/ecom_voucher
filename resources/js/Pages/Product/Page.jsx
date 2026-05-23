@@ -62,11 +62,6 @@ export default function ProductDetailsPage({
     };
 
     const toggleWishlist = () => {
-        if (!auth.user) {
-            router.visit("/login");
-            return;
-        }
-
         if (!isWishlisted) {
             setIsWishlisted(true);
             router.post(

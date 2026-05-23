@@ -32,6 +32,15 @@ Route::patch('/cart/{productId}', [CartController::class, 'update'])->name('cart
 Route::delete('/cart/{productId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
+// Public wishlist routes (work for both auth and guest users)
+Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
+Route::post('/wishlist/add', [WishlistController::class, 'add'])->name('wishlist.add');
+Route::delete('/wishlist/{productId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+Route::delete('/wishlist', [WishlistController::class, 'clear'])->name('wishlist.clear');
+Route::post('/wishlist/{productId}/move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
+Route::post('/wishlist/move-all', [WishlistController::class, 'moveAllToCart'])->name('wishlist.move-all');
+Route::delete('/wishlist/product/{product}', [WishlistController::class, 'removeByProduct'])->name('wishlist.remove-by-product');
+
 // Guest order routes
 Route::post('/orders/guest/create', [OrderController::class, 'createGuestOrder'])->name('orders.guest-create');
 Route::get('/orders/guest-confirmation', [OrderController::class, 'guestConfirmation'])->name('orders.guest-confirmation');
@@ -68,15 +77,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Review routes
         Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-
-        // Wishlist routes
-        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
-        Route::post('/wishlist/add', [WishlistController::class, 'add'])->name('wishlist.add');
-        Route::delete('/wishlist/{wishlist}', [WishlistController::class, 'remove'])->name('wishlist.remove');
-        Route::delete('/wishlist', [WishlistController::class, 'clear'])->name('wishlist.clear');
-        Route::post('/wishlist/{wishlist}/move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
-        Route::post('/wishlist/move-all', [WishlistController::class, 'moveAllToCart'])->name('wishlist.move-all');
-        Route::delete('/wishlist/product/{product}', [WishlistController::class, 'removeByProduct'])->name('wishlist.remove-by-product');
 
         // Order routes (auth required for creating/viewing user orders)
         Route::post('/orders/create-from-cart', [OrderController::class, 'createFromCart'])->name('orders.create-from-cart');

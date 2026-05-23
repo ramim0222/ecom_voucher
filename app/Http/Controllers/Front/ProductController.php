@@ -147,11 +147,11 @@ class ProductController extends Controller
         // The stock is automatically calculated via the getStockAttribute() accessor in the Product model
         // and is included in JSON via the $appends array
 
-        $wishlistEntry = Auth::check()
+        $userHasWishlisted = Auth::check()
             ? Wishlist::where('user_id', Auth::id())
                 ->where('product_id', $product->id)
-                ->first()
-            : null;
+                ->exists()
+            : isset(session('guest_wishlist', [])[(string) $product->id]);
 
         MetaConversionApiService::trackViewContent($product, $request);
 
@@ -191,8 +191,8 @@ class ProductController extends Controller
             'reviews' => $approvedReviews,
             'relatedProducts' => $relatedProducts,
             'userHasReviewed' => $userHasReviewed,
-            'userHasWishlisted' => (bool) $wishlistEntry,
-            'wishlistId' => $wishlistEntry?->id,
+            'userHasWishlisted' => $userHasWishlisted,
+            'wishlistId' => null,
         ]);
     }
 

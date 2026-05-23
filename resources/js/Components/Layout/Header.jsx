@@ -4,7 +4,7 @@ import Dropdown from "@/Components/Dropdown";
 import { useState } from "react";
 
 export function Header() {
-    const { auth, categories = [], cartCount = 0 } = usePage().props;
+    const { auth, categories = [], cartCount = 0, wishlistCount = 0 } = usePage().props;
     const isAuthenticated = !!auth.user;
     const isAdmin = auth.user?.role === "admin";
     const dashboardRoute = isAdmin ? route("admin") : route("dashboard");
@@ -112,15 +112,18 @@ export function Header() {
                             )}
                         </Link>
 
-                        {/* Wishlist - Responsive sizing */}
-                        {isAuthenticated && (
-                            <Link
-                                href={route("wishlist")}
-                                className="relative p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors"
-                            >
-                                <span className="text-lg sm:text-xl">💖</span>
-                            </Link>
-                        )}
+                        {/* Wishlist - visible for guests and authenticated users */}
+                        <Link
+                            href={route("wishlist")}
+                            className="relative p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors"
+                        >
+                            <span className="text-lg sm:text-xl">💖</span>
+                            {wishlistCount > 0 && (
+                                <span className="absolute -top-0.5 sm:-top-1 -right-0.5 sm:-right-1 bg-accent text-accent-foreground text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
+                                    {wishlistCount}
+                                </span>
+                            )}
+                        </Link>
 
                         {/* Auth Buttons - Responsive sizing and layout */}
                         {isAuthenticated ? (

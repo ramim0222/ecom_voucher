@@ -5,14 +5,14 @@ import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { WishlistItem } from "@/Components/Wishlist/WishlistItem";
 import { WishlistSummary } from "@/Components/Wishlist/WishlistSummary";
-import { router, usePage } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 
 export default function WishlistPage({
     wishlistItems: initialWishlistItems = [],
 }) {
     const [wishlistItems, setWishlistItems] = useState(initialWishlistItems);
     const { props } = usePage();
-    const { flash } = props;
+    const { flash, auth } = props;
 
     // Update local state when props change
     useEffect(() => {
@@ -147,6 +147,20 @@ export default function WishlistPage({
                         {wishlistItems.length === 1 ? "item" : "items"} in your
                         wishlist
                     </p>
+                    {!auth?.user && (
+                        <div className="mt-4 flex items-center gap-3 bg-primary/10 border border-primary/30 rounded-lg px-4 py-3 text-sm">
+                            <span>You are browsing as a guest.</span>
+                            <Link
+                                href={route("login")}
+                                className="text-accent hover:underline font-medium"
+                            >
+                                Sign in
+                            </Link>
+                            <span className="text-muted-foreground">
+                                to save your wishlist across devices.
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
