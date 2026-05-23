@@ -25,7 +25,7 @@ class IndexController extends Controller
             }])
             ->orderBy('sort_order')
             ->orderByDesc('id')
-            ->take(6) // Limit to 6 featured products
+            ->take(8)
             ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image', 'is_featured'])
             ->map(function ($product) {
                 // Calculate review statistics
@@ -53,7 +53,7 @@ class IndexController extends Controller
             // Order by discount percentage desc, then most recent
             ->orderByRaw('(original_price - price) / NULLIF(original_price, 0) DESC')
             ->orderByDesc('id')
-            ->take(6)
+            ->take(8)
             ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image', 'is_featured'])
             ->map(function ($product) {
                 $approvedReviews = $product->reviews;
@@ -68,8 +68,8 @@ class IndexController extends Controller
                 return $product;
             });
 
-        // Get categories for category display
-        $categories = Category::where('status', 'active')
+        // Featured categories for homepage grid (do not override shared nav categories)
+        $featuredCategories = Category::where('status', 'active')
             ->orderBy('id')
             ->take(4)
             ->get(['id', 'name', 'logo']);
@@ -81,7 +81,7 @@ class IndexController extends Controller
             'phpVersion' => PHP_VERSION,
             'featuredProducts' => $featuredProducts,
             'discountedProducts' => $discountedProducts,
-            'categories' => $categories,
+            'featuredCategories' => $featuredCategories,
         ]);
     }
 

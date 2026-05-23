@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 export default function HomePage({
     featuredProducts = [],
     discountedProducts = [],
-    categories = [],
+    featuredCategories = [],
 }) {
     const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -183,8 +183,8 @@ export default function HomePage({
                     </h2>
 
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
-                        {categories.length > 0
-                            ? categories.map((category) => (
+                        {featuredCategories.length > 0
+                            ? featuredCategories.map((category) => (
                                   <div
                                       key={category.id}
                                       className="glass-card rounded-xl p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 2xl:p-10 text-center hover-lift cursor-pointer group"

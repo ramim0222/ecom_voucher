@@ -49,9 +49,13 @@ export function Header() {
                                 <Dropdown.Content
                                     align="left"
                                     width="48"
-                                    contentClasses="py-1 bg-white dark:bg-slate-800"
+                                    contentClasses="py-0 bg-white dark:bg-slate-800 overflow-hidden"
                                 >
-                                    <div className="max-h-80 overflow-auto">
+                                    <div
+                                        className="dropdown-scroll max-h-64 overflow-y-auto overflow-x-hidden py-1"
+                                        onClick={(e) => e.stopPropagation()}
+                                        onWheel={(e) => e.stopPropagation()}
+                                    >
                                         {(categories || []).map((cat) => (
                                             <Dropdown.Link
                                                 key={cat.id}
@@ -182,7 +186,7 @@ export function Header() {
                                 <div className="text-sm font-medium text-muted-foreground">
                                     Categories
                                 </div>
-                                <div className="pl-4 space-y-2">
+                                <div className="dropdown-scroll max-h-48 overflow-y-auto overflow-x-hidden pl-4 space-y-2">
                                     {(categories || []).map((cat) => (
                                         <Link
                                             key={cat.id}
