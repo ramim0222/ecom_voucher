@@ -4,6 +4,10 @@ import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductTabs } from "@/Components/Product/ProductTabs";
 import { RelatedProducts } from "@/Components/Product/RelatedProducts";
 import { Link, router } from "@inertiajs/react";
+import {
+    formatValidationErrors,
+    useToast,
+} from "@/Components/Admin/ToastProvider";
 
 export default function ProductDetailsPage({
     product,
@@ -17,6 +21,7 @@ export default function ProductDetailsPage({
     const [quantity, setQuantity] = useState(1);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [isWishlisted, setIsWishlisted] = useState(userHasWishlisted);
+    const { addToast } = useToast();
 
     const discount = product.original_price
         ? Math.round(
@@ -29,13 +34,16 @@ export default function ProductDetailsPage({
     const addToCart = () => {
         // Check if product is in stock
         if ((product.stock || 0) === 0) {
-            alert("This product is out of stock.");
+            addToast("This product is out of stock.", "error");
             return;
         }
 
         // Check if requested quantity is available
         if (quantity > (product.stock || 0)) {
-            alert(`Only ${product.stock} items available in stock.`);
+            addToast(
+                `Only ${product.stock} items available in stock.`,
+                "error"
+            );
             return;
         }
 
@@ -49,12 +57,12 @@ export default function ProductDetailsPage({
             },
             {
                 onSuccess: () => {
-                    alert("Product added to cart successfully!");
+                    addToast("Product added to cart successfully!", "success");
                     setIsAddingToCart(false);
                 },
                 onError: (errors) => {
                     console.error("Failed to add to cart:", errors);
-                    alert("Failed to add product to cart. Please try again.");
+                    addToast(formatValidationErrors(errors), "error");
                     setIsAddingToCart(false);
                 },
             }

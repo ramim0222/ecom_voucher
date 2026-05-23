@@ -2,7 +2,7 @@ import { CategorySlider } from "@/Components/Home/CategorySlider";
 import { Header } from "@/Components/Layout/Header";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { VoucherCard } from "@/Components/ui/VoucherCard";
-import { usePage } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 
 export default function HomePage({
@@ -36,14 +36,15 @@ export default function HomePage({
                         access to your favorite gaming platforms.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                        <GamingButton
-                            variant="accent"
-                            size="lg"
-                            onClick={() => (window.location.href = "/products")}
-                            className="text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4"
-                        >
-                            Explore Vouchers
-                        </GamingButton>
+                        <Link href={route("products")}>
+                            <GamingButton
+                                variant="accent"
+                                size="lg"
+                                className="text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4"
+                            >
+                                Explore Vouchers
+                            </GamingButton>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -87,9 +88,7 @@ export default function HomePage({
                                 platform={product.category?.name || ""}
                                 rating={product.average_rating}
                                 reviewsCount={product.reviews_count}
-                                onClick={() =>
-                                    (window.location.href = `/products/${product.id}`)
-                                }
+                                href={route("product", product.id)}
                             />
                         ))}
                     </div>
@@ -99,15 +98,14 @@ export default function HomePage({
                             <p className="text-muted-foreground text-base sm:text-lg lg:text-lg xl:text-xl 2xl:text-xl mb-4 sm:mb-6">
                                 No featured products available at the moment.
                             </p>
-                            <GamingButton
-                                variant="accent"
-                                className="mt-4 sm:mt-6 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3"
-                                onClick={() =>
-                                    (window.location.href = "/products")
-                                }
-                            >
-                                Browse All Products
-                            </GamingButton>
+                            <Link href={route("products")}>
+                                <GamingButton
+                                    variant="accent"
+                                    className="mt-4 sm:mt-6 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3"
+                                >
+                                    Browse All Products
+                                </GamingButton>
+                            </Link>
                         </div>
                     )}
                 </div>
@@ -151,9 +149,7 @@ export default function HomePage({
                                 platform={product.category?.name || ""}
                                 rating={product.average_rating}
                                 reviewsCount={product.reviews_count}
-                                onClick={() =>
-                                    (window.location.href = `/products/${product.id}`)
-                                }
+                                href={route("product", product.id)}
                             />
                         ))}
                     </div>
@@ -163,15 +159,14 @@ export default function HomePage({
                             <p className="text-muted-foreground text-base sm:text-lg lg:text-lg xl:text-xl 2xl:text-xl mb-4 sm:mb-6">
                                 No discounted products available at the moment.
                             </p>
-                            <GamingButton
-                                variant="accent"
-                                className="mt-4 sm:mt-6 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3"
-                                onClick={() =>
-                                    (window.location.href = "/products")
-                                }
-                            >
-                                Browse All Products
-                            </GamingButton>
+                            <Link href={route("products")}>
+                                <GamingButton
+                                    variant="accent"
+                                    className="mt-4 sm:mt-6 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3"
+                                >
+                                    Browse All Products
+                                </GamingButton>
+                            </Link>
                         </div>
                     )}
                 </div>

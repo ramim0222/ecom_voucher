@@ -37,9 +37,7 @@ export function RelatedProducts({ relatedProducts = [] }) {
                         platform={product.platform}
                         rating={product.average_rating}
                         reviewsCount={product.reviews_count}
-                        onClick={() =>
-                            (window.location.href = `/products/${product.id}`)
-                        }
+                        href={route("product", product.id)}
                     />
                 ))}
             </div>

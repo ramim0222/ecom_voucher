@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { GamingButton } from "./GamingButton";
+import { Link } from "@inertiajs/react";
 
 export function VoucherCard({
     title,
@@ -10,17 +10,17 @@ export function VoucherCard({
     platform,
     rating,
     reviewsCount,
+    href,
     className,
     ...props
 }) {
-    return (
-        <div
-            className={cn(
-                "glass-card rounded-xl p-4 hover-lift group cursor-pointer",
-                className
-            )}
-            {...props}
-        >
+    const cardClasses = cn(
+        "glass-card rounded-xl p-4 hover-lift group cursor-pointer block",
+        className
+    );
+
+    const content = (
+        <>
             <div className="relative overflow-hidden rounded-lg mb-4">
                 <img
                     src={
@@ -81,11 +81,25 @@ export function VoucherCard({
                             </span>
                         )}
                     </div>
-                    <GamingButton size="sm" variant="primary">
+                    <span className="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 px-4 py-2 text-sm bg-primary hover:bg-accent text-primary-foreground hover:text-accent-foreground hover-lift neon-glow">
                         Buy Now
-                    </GamingButton>
+                    </span>
                 </div>
             </div>
+        </>
+    );
+
+    if (href) {
+        return (
+            <Link href={href} className={cardClasses}>
+                {content}
+            </Link>
+        );
+    }
+
+    return (
+        <div className={cardClasses} {...props}>
+            {content}
         </div>
     );
 }

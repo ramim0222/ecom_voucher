@@ -5,7 +5,7 @@ import { VoucherCard } from "@/Components/ui/VoucherCard";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductFilters } from "@/Components/Product/ProductFilter";
 import { ProductSort } from "@/Components/Product/ProductSort";
-import { usePage } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
 export default function ProductsPage({ products = [], filters = {} }) {
@@ -121,9 +121,7 @@ export default function ProductsPage({ products = [], filters = {} }) {
                                     }
                                     rating={product.average_rating}
                                     reviewsCount={product.reviews_count}
-                                    onClick={() =>
-                                        (window.location.href = `/products/${product.id}`)
-                                    }
+                                    href={route("product", product.id)}
                                 />
                             ))}
                         </div>
@@ -134,15 +132,14 @@ export default function ProductsPage({ products = [], filters = {} }) {
                                 <p className="text-muted-foreground text-base sm:text-lg lg:text-lg xl:text-xl 2xl:text-xl mb-4 sm:mb-6">
                                     No products found matching your criteria.
                                 </p>
-                                <GamingButton
-                                    variant="accent"
-                                    className="text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3"
-                                    onClick={() =>
-                                        (window.location.href = "/products")
-                                    }
-                                >
-                                    View All Products
-                                </GamingButton>
+                                <Link href={route("products")}>
+                                    <GamingButton
+                                        variant="accent"
+                                        className="text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3"
+                                    >
+                                        View All Products
+                                    </GamingButton>
+                                </Link>
                             </div>
                         )}
 
