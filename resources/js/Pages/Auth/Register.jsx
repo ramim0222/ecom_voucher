@@ -465,10 +465,24 @@ export default function Register({ status }) {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <GamingButton variant="ghost" size="lg" className="w-full">
+                    <GamingButton
+                        variant="ghost"
+                        size="lg"
+                        className="w-full"
+                        href={route("auth.social.redirect", {
+                            provider: "google",
+                        })}
+                    >
                         Google
                     </GamingButton>
-                    <GamingButton variant="ghost" size="lg" className="w-full">
+                    <GamingButton
+                        variant="ghost"
+                        size="lg"
+                        className="w-full"
+                        href={route("auth.social.redirect", {
+                            provider: "discord",
+                        })}
+                    >
                         Discord
                     </GamingButton>
                 </div>

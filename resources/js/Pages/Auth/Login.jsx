@@ -150,7 +150,9 @@ export default function Login({ status, canResetPassword }) {
                             variant="ghost"
                             size="lg"
                             className="w-full"
-                            type="button"
+                            href={route("auth.social.redirect", {
+                                provider: "google",
+                            })}
                         >
                             Google
                         </GamingButton>
@@ -158,7 +160,9 @@ export default function Login({ status, canResetPassword }) {
                             variant="ghost"
                             size="lg"
                             className="w-full"
-                            type="button"
+                            href={route("auth.social.redirect", {
+                                provider: "discord",
+                            })}
                         >
                             Discord
                         </GamingButton>

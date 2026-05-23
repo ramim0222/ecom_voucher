@@ -3,7 +3,6 @@ import { usePage, Link, router } from "@inertiajs/react";
 import Dropdown from "@/Components/Dropdown";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { slideDown } from "@/lib/animations";
 
 export function Header() {
     const {
@@ -25,7 +24,6 @@ export function Header() {
     const logoPath = branding?.logo_path || "";
     const brandInitial = brandName.charAt(0).toUpperCase() || "G";
     const mobileNavRef = useRef(null);
-    const categoriesPanelRef = useRef(null);
 
     const closeMobileMenu = () => {
         setIsMobileMenuOpen(false);
@@ -92,16 +90,6 @@ export function Header() {
         }
     }, [isMobileMenuOpen]);
 
-    useEffect(() => {
-        const panel = categoriesPanelRef.current;
-
-        if (!panel) {
-            return undefined;
-        }
-
-        slideDown(panel, isCategoriesOpen);
-    }, [isCategoriesOpen]);
-
     return (
         <header className="sticky top-0 z-50 glass-card border-b border-border/50 shrink-0">
             <div className="relative z-50 container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12 py-2.5 sm:py-3 md:py-4">
@@ -157,11 +145,7 @@ export function Header() {
                                     width="48"
                                     contentClasses="py-0 bg-white dark:bg-slate-800 overflow-hidden"
                                 >
-                                    <div
-                                        className="dropdown-scroll max-h-64 overflow-y-auto overflow-x-hidden py-1"
-                                        onClick={(e) => e.stopPropagation()}
-                                        onWheel={(e) => e.stopPropagation()}
-                                    >
+                                    <div className="dropdown-scroll max-h-64 overflow-y-auto overflow-x-hidden py-1">
                                         {(categories || []).map((cat) => (
                                             <Dropdown.Link
                                                 key={cat.id}
@@ -339,31 +323,36 @@ export function Header() {
                                         ▾
                                     </span>
                                 </button>
-                                {isCategoriesOpen && (
-                                    <div
-                                        ref={categoriesPanelRef}
-                                        className="dropdown-scroll max-h-48 space-y-1 overflow-y-auto overflow-x-hidden pb-2 pl-3"
-                                    >
-                                        {(categories || []).map((cat) => (
-                                            <Link
-                                                key={cat.id}
-                                                href={route("products", {
-                                                    category: cat.id,
-                                                })}
-                                                className="block rounded-md px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted hover:text-accent"
-                                                onClick={closeMobileMenu}
-                                            >
-                                                {cat.name}
-                                            </Link>
-                                        ))}
-                                        {(!categories ||
-                                            categories.length === 0) && (
-                                            <div className="px-3 py-2 text-sm text-muted-foreground">
-                                                No categories
-                                            </div>
-                                        )}
+                                <div
+                                    className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${
+                                        isCategoriesOpen
+                                            ? "grid-rows-[1fr]"
+                                            : "grid-rows-[0fr]"
+                                    }`}
+                                >
+                                    <div className="min-h-0 overflow-hidden">
+                                        <div className="dropdown-scroll max-h-48 space-y-1 overflow-y-auto overflow-x-hidden pb-2 pl-3">
+                                            {(categories || []).map((cat) => (
+                                                <Link
+                                                    key={cat.id}
+                                                    href={route("products", {
+                                                        category: cat.id,
+                                                    })}
+                                                    className="block rounded-md px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted hover:text-accent"
+                                                    onClick={closeMobileMenu}
+                                                >
+                                                    {cat.name}
+                                                </Link>
+                                            ))}
+                                            {(!categories ||
+                                                categories.length === 0) && (
+                                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                                    No categories
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
+                                </div>
                             </div>
 
                             <Link

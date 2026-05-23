@@ -58,7 +58,7 @@ export function CartSummary({ subtotal, total, itemCount }) {
                 </div> */}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-border">
+            {/* <div className="mt-6 pt-6 border-t border-border">
                 <h3 className="font-medium mb-3">We Accept:</h3>
                 <div className="flex gap-2">
                     {["Visa", "MC", "PayPal", "Apple Pay"].map((method) => (
@@ -70,7 +70,7 @@ export function CartSummary({ subtotal, total, itemCount }) {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }
