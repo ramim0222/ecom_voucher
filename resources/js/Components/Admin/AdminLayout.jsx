@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { FlashToastListener } from "@/Components/Admin/ToastProvider";
-import { router } from "@inertiajs/react";
+import { Link, router, usePage } from "@inertiajs/react";
 
 export function AdminLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { url } = usePage();
 
     const menuItems = [
         { href: "/admin", label: "Dashboard", icon: "📊" },
@@ -51,18 +52,33 @@ export function AdminLayout({ children }) {
                     </div>
 
                     <nav className="flex-1 space-y-2">
-                        {menuItems.map((item) => (
-                            <a
-                                key={item.href}
-                                href={item.href}
-                                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-700/50 transition-colors group text-slate-300 hover:text-white"
-                            >
-                                <span className="text-xl">{item.icon}</span>
-                                <span className="font-medium">
-                                    {item.label}
-                                </span>
-                            </a>
-                        ))}
+                        {menuItems.map((item) => {
+                            const isActive =
+                                item.href === "/"
+                                    ? url === "/"
+                                    : item.href === "/admin"
+                                      ? url === "/admin"
+                                      : url === item.href ||
+                                        url.startsWith(`${item.href}/`);
+
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={() => setIsSidebarOpen(false)}
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-700/50 transition-colors group ${
+                                        isActive
+                                            ? "bg-slate-700/50 text-white"
+                                            : "text-slate-300 hover:text-white"
+                                    }`}
+                                >
+                                    <span className="text-xl">{item.icon}</span>
+                                    <span className="font-medium">
+                                        {item.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
                     </nav>
 
                     <div className="pt-6 border-t border-slate-700">

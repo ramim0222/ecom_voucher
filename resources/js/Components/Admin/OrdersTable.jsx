@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { router } from "@inertiajs/react";
 
 export function OrdersTable({ filter }) {
     const [orders] = useState([
@@ -138,7 +139,12 @@ export function OrdersTable({ filter }) {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() =>
-                                            (window.location.href = `/admin/orders/${order.id}`)
+                                            router.visit(
+                                                route(
+                                                    "admin.orders.show",
+                                                    order.id
+                                                )
+                                            )
                                         }
                                     >
                                         View Details

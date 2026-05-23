@@ -117,7 +117,12 @@ export function UsersTable({ users }) {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() =>
-                                                (window.location.href = `/admin/users/${user.id}`)
+                                                router.visit(
+                                                    route(
+                                                        "admin.users.show",
+                                                        user.id
+                                                    )
+                                                )
                                             }
                                         >
                                             View Profile

@@ -131,7 +131,7 @@ export default function AdminProducts({
                     setIsCodeModalOpen(false);
                     setSelectedProductForCodes(null);
                     // Refresh the page to show updated stock counts
-                    window.location.reload();
+                    router.reload({ only: ["products"] });
                 },
                 onError: (errors) => {
                     addToast(formatValidationErrors(errors), "error");

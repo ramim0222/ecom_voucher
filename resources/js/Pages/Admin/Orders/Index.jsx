@@ -81,6 +81,26 @@ export default function AdminOrders({ orders = { data: [] }, filters = {} }) {
         }
     };
 
+    const getCustomerDisplay = (order) => {
+        if (order.user) {
+            return {
+                name: `${order.user.first_name} ${order.user.last_name}`.trim(),
+                email: order.user.email,
+                isGuest: false,
+            };
+        }
+
+        const billing = order.billing_address || {};
+        const name =
+            `${billing.first_name || ""} ${billing.last_name || ""}`.trim();
+
+        return {
+            name: name || "Guest",
+            email: billing.email || "—",
+            isGuest: true,
+        };
+    };
+
     return (
         <AdminLayout>
             <div className="space-y-6">
@@ -197,7 +217,11 @@ export default function AdminOrders({ orders = { data: [] }, filters = {} }) {
                             </thead>
                             <tbody>
                                 {orders.data && orders.data.length > 0 ? (
-                                    orders.data.map((order) => (
+                                    orders.data.map((order) => {
+                                        const customer =
+                                            getCustomerDisplay(order);
+
+                                        return (
                                         <tr
                                             key={order.id}
                                             className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors"
@@ -208,11 +232,15 @@ export default function AdminOrders({ orders = { data: [] }, filters = {} }) {
                                             <td className="py-3">
                                                 <div>
                                                     <p className="text-white">
-                                                        {order.user.first_name}{" "}
-                                                        {order.user.last_name}
+                                                        {customer.name}
+                                                        {customer.isGuest && (
+                                                            <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-medium text-slate-300 bg-slate-600/50">
+                                                                Guest
+                                                            </span>
+                                                        )}
                                                     </p>
                                                     <p className="text-slate-400 text-sm">
-                                                        {order.user.email}
+                                                        {customer.email}
                                                     </p>
                                                 </div>
                                             </td>
@@ -265,7 +293,8 @@ export default function AdminOrders({ orders = { data: [] }, filters = {} }) {
                                                 </GamingButton>
                                             </td>
                                         </tr>
-                                    ))
+                                        );
+                                    })
                                 ) : (
                                     <tr>
                                         <td

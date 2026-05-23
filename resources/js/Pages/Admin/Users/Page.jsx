@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { router } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { UserAccountInfo } from "@/Components/Admin/UserAccountInfo";
@@ -58,7 +59,9 @@ export default function AdminUserProfilePage({ user }) {
                     <GamingButton
                         variant="ghost"
                         size="sm"
-                        onClick={() => (window.location.href = "/admin/users")}
+                        onClick={() =>
+                            router.visit(route("admin.users.index"))
+                        }
                         className="text-slate-300"
                     >
                         ← Back to Users

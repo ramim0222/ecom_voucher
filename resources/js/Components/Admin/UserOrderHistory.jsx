@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { router } from "@inertiajs/react";
 
 export function UserOrderHistory({ userId }) {
     const [orders] = useState([
@@ -122,7 +123,12 @@ export function UserOrderHistory({ userId }) {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() =>
-                                            (window.location.href = `/admin/orders/${order.id}`)
+                                            router.visit(
+                                                route(
+                                                    "admin.orders.show",
+                                                    order.id
+                                                )
+                                            )
                                         }
                                         className="text-slate-300"
                                     >
