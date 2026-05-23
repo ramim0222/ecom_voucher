@@ -25,8 +25,11 @@ class UpdateBrandingRequest extends FormRequest
             'discounts_title' => ['required', 'string', 'max:150'],
             'discounts_description' => ['nullable', 'string', 'max:500'],
             'categories_title' => ['required', 'string', 'max:150'],
+            'auth_panel_title' => ['required', 'string', 'max:150'],
+            'auth_panel_description' => ['nullable', 'string', 'max:500'],
             'branding.logo' => ['nullable', 'file', 'mimes:jpeg,jpg,png,webp,svg', 'max:2048'],
             'branding.favicon' => ['nullable', 'file', 'mimes:ico,png,svg,webp', 'max:1024'],
+            'branding.auth_background' => ['nullable', 'file', 'mimes:jpeg,jpg,png,webp', 'max:4096'],
         ];
     }
 }

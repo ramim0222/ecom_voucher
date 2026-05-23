@@ -33,17 +33,11 @@ export default function Register({ status }) {
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout
+            title="Create Account"
+            subtitle="Join GameVault and unlock exclusive gaming vouchers"
+        >
             <Head title="Register" />
-
-            <div className="mb-8 text-center">
-                <h1 className="font-[family-name:var(--font-heading)] font-bold text-3xl mb-2 text-foreground">
-                    Create Account
-                </h1>
-                <p className="text-muted-foreground">
-                    Join GameVault and unlock exclusive gaming vouchers
-                </p>
-            </div>
 
             {status && (
                 <div className="mb-4 font-medium text-sm text-green-600">
@@ -51,9 +45,9 @@ export default function Register({ status }) {
                 </div>
             )}
 
-            <form onSubmit={submit} className="space-y-6">
+            <form onSubmit={submit} className="space-y-4 sm:space-y-6">
                 {/* Name Fields */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium mb-2 text-foreground">
                             First Name
@@ -251,7 +245,7 @@ export default function Register({ status }) {
                         )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-2 text-foreground">
                                 City
@@ -307,7 +301,7 @@ export default function Register({ status }) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium mb-2 text-foreground">
                                 ZIP/Postal Code
@@ -465,7 +459,7 @@ export default function Register({ status }) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <GamingButton variant="ghost" size="lg" className="w-full">
                         Google
                     </GamingButton>

@@ -1,8 +1,9 @@
 import { Link, usePage } from "@inertiajs/react";
 import { Mail, Shield, Zap } from "lucide-react";
 
-export function Footer() {
+export function Footer({ variant = "default" }) {
     const { branding = {}, categories = [], auth } = usePage().props;
+    const isAuthCompact = variant === "auth";
     const brandName = branding?.brand_name || "GameVault";
     const brandDescription =
         branding?.brand_description || "Premium Gaming Vouchers";
@@ -28,7 +29,20 @@ export function Footer() {
     const featuredCategories = (categories || []).slice(0, 6);
 
     return (
-        <footer className="mt-auto border-t border-border/50 bg-card/40">
+        <footer className="mt-auto border-t border-border/50 bg-card/40 shrink-0">
+            {isAuthCompact && (
+                <div className="lg:hidden px-4 py-3">
+                    <p className="text-xs text-center text-muted-foreground">
+                        &copy; {currentYear} {brandName}. All rights reserved.
+                    </p>
+                </div>
+            )}
+
+            <div
+                className={
+                    isAuthCompact ? "hidden lg:block" : undefined
+                }
+            >
             <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 py-8 sm:py-10 md:py-12">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
                     {/* Brand */}
@@ -200,6 +214,7 @@ export function Footer() {
                         Built for gamers. Powered by instant digital delivery.
                     </p>
                 </div>
+            </div>
             </div>
         </footer>
     );

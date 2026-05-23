@@ -36,6 +36,8 @@ class BrandingController extends Controller
         $brandingSettings['discounts_title'] = $validated['discounts_title'];
         $brandingSettings['discounts_description'] = $validated['discounts_description'] ?? '';
         $brandingSettings['categories_title'] = $validated['categories_title'];
+        $brandingSettings['auth_panel_title'] = $validated['auth_panel_title'];
+        $brandingSettings['auth_panel_description'] = $validated['auth_panel_description'] ?? '';
 
         if ($request->hasFile('branding.logo')) {
             if (! empty($brandingSettings['logo_path']) && Storage::disk('public')->exists($brandingSettings['logo_path'])) {
@@ -51,6 +53,14 @@ class BrandingController extends Controller
             }
 
             $brandingSettings['favicon_path'] = $request->file('branding.favicon')->store('settings/branding/favicon', 'public');
+        }
+
+        if ($request->hasFile('branding.auth_background')) {
+            if (! empty($brandingSettings['auth_background_path']) && Storage::disk('public')->exists($brandingSettings['auth_background_path'])) {
+                Storage::disk('public')->delete($brandingSettings['auth_background_path']);
+            }
+
+            $brandingSettings['auth_background_path'] = $request->file('branding.auth_background')->store('settings/branding/auth-background', 'public');
         }
 
         Option::setValue('branding_settings', $brandingSettings);

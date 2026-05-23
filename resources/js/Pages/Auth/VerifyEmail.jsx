@@ -46,13 +46,12 @@ export default function VerifyEmailPage({ status }) {
         (!lastResendTime || Date.now() - lastResendTime > 60000); // 1 minute cooldown
 
     return (
-        <SiteLayout>
+        <SiteLayout variant="auth">
             <AuthLayout
                 title="Verify Your Email"
                 subtitle="Check your inbox to complete registration"
-                backgroundImage="/glowing-gaming-envelope.png"
             >
-                <div className="text-center space-y-6">
+                <div className="text-center space-y-4 sm:space-y-6">
                     {/* Email Icon with Glow Effect */}
                     <div className="relative mx-auto w-20 h-20">
                         <div className="absolute inset-0 bg-accent/20 rounded-full animate-pulse"></div>

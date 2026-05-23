@@ -28,14 +28,13 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <SiteLayout>
+        <SiteLayout variant="auth">
             <Head title="Log in" />
             <AuthLayout
                 title="Welcome Back"
                 subtitle="Sign in to your GameVault account"
-                backgroundImage="/placeholder-j7n3w.png"
             >
-                <form onSubmit={submit} className="space-y-6">
+                <form onSubmit={submit} className="space-y-4 sm:space-y-6">
                     {status && (
                         <div className="mb-4 text-sm font-medium text-green-600">
                             {status}
@@ -98,7 +97,7 @@ export default function Login({ status, canResetPassword }) {
                         />
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <label className="flex items-center gap-2 cursor-pointer">
                             <Checkbox
                                 name="remember"
@@ -141,7 +140,7 @@ export default function Login({ status, canResetPassword }) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <GamingButton
                             variant="ghost"
                             size="lg"

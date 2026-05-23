@@ -25,6 +25,9 @@ class BrandingService
             'discounts_title' => (string) ($settings['discounts_title'] ?? 'Biggest Discounts'),
             'discounts_description' => (string) ($settings['discounts_description'] ?? 'Save more on these top discounted vouchers'),
             'categories_title' => (string) ($settings['categories_title'] ?? 'Browse by Platform'),
+            'auth_panel_title' => (string) ($settings['auth_panel_title'] ?? 'Join the Gaming Revolution'),
+            'auth_panel_description' => (string) ($settings['auth_panel_description'] ?? 'Access thousands of gaming vouchers and unlock your next adventure.'),
+            'auth_background_path' => (string) ($settings['auth_background_path'] ?? ''),
         ];
     }
 }

@@ -67,13 +67,12 @@ export default function ResetPasswordPage({ token, email, status }) {
     const strengthInfo = getStrengthLabel(passwordStrength);
 
     return (
-        <SiteLayout>
+        <SiteLayout variant="auth">
             <AuthLayout
                 title="Reset Your Password"
                 subtitle="Create a new secure password"
-                backgroundImage="/gaming-password-reset-digital-lock.png"
             >
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                     <div>
                         <label className="block text-sm font-medium mb-2">
                             New Password

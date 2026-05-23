@@ -48,9 +48,15 @@ export default function Branding({ brandingSettings }) {
             "Save more on these top discounted vouchers",
         categories_title:
             brandingSettings?.categories_title || "Browse by Platform",
+        auth_panel_title:
+            brandingSettings?.auth_panel_title || "Join the Gaming Revolution",
+        auth_panel_description:
+            brandingSettings?.auth_panel_description ||
+            "Access thousands of gaming vouchers and unlock your next adventure.",
         branding: {
             logo: null,
             favicon: null,
+            auth_background: null,
         },
     });
     const [errors, setErrors] = useState({});
@@ -60,6 +66,9 @@ export default function Branding({ brandingSettings }) {
     );
     const [faviconPreview, setFaviconPreview] = useState(
         resolveStorageUrl(brandingSettings?.favicon_path || "")
+    );
+    const [authBackgroundPreview, setAuthBackgroundPreview] = useState(
+        resolveStorageUrl(brandingSettings?.auth_background_path || "")
     );
 
     const updateForm = (path, value) => {
@@ -86,6 +95,10 @@ export default function Branding({ brandingSettings }) {
         reader.onloadend = () => {
             if (field === "logo") {
                 setLogoPreview(reader.result);
+                return;
+            }
+            if (field === "auth_background") {
+                setAuthBackgroundPreview(reader.result);
                 return;
             }
             setFaviconPreview(reader.result);
@@ -128,8 +141,9 @@ export default function Branding({ brandingSettings }) {
                         Store Branding
                     </h1>
                     <p className="text-slate-400">
-                        Update your store logo, favicon, brand name, and
-                        description shown across the storefront.
+                        Update your store logo, favicon, brand name, homepage
+                        content, and auth page panel shown on login and
+                        registration screens.
                     </p>
                 </div>
 
@@ -430,6 +444,110 @@ export default function Branding({ brandingSettings }) {
                                     <p className="text-xs text-red-400 mt-1">
                                         {errors.products_description}
                                     </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-semibold text-white mb-4">
+                            Auth Pages Panel
+                        </h3>
+                        <p className="text-sm text-slate-400 mb-4">
+                            Customize the right-side panel shown on login,
+                            register, and password reset pages.
+                        </p>
+                        <div className="grid grid-cols-1 gap-4">
+                            <div>
+                                <label
+                                    htmlFor="auth_panel_title"
+                                    className={labelClassName}
+                                >
+                                    Panel Title
+                                </label>
+                                <input
+                                    id="auth_panel_title"
+                                    type="text"
+                                    value={form.auth_panel_title}
+                                    onChange={(e) =>
+                                        updateForm(
+                                            "auth_panel_title",
+                                            e.target.value
+                                        )
+                                    }
+                                    className={inputClassName}
+                                    placeholder="Join the Gaming Revolution"
+                                />
+                                {errors.auth_panel_title && (
+                                    <p className="text-xs text-red-400 mt-1">
+                                        {errors.auth_panel_title}
+                                    </p>
+                                )}
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="auth_panel_description"
+                                    className={labelClassName}
+                                >
+                                    Panel Description
+                                </label>
+                                <textarea
+                                    id="auth_panel_description"
+                                    rows={3}
+                                    value={form.auth_panel_description}
+                                    onChange={(e) =>
+                                        updateForm(
+                                            "auth_panel_description",
+                                            e.target.value
+                                        )
+                                    }
+                                    className={inputClassName}
+                                    placeholder="Access thousands of gaming vouchers and unlock your next adventure."
+                                />
+                                {errors.auth_panel_description && (
+                                    <p className="text-xs text-red-400 mt-1">
+                                        {errors.auth_panel_description}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium text-slate-300">
+                                    Background Image
+                                </p>
+                                <label
+                                    htmlFor="branding-auth-background-upload"
+                                    className="h-40 rounded-lg border border-dashed border-slate-600 bg-slate-700/40 flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-700/60 transition-colors"
+                                >
+                                    <Upload className="w-4 h-4 text-slate-400" />
+                                    <span className="text-sm text-slate-400">
+                                        Upload Auth Background
+                                    </span>
+                                </label>
+                                <input
+                                    id="branding-auth-background-upload"
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                                    className="hidden"
+                                    onChange={(e) =>
+                                        handleBrandingFileChange(
+                                            "auth_background",
+                                            e.target.files?.[0]
+                                        )
+                                    }
+                                />
+                                {errors["branding.auth_background"] && (
+                                    <p className="text-xs text-red-400">
+                                        {errors["branding.auth_background"]}
+                                    </p>
+                                )}
+                                {authBackgroundPreview && (
+                                    <div className="mt-2 h-40 rounded-md border border-slate-600 bg-slate-700/40 overflow-hidden">
+                                        <img
+                                            src={authBackgroundPreview}
+                                            alt="Auth background preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
                                 )}
                             </div>
                         </div>

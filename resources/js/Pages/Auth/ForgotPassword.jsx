@@ -37,13 +37,12 @@ export default function ForgotPasswordPage({ status }) {
 
     if (isSubmitted) {
         return (
-            <SiteLayout>
+            <SiteLayout variant="auth">
                 <AuthLayout
                     title="Check Your Email"
                     subtitle="We've sent password reset instructions"
-                    backgroundImage="/gaming-email-sent.png"
                 >
-                    <div className="text-center space-y-6">
+                    <div className="text-center space-y-4 sm:space-y-6">
                         <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto">
                             <span className="text-2xl">📧</span>
                         </div>
@@ -87,13 +86,12 @@ export default function ForgotPasswordPage({ status }) {
     }
 
     return (
-        <SiteLayout>
+        <SiteLayout variant="auth">
             <AuthLayout
                 title="Reset Password"
                 subtitle="Enter your email to receive reset instructions"
-                backgroundImage="/gaming-password-reset.png"
             >
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                     <div>
                         <label className="block text-sm font-medium mb-2">
                             Email Address

@@ -27,13 +27,12 @@ export default function ConfirmPasswordPage() {
     };
 
     return (
-        <SiteLayout>
+        <SiteLayout variant="auth">
             <AuthLayout
                 title="Confirm Your Password"
                 subtitle="Please enter your password to continue"
-                backgroundImage="/gaming-security-shield.png"
             >
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                     <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
                         <p className="text-sm text-accent">
                             🔒 For your security, please confirm your password
@@ -41,7 +40,7 @@ export default function ConfirmPasswordPage() {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                         <div>
                             <label className="block text-sm font-medium mb-2">
                                 Current Password

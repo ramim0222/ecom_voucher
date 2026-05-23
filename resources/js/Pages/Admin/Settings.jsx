@@ -9,7 +9,7 @@ export default function Settings() {
             href: route("admin.settings.branding"),
             title: "Store Branding",
             description:
-                "Upload logo and favicon, and set your brand name and description.",
+                "Upload logo and favicon, set brand name, homepage content, and auth page panel.",
             icon: "🎨",
         },
     ];
