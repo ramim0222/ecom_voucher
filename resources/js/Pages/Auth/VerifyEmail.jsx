@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
@@ -46,8 +46,7 @@ export default function VerifyEmailPage({ status }) {
         (!lastResendTime || Date.now() - lastResendTime > 60000); // 1 minute cooldown
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
             <AuthLayout
                 title="Verify Your Email"
                 subtitle="Check your inbox to complete registration"
@@ -162,6 +161,6 @@ export default function VerifyEmailPage({ status }) {
                     </div>
                 </div>
             </AuthLayout>
-        </div>
+        </SiteLayout>
     );
 }

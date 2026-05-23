@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
@@ -37,8 +37,7 @@ export default function ForgotPasswordPage({ status }) {
 
     if (isSubmitted) {
         return (
-            <div className="min-h-screen">
-                <Header />
+            <SiteLayout>
                 <AuthLayout
                     title="Check Your Email"
                     subtitle="We've sent password reset instructions"
@@ -83,13 +82,12 @@ export default function ForgotPasswordPage({ status }) {
                         </div>
                     </div>
                 </AuthLayout>
-            </div>
+            </SiteLayout>
         );
     }
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
             <AuthLayout
                 title="Reset Password"
                 subtitle="Enter your email to receive reset instructions"
@@ -139,6 +137,6 @@ export default function ForgotPasswordPage({ status }) {
                     </p>
                 </form>
             </AuthLayout>
-        </div>
+        </SiteLayout>
     );
 }

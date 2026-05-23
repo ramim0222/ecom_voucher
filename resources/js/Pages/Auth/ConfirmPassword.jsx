@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
@@ -27,8 +27,7 @@ export default function ConfirmPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
             <AuthLayout
                 title="Confirm Your Password"
                 subtitle="Please enter your password to continue"
@@ -104,6 +103,6 @@ export default function ConfirmPasswordPage() {
                     </p>
                 </div>
             </AuthLayout>
-        </div>
+        </SiteLayout>
     );
 }

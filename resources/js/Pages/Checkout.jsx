@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { CheckoutForm } from "@/Components/Checkout/CheckoutForm";
 import { OrderSummary } from "@/Components/Checkout/OrderSummary";
 import { usePage } from "@inertiajs/react";
@@ -54,8 +54,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
     ];
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
 
             <div className="container mx-auto px-4 py-8">
                 <div className="mb-8">
@@ -119,6 +118,6 @@ export default function CheckoutPage({ cartItems = [], user }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </SiteLayout>
     );
 }

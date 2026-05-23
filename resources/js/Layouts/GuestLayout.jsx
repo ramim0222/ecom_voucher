@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
@@ -27,8 +27,7 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
             <AuthLayout
                 title="Join GameVault"
                 subtitle="Create your account and start gaming"
@@ -234,6 +233,6 @@ export default function SignupPage() {
                     </p>
                 </form>
             </AuthLayout>
-        </div>
+        </SiteLayout>
     );
 }

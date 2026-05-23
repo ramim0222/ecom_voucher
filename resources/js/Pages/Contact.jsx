@@ -1,4 +1,4 @@
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { useForm, usePage } from "@inertiajs/react";
 import { useCallback, useEffect, useRef } from "react";
@@ -94,8 +94,7 @@ export default function ContactPage({
         "w-full bg-input border border-border rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-colors";
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
 
             <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10" />
@@ -397,6 +396,6 @@ export default function ContactPage({
                     </div>
                 </div>
             </section>
-        </div>
+        </SiteLayout>
     );
 }

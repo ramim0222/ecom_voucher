@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
@@ -67,8 +67,7 @@ export default function ResetPasswordPage({ token, email, status }) {
     const strengthInfo = getStrengthLabel(passwordStrength);
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
             <AuthLayout
                 title="Reset Your Password"
                 subtitle="Create a new secure password"
@@ -172,6 +171,6 @@ export default function ResetPasswordPage({ token, email, status }) {
                     </p>
                 </form>
             </AuthLayout>
-        </div>
+        </SiteLayout>
     );
 }

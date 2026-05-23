@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
@@ -66,8 +66,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
     return (
         <>
             <Head title="Order History" />
-            <div className="min-h-screen">
-                <Header />
+            <SiteLayout>
                 <DashboardLayout>
                     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
                         {/* Header Section */}
@@ -1194,7 +1193,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                         </div>
                     </div>
                 </DashboardLayout>
-            </div>
+            </SiteLayout>
         </>
     );
 }

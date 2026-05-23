@@ -1,6 +1,6 @@
 "use client";
 
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { OrderCard } from "@/Components/Dashboard/OrderCard";
 import { StatsCard } from "@/Components/Dashboard/StatsCard";
@@ -11,8 +11,7 @@ export default function DashboardPage({ user, recentOrders, stats }) {
     console.log("Dashboard props:", { user, recentOrders, stats });
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
             <DashboardLayout>
                 <div className="space-y-8">
                     {/* Welcome Section */}
@@ -138,6 +137,6 @@ export default function DashboardPage({ user, recentOrders, stats }) {
                     </div>
                 </div>
             </DashboardLayout>
-        </div>
+        </SiteLayout>
     );
 }

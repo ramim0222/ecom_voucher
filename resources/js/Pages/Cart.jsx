@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { CartItem } from "@/Components/Cart/CartItem";
 import { CartSummary } from "@/Components/Cart/CartSummary";
@@ -97,8 +97,7 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
 
     if (cartItems.length === 0) {
         return (
-            <div className="min-h-screen">
-                <Header />
+            <SiteLayout>
                 <div className="container mx-auto px-4 py-16 text-center">
                     <div className="glass-card rounded-xl p-12 max-w-md mx-auto">
                         <div className="text-6xl mb-4">🛒</div>
@@ -118,13 +117,12 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
                         </GamingButton>
                     </div>
                 </div>
-            </div>
+            </SiteLayout>
         );
     }
 
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
 
             <div className="container mx-auto px-4 py-8">
                 <div className="mb-8">
@@ -191,6 +189,6 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </SiteLayout>
     );
 }

@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { useState } from "react";
 
@@ -46,8 +46,7 @@ export default function OrderShow({ order }) {
     return (
         <>
             <Head title={`Order ${order.order_number}`} />
-            <div className="min-h-screen">
-                <Header />
+            <SiteLayout>
 
                 <div className="container mx-auto px-4 py-8">
                     <div className="mb-8">
@@ -320,7 +319,7 @@ export default function OrderShow({ order }) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </SiteLayout>
         </>
     );
 }

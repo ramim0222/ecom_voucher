@@ -15,7 +15,7 @@ import {
     Download,
     Users,
 } from "lucide-react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 
 export default function SupportPage({ reviews = [] }) {
     const [searchQuery, setSearchQuery] = useState("");
@@ -122,9 +122,8 @@ export default function SupportPage({ reviews = [] }) {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <SiteLayout className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
             {/* Hero Section */}
-            <Header />
             <div className="relative overflow-hidden bg-gradient-to-r from-cyan-900/20 to-teal-900/20 border-b border-cyan-500/20">
                 <div className="absolute inset-0 bg-[url('/gaming-support-background.png')] bg-cover bg-center opacity-10"></div>
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
@@ -433,6 +432,6 @@ export default function SupportPage({ reviews = [] }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </SiteLayout>
     );
 }

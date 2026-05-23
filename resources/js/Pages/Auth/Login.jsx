@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 import InputError from "@/Components/InputError";
@@ -28,9 +28,8 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <div className="min-h-screen">
+        <SiteLayout>
             <Head title="Log in" />
-            <Header />
             <AuthLayout
                 title="Welcome Back"
                 subtitle="Sign in to your GameVault account"
@@ -172,6 +171,6 @@ export default function Login({ status, canResetPassword }) {
                     </p>
                 </form>
             </AuthLayout>
-        </div>
+        </SiteLayout>
     );
 }

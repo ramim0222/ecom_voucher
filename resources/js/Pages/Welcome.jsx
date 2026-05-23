@@ -1,5 +1,5 @@
 import { CategorySlider } from "@/Components/Home/CategorySlider";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { VoucherCard } from "@/Components/ui/VoucherCard";
 import { Link, usePage } from "@inertiajs/react";
@@ -36,8 +36,7 @@ export default function HomePage({
 
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
     return (
-        <div className="min-h-screen">
-            <Header />
+        <SiteLayout>
 
             {/* Hero Section */}
             <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 2xl:py-32 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 overflow-hidden">
@@ -204,6 +203,6 @@ export default function HomePage({
                     ↑
                 </button>
             )}
-        </div>
+        </SiteLayout>
     );
 }

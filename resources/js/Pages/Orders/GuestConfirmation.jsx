@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
-import { Header } from "@/Components/Layout/Header";
+import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export default function GuestConfirmation({ order }) {
@@ -25,8 +25,7 @@ export default function GuestConfirmation({ order }) {
     return (
         <>
             <Head title="Order Confirmed" />
-            <div className="min-h-screen">
-                <Header />
+            <SiteLayout>
 
                 <div className="container mx-auto px-4 py-8 max-w-3xl">
                     {/* Success Banner */}
@@ -205,7 +204,7 @@ export default function GuestConfirmation({ order }) {
                         </GamingButton>
                     </div>
                 </div>
-            </div>
+            </SiteLayout>
         </>
     );
 }
