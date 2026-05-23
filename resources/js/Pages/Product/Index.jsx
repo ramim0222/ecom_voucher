@@ -8,9 +8,13 @@ import { ProductSort } from "@/Components/Product/ProductSort";
 import { usePage } from "@inertiajs/react";
 import { useState } from "react";
 
-export default function ProductsPage({ products = [], activeCategory = null }) {
+export default function ProductsPage({ products = [], filters = {} }) {
     const { categories = [] } = usePage().props;
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+    const activeCategoryNames = (filters.categories ?? [])
+        .map((id) => categories.find((c) => String(c.id) === String(id))?.name)
+        .filter(Boolean);
 
     const toggleFilters = () => {
         setIsFiltersOpen(!isFiltersOpen);
@@ -38,17 +42,16 @@ export default function ProductsPage({ products = [], activeCategory = null }) {
                             <span className="text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base text-muted-foreground">
                                 Showing {products.length} results
                             </span>
-                            {activeCategory && (
-                                <span className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full">
-                                    {categories.find(
-                                        (c) =>
-                                            Number(c.id) ===
-                                            Number(activeCategory)
-                                    )?.name || "Selected"}
+                            {activeCategoryNames.map((name) => (
+                                <span
+                                    key={name}
+                                    className="text-xs bg-accent/20 text-accent px-2 py-1 rounded-full"
+                                >
+                                    {name}
                                 </span>
-                            )}
+                            ))}
                         </div>
-                        <ProductSort />
+                        <ProductSort filters={filters} />
                     </div>
                 </div>
             </section>
@@ -77,7 +80,10 @@ export default function ProductsPage({ products = [], activeCategory = null }) {
                         }`}
                     >
                         <div className="lg:sticky lg:top-24">
-                            <ProductFilters />
+                            <ProductFilters
+                                filters={filters}
+                                categories={categories}
+                            />
                         </div>
                     </aside>
 

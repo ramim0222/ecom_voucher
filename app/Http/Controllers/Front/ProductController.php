@@ -14,39 +14,91 @@ class ProductController extends Controller
 {
     public function products(Request $request)
     {
-        $categoryId = $request->query('category');
+        $categoryIds = collect($request->input('categories', []))
+            ->when($request->filled('category'), fn ($ids) => $ids->push($request->query('category')))
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
 
-        $query = Product::query()->where('status', 'active');
-        if ($categoryId) {
-            $query->where('category_id', $categoryId);
+        $priceRange = $request->query('price_range');
+        $minRating = $request->filled('min_rating') ? (float) $request->query('min_rating') : null;
+        $inStock = $request->boolean('in_stock');
+        $onSale = $request->boolean('on_sale');
+        $sort = $request->query('sort', 'featured');
+
+        $approvedReviewsQuery = fn ($query) => $query->where('status', 'approved');
+
+        $query = Product::query()
+            ->where('status', 'active')
+            ->with(['codes'])
+            ->withAvg(['reviews as average_rating_calc' => $approvedReviewsQuery], 'rating')
+            ->withCount(['reviews as reviews_count_calc' => $approvedReviewsQuery]);
+
+        if (! empty($categoryIds)) {
+            $query->whereIn('category_id', $categoryIds);
         }
 
+        if ($priceRange) {
+            [$minPrice, $maxPrice] = $this->parsePriceRange($priceRange);
+            if ($minPrice !== null) {
+                $query->where('price', '>=', $minPrice);
+            }
+            if ($maxPrice !== null) {
+                $query->where('price', '<=', $maxPrice);
+            }
+        }
+
+        if ($minRating !== null) {
+            $query->having('average_rating_calc', '>=', $minRating);
+        }
+
+        if ($inStock) {
+            $query->whereHas('codes', fn ($codeQuery) => $codeQuery->where('status', 'available'));
+        }
+
+        if ($onSale) {
+            $query->whereNotNull('original_price')
+                ->whereColumn('original_price', '>', 'price');
+        }
+
+        match ($sort) {
+            'price-low' => $query->orderBy('price')->orderByDesc('id'),
+            'price-high' => $query->orderByDesc('price')->orderByDesc('id'),
+            'rating' => $query->orderByDesc('average_rating_calc')->orderByDesc('id'),
+            'newest' => $query->orderByDesc('created_at')->orderByDesc('id'),
+            'popular' => $query->orderByDesc('reviews_count_calc')->orderByDesc('id'),
+            default => $query->orderByDesc('is_featured')->orderBy('sort_order')->orderByDesc('id'),
+        };
+
         $products = $query
-            ->with(['codes', 'reviews' => function($query) {
-                $query->where('status', 'approved');
-            }])
-            ->orderBy('sort_order')
-            ->orderByDesc('id')
-            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image'])
+            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image', 'created_at'])
             ->map(function ($product) {
-                // Calculate review statistics
-                $approvedReviews = $product->reviews;
-                $reviewsCount = $approvedReviews->count();
-                $averageRating = $reviewsCount > 0 ? $approvedReviews->avg('rating') : 0;
+                $reviewsCount = (int) $product->reviews_count_calc;
+                $averageRating = $reviewsCount > 0
+                    ? round((float) $product->average_rating_calc, 1)
+                    : 0;
 
-                // Add computed fields
                 $product->reviews_count = $reviewsCount;
-                $product->average_rating = round($averageRating, 1);
+                $product->average_rating = $averageRating;
 
-                // Remove the reviews relationship to avoid sending unnecessary data
-                unset($product->reviews);
+                unset($product->reviews_count_calc, $product->average_rating_calc, $product->codes);
 
                 return $product;
             });
 
         return Inertia::render('Product/Index', [
             'products' => $products,
-            'activeCategory' => $categoryId ? (int) $categoryId : null,
+            'activeCategory' => count($categoryIds) === 1 ? $categoryIds[0] : null,
+            'filters' => [
+                'categories' => array_map('strval', $categoryIds),
+                'price_range' => $priceRange ?: '',
+                'min_rating' => $minRating ? (string) (int) $minRating : '',
+                'in_stock' => $inStock,
+                'on_sale' => $onSale,
+                'sort' => $sort,
+            ],
         ]);
     }
 
@@ -110,5 +162,17 @@ class ProductController extends Controller
             'userHasWishlisted' => (bool) $wishlistEntry,
             'wishlistId' => $wishlistEntry?->id,
         ]);
+    }
+
+    private function parsePriceRange(string $priceRange): array
+    {
+        return match ($priceRange) {
+            '0-100' => [0, 100],
+            '100-250' => [100, 250],
+            '250-500' => [250, 500],
+            '500-1000' => [500, 1000],
+            '1000+' => [1000, null],
+            default => [null, null],
+        };
     }
 }
