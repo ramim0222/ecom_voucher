@@ -77,10 +77,7 @@ class OrderService
             // Clear cart
             Cart::where('user_id', $user->id)->delete();
 
-            // Auto-complete payment and assign codes for all orders
-            $this->autoCompleteOrder($order);
-
-            Log::info('Order created and auto-completed successfully', ['order_id' => $order->id, 'user_id' => $user->id]);
+            Log::info('Order created, awaiting payment', ['order_id' => $order->id, 'user_id' => $user->id]);
 
             return $order;
         });
@@ -137,9 +134,7 @@ class OrderService
                 ]);
             }
 
-            $this->autoCompleteOrder($order);
-
-            Log::info('Guest order created and auto-completed successfully', ['order_id' => $order->id]);
+            Log::info('Guest order created, awaiting payment', ['order_id' => $order->id]);
 
             return $order;
         });
@@ -195,40 +190,10 @@ class OrderService
                 ]);
             }
 
-            // Auto-complete payment and assign codes for all orders
-            $this->autoCompleteOrder($order);
-
-            Log::info('Order created and auto-completed successfully', ['order_id' => $order->id, 'user_id' => $user->id]);
+            Log::info('Order created, awaiting payment', ['order_id' => $order->id, 'user_id' => $user->id]);
 
             return $order;
         });
-    }
-
-    /**
-     * Auto-complete order with payment and code assignment
-     * Used when payment integration is not required
-     */
-    protected function autoCompleteOrder(Order $order): void
-    {
-        // Since payment integration is not available, automatically mark as paid
-        $order->update([
-            'payment_status' => 'paid',
-            'payment_completed_at' => now(),
-            'payment_reference' => 'AUTO-' . time() . '-' . $order->id,
-            'payment_details' => ['auto_completed' => true, 'note' => 'Automatically marked as paid'],
-            'status' => 'processing',
-        ]);
-
-        // Assign codes immediately
-        $this->assignCodesAtPayment($order);
-
-        // Mark order as completed since codes are assigned
-        $order->update(['status' => 'completed']);
-
-        Log::info('Order auto-completed successfully', [
-            'order_id' => $order->id,
-            'payment_reference' => $order->payment_reference
-        ]);
     }
 
     /**

@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Cart;
 use App\Models\Wishlist;
 use App\Services\BrandingService;
+use App\Services\PaymentSettingsService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -50,6 +51,7 @@ class HandleInertiaRequests extends Middleware
                 ? (int) Wishlist::where('user_id', $request->user()->id)->count()
                 : (int) count($request->session()->get('guest_wishlist', [])),
             'branding' => fn () => BrandingService::getSettings(),
+            'paymentMethods' => fn () => PaymentSettingsService::getEnabledMethods(),
             'categories' => fn () => Category::query()
                 ->orderBy('name')
                 ->get(['id', 'name', 'logo', 'status'])

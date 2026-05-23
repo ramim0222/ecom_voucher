@@ -12,6 +12,13 @@ export default function Settings() {
                 "Upload logo and favicon, set brand name, homepage content, and auth page panel.",
             icon: "🎨",
         },
+        {
+            href: route("admin.settings.payment"),
+            title: "Payment Settings",
+            description:
+                "Configure bKash, Nagad, and Rocket gateway credentials and toggle each method on or off.",
+            icon: "💳",
+        },
     ];
 
     const marketingIntegrations = [

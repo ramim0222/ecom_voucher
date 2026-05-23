@@ -16,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        // Exempt payment gateway IPN webhooks from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'payment/ipn/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

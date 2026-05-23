@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Code;
+use App\Services\BkashPaymentService;
 use App\Services\MetaConversionApiService;
+use App\Services\NagadPaymentService;
 use App\Services\OrderService;
+use App\Services\PaymentSettingsService;
+use App\Services\RocketPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -164,10 +169,7 @@ class OrderController extends Controller
             session()->forget('guest_cart');
             session(['guest_order_id' => $order->id]);
 
-            MetaConversionApiService::trackPurchase($order, $request);
-
-            return redirect()->route('orders.guest-confirmation')
-                ->with('success', 'Order placed successfully!');
+            return $this->redirectToGateway($order, $request);
 
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -261,14 +263,279 @@ class OrderController extends Controller
 
             $order = $this->orderService->createOrderFromCart($user, $orderData);
 
-            MetaConversionApiService::trackPurchase($order, $request);
-
-            return redirect()->route('orders.show', $order->id)
-                ->with('success', 'Order created successfully!');
+            return $this->redirectToGateway($order, $request);
 
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Redirect the customer to the appropriate payment gateway.
+     */
+    private function redirectToGateway(Order $order, Request $request)
+    {
+        try {
+            $method = $order->payment_method;
+
+            $settings = PaymentSettingsService::getSettings();
+
+            if (!($settings[$method]['enabled'] ?? false)) {
+                throw new \RuntimeException("Payment method '{$method}' is not enabled.");
+            }
+
+            $redirectUrl = match ($method) {
+                'bkash'  => (new BkashPaymentService($settings['bkash']))->initiatePayment($order),
+                'nagad'  => (new NagadPaymentService($settings['nagad']))->initiatePayment($order),
+                'rocket' => (new RocketPaymentService($settings['rocket']))->initiatePayment($order),
+                default  => throw new \RuntimeException("Unsupported payment method: {$method}"),
+            };
+
+            // Inertia XHR requests cannot follow a normal external redirect — force a full-page visit.
+            if ($request->header('X-Inertia')) {
+                return Inertia::location($redirectUrl);
+            }
+
+            return redirect()->away($redirectUrl);
+
+        } catch (\Throwable $e) {
+            Log::error('Gateway redirect failed', [
+                'order_id' => $order->id,
+                'method'   => $order->payment_method,
+                'error'    => $e->getMessage(),
+            ]);
+
+            // Mark order as failed and redirect to failure page
+            $order->update(['payment_status' => 'failed']);
+
+            return redirect()->route('payment.failed', ['order' => $order->order_number])
+                ->with('error', 'Could not initiate payment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle bKash gateway callback (customer redirected back after payment).
+     */
+    public function handleBkashCallback(Request $request)
+    {
+        $paymentId = $request->query('paymentID');
+        $status    = $request->query('status');
+
+        if (!$paymentId || $status !== 'success') {
+            Log::warning('bKash callback: non-success', ['query' => $request->query()]);
+            return redirect()->route('payment.failed')
+                ->with('error', 'bKash payment was not completed.');
+        }
+
+        $order = Order::where('payment_reference', $paymentId)->first();
+
+        if (!$order) {
+            Log::error('bKash callback: order not found', ['paymentID' => $paymentId]);
+            return redirect()->route('payment.failed')
+                ->with('error', 'Order not found for this payment.');
+        }
+
+        $settings = PaymentSettingsService::getBkashCredentials();
+        $verified = (new BkashPaymentService($settings))->verifyPayment($paymentId);
+
+        return $this->finalizePayment($order, $verified, 'bkash', $paymentId, $request);
+    }
+
+    /**
+     * Handle Nagad gateway callback.
+     */
+    public function handleNagadCallback(Request $request)
+    {
+        $paymentRef = $request->query('payment_ref_id') ?? $request->query('paymentRefId');
+        $status     = $request->query('status');
+
+        if (!$paymentRef || strtolower($status ?? '') !== 'success') {
+            Log::warning('Nagad callback: non-success', ['query' => $request->query()]);
+            return redirect()->route('payment.failed')
+                ->with('error', 'Nagad payment was not completed.');
+        }
+
+        $order = Order::where('payment_reference', $paymentRef)->first();
+
+        if (!$order) {
+            Log::error('Nagad callback: order not found', ['paymentRef' => $paymentRef]);
+            return redirect()->route('payment.failed')
+                ->with('error', 'Order not found for this payment.');
+        }
+
+        $settings = PaymentSettingsService::getNagadCredentials();
+        $verified = (new NagadPaymentService($settings))->verifyPayment($paymentRef);
+
+        return $this->finalizePayment($order, $verified, 'nagad', $paymentRef, $request);
+    }
+
+    /**
+     * Handle Rocket gateway callback.
+     */
+    public function handleRocketCallback(Request $request)
+    {
+        $sessionKey = $request->query('session_key') ?? $request->query('mer_txnid');
+        $status     = $request->query('pay_status') ?? $request->query('status');
+
+        if (!$sessionKey || (strtolower($status ?? '') !== 'successful' && strtolower($status ?? '') !== 'success')) {
+            Log::warning('Rocket callback: non-success', ['query' => $request->query()]);
+            return redirect()->route('payment.failed')
+                ->with('error', 'Rocket payment was not completed.');
+        }
+
+        $order = Order::where('payment_reference', $sessionKey)->first();
+
+        if (!$order) {
+            Log::error('Rocket callback: order not found', ['sessionKey' => $sessionKey]);
+            return redirect()->route('payment.failed')
+                ->with('error', 'Order not found for this payment.');
+        }
+
+        $settings = PaymentSettingsService::getRocketCredentials();
+        $verified = (new RocketPaymentService($settings))->verifyPayment($sessionKey);
+
+        return $this->finalizePayment($order, $verified, 'rocket', $sessionKey, $request);
+    }
+
+    /**
+     * Common payment finalization: mark paid, assign codes, redirect to confirmation.
+     */
+    private function finalizePayment(Order $order, bool $verified, string $method, string $reference, Request $request)
+    {
+        if (!$verified) {
+            $order->update(['payment_status' => 'failed']);
+
+            return redirect()->route('payment.failed', ['order' => $order->order_number])
+                ->with('error', 'Payment verification failed. Please contact support.');
+        }
+
+        try {
+            $this->orderService->processPayment($order, $method, [
+                'payment_reference' => $reference,
+                'payment_details'   => ['gateway' => $method, 'verified_at' => now()->toISOString()],
+            ]);
+
+            MetaConversionApiService::trackPurchase($order->fresh(), $request);
+
+        } catch (\Throwable $e) {
+            Log::error('finalizePayment processPayment failed', [
+                'order_id' => $order->id,
+                'error'    => $e->getMessage(),
+            ]);
+
+            return redirect()->route('payment.failed', ['order' => $order->order_number])
+                ->with('error', 'Payment received but order processing failed. Please contact support.');
+        }
+
+        // Redirect guest vs auth user to the right confirmation page
+        if ($order->user_id === null) {
+            return redirect()->route('orders.guest-confirmation')
+                ->with('success', 'Payment successful! Your order is confirmed.');
+        }
+
+        return redirect()->route('orders.show', $order->id)
+            ->with('success', 'Payment successful! Your order is confirmed.');
+    }
+
+    /**
+     * IPN handler for bKash (server-to-server notification).
+     */
+    public function handleBkashIpn(Request $request)
+    {
+        Log::info('bKash IPN received', $request->all());
+
+        $paymentId = $request->input('paymentID');
+        $status    = $request->input('transactionStatus');
+
+        if ($paymentId && $status === 'Completed') {
+            $order = Order::where('payment_reference', $paymentId)
+                ->where('payment_status', 'pending')
+                ->first();
+
+            if ($order) {
+                $settings = PaymentSettingsService::getBkashCredentials();
+                $verified = (new BkashPaymentService($settings))->verifyPayment($paymentId);
+
+                if ($verified) {
+                    $this->orderService->processPayment($order, 'bkash', [
+                        'payment_reference' => $paymentId,
+                        'payment_details'   => ['gateway' => 'bkash', 'ipn' => true],
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['status' => 'received']);
+    }
+
+    /**
+     * IPN handler for Nagad.
+     */
+    public function handleNagadIpn(Request $request)
+    {
+        Log::info('Nagad IPN received', $request->all());
+
+        $paymentRef = $request->input('payment_ref_id');
+
+        if ($paymentRef) {
+            $order = Order::where('payment_reference', $paymentRef)
+                ->where('payment_status', 'pending')
+                ->first();
+
+            if ($order) {
+                $settings = PaymentSettingsService::getNagadCredentials();
+                $verified = (new NagadPaymentService($settings))->verifyPayment($paymentRef);
+
+                if ($verified) {
+                    $this->orderService->processPayment($order, 'nagad', [
+                        'payment_reference' => $paymentRef,
+                        'payment_details'   => ['gateway' => 'nagad', 'ipn' => true],
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['status' => 'received']);
+    }
+
+    /**
+     * IPN handler for Rocket.
+     */
+    public function handleRocketIpn(Request $request)
+    {
+        Log::info('Rocket IPN received', $request->all());
+
+        $sessionKey = $request->input('session_key');
+
+        if ($sessionKey) {
+            $order = Order::where('payment_reference', $sessionKey)
+                ->where('payment_status', 'pending')
+                ->first();
+
+            if ($order) {
+                $settings = PaymentSettingsService::getRocketCredentials();
+                $verified = (new RocketPaymentService($settings))->verifyPayment($sessionKey);
+
+                if ($verified) {
+                    $this->orderService->processPayment($order, 'rocket', [
+                        'payment_reference' => $sessionKey,
+                        'payment_details'   => ['gateway' => 'rocket', 'ipn' => true],
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['status' => 'received']);
+    }
+
+    /**
+     * Payment failure page.
+     */
+    public function paymentFailed(Request $request)
+    {
+        return Inertia::render('Orders/PaymentFailed', [
+            'orderNumber' => $request->query('order'),
+        ]);
     }
 
     /**

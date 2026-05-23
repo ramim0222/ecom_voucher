@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePage } from "@inertiajs/react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ThemedSelect } from "@/Components/ui/ThemedSelect";
 import { useForm } from "@inertiajs/react";
@@ -15,77 +16,71 @@ const countryOptions = [
     { value: "UK", label: "United Kingdom" },
 ];
 
-const paymentMethodOptions = [
-    { value: "card", label: "Credit/Debit Card" },
-    { value: "bkash", label: "bKash" },
-    { value: "rocket", label: "Rocket" },
-    { value: "nagad", label: "Nagad" },
-];
+const METHOD_LABELS = {
+    bkash:  "bKash",
+    nagad:  "Nagad",
+    rocket: "Rocket",
+};
+
+const METHOD_STYLES = {
+    bkash:  { bg: "bg-green-50 dark:bg-green-900/20", border: "border-green-200 dark:border-green-800", text: "text-green-700 dark:text-green-400" },
+    nagad:  { bg: "bg-orange-50 dark:bg-orange-900/20", border: "border-orange-200 dark:border-orange-800", text: "text-orange-700 dark:text-orange-400" },
+    rocket: { bg: "bg-purple-50 dark:bg-purple-900/20", border: "border-purple-200 dark:border-purple-800", text: "text-purple-700 dark:text-purple-400" },
+};
 
 export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        payment_method: "card",
+    const { paymentMethods = [] } = usePage().props;
+
+    const paymentMethodOptions = paymentMethods.map((m) => ({
+        value: m,
+        label: METHOD_LABELS[m] ?? m,
+    }));
+
+    const defaultMethod = paymentMethods[0] ?? "";
+
+    const { data, setData, post, processing, errors } = useForm({
+        payment_method: defaultMethod,
         billing_address: {
             first_name: user?.first_name || "",
-            last_name: user?.last_name || "",
-            email: user?.email || "",
-            phone: user?.phone_number || "",
-            address: user?.street_address || "",
-            city: user?.city || "",
-            state: user?.state || "",
-            zip: user?.zip || "",
-            country: user?.country || "BD",
+            last_name:  user?.last_name  || "",
+            email:      user?.email      || "",
+            phone:      user?.phone_number || "",
+            address:    user?.street_address || "",
+            city:       user?.city     || "",
+            state:      user?.state    || "",
+            zip:        user?.zip      || "",
+            country:    user?.country  || "BD",
         },
         notes: "",
     });
 
     const [formData, setFormData] = useState({
-        email: user?.email || "",
-        firstName: user?.first_name || "",
-        lastName: user?.last_name || "",
-        phone: user?.phone_number || "",
-        address: user?.street_address || "",
-        city: user?.city || "",
-        state: user?.state || "",
-        zipCode: user?.zip || "",
-        country: user?.country || "BD",
-        cardNumber: "",
-        expiryDate: "",
-        cvv: "",
-        cardName: "",
-        paymentMethod: "card",
+        email:         user?.email          || "",
+        firstName:     user?.first_name     || "",
+        lastName:      user?.last_name      || "",
+        phone:         user?.phone_number   || "",
+        address:       user?.street_address || "",
+        city:          user?.city           || "",
+        state:         user?.state          || "",
+        zipCode:       user?.zip            || "",
+        country:       user?.country        || "BD",
+        paymentMethod: defaultMethod,
     });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+        setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Update Inertia form data for billing address
-        if (
-            [
-                "firstName",
-                "lastName",
-                "email",
-                "phone",
-                "address",
-                "city",
-                "state",
-                "zipCode",
-                "country",
-            ].includes(name)
-        ) {
-            const addressField =
-                {
-                    firstName: "first_name",
-                    lastName: "last_name",
-                    address: "address",
-                    zipCode: "zip",
-                    state: "state",
-                }[name] || name;
+        const addressFieldMap = {
+            firstName: "first_name",
+            lastName:  "last_name",
+            address:   "address",
+            zipCode:   "zip",
+            state:     "state",
+        };
 
+        if (Object.keys(addressFieldMap).includes(name) || ["email", "phone", "city", "country"].includes(name)) {
+            const addressField = addressFieldMap[name] ?? name;
             setData("billing_address", {
                 ...data.billing_address,
                 [addressField]: value,
@@ -114,13 +109,7 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
             );
         }
         if (step === 2) {
-            return (
-                formData.paymentMethod === "bkash" ||
-                (formData.cardNumber &&
-                    formData.expiryDate &&
-                    formData.cvv &&
-                    formData.cardName)
-            );
+            return !!formData.paymentMethod;
         }
         return true;
     };
@@ -150,13 +139,15 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
             : route("orders.guest-create");
 
         post(endpoint, {
-            onSuccess: () => {},
-            onError: (errors) => {
-                console.error("Order creation failed:", errors);
+            preserveScroll: true,
+            onError: (errs) => {
+                console.error("Order creation failed:", errs);
                 alert("Failed to create order. Please try again.");
             },
         });
     };
+
+    const selectedStyle = METHOD_STYLES[formData.paymentMethod] ?? METHOD_STYLES.bkash;
 
     return (
         <div className="glass-card rounded-xl p-6">
@@ -318,131 +309,44 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
             {currentStep === 2 && (
                 <div>
                     <h2 className="font-heading font-semibold text-xl mb-6">
-                        Payment Information
+                        Payment Method
                     </h2>
-                    <form className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-2">
-                                Payment Method
-                            </label>
-                            <ThemedSelect
-                                name="paymentMethod"
-                                value={formData.paymentMethod}
-                                onChange={handleThemedSelectChange("paymentMethod")}
-                                options={paymentMethodOptions}
-                            />
+
+                    {paymentMethodOptions.length === 0 ? (
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-yellow-700 dark:text-yellow-400 text-sm">
+                            No payment methods are currently available. Please
+                            contact the store.
                         </div>
-
-                        {formData.paymentMethod === "card" && (
-                            <>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Card Number
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="cardNumber"
-                                        value={formData.cardNumber}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        placeholder="1234 5678 9012 3456"
-                                        required={
-                                            formData.paymentMethod === "card"
-                                        }
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            Expiry Date
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="expiryDate"
-                                            value={formData.expiryDate}
-                                            onChange={handleInputChange}
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                            placeholder="MM/YY"
-                                            required={
-                                                formData.paymentMethod ===
-                                                "card"
-                                            }
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            CVV
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="cvv"
-                                            value={formData.cvv}
-                                            onChange={handleInputChange}
-                                            className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                            placeholder="123"
-                                            required={
-                                                formData.paymentMethod ===
-                                                "card"
-                                            }
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Cardholder Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="cardName"
-                                        value={formData.cardName}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                        placeholder="John Doe"
-                                        required={
-                                            formData.paymentMethod === "card"
-                                        }
-                                    />
-                                </div>
-                            </>
-                        )}
-
-                        {formData.paymentMethod === "bkash" && (
-                            <div className="bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800 rounded-lg p-4">
-                                <div className="flex items-center mb-2">
-                                    <span className="text-pink-600 dark:text-pink-400 font-medium">
-                                        bKash Payment
-                                    </span>
-                                </div>
-                                <p className="text-sm text-pink-600 dark:text-pink-400">
-                                    You will be redirected to bKash payment
-                                    gateway after placing the order.
-                                </p>
+                    ) : (
+                        <form className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-2">
+                                    Select Payment Method
+                                </label>
+                                <ThemedSelect
+                                    name="paymentMethod"
+                                    value={formData.paymentMethod}
+                                    onChange={handleThemedSelectChange("paymentMethod")}
+                                    options={paymentMethodOptions}
+                                />
                             </div>
-                        )}
 
-                        {(formData.paymentMethod === "rocket" ||
-                            formData.paymentMethod === "nagad") && (
-                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                                <div className="flex items-center mb-2">
-                                    <span className="text-blue-600 dark:text-blue-400 font-medium">
-                                        {formData.paymentMethod === "rocket"
-                                            ? "Rocket"
-                                            : "Nagad"}{" "}
-                                        Payment
-                                    </span>
+                            {formData.paymentMethod && (
+                                <div
+                                    className={`${selectedStyle.bg} border ${selectedStyle.border} rounded-lg p-4`}
+                                >
+                                    <p className={`font-medium mb-1 ${selectedStyle.text}`}>
+                                        {METHOD_LABELS[formData.paymentMethod]} Payment
+                                    </p>
+                                    <p className={`text-sm ${selectedStyle.text}`}>
+                                        After placing your order you will be redirected to the{" "}
+                                        {METHOD_LABELS[formData.paymentMethod]} payment page to
+                                        complete the transaction securely.
+                                    </p>
                                 </div>
-                                <p className="text-sm text-blue-600 dark:text-blue-400">
-                                    You will be redirected to{" "}
-                                    {formData.paymentMethod === "rocket"
-                                        ? "Rocket"
-                                        : "Nagad"}{" "}
-                                    payment gateway after placing the order.
-                                </p>
-                            </div>
-                        )}
-                    </form>
+                            )}
+                        </form>
+                    )}
                 </div>
             )}
 
@@ -469,7 +373,10 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
                         <div className="glass-card rounded-lg p-4">
                             <h3 className="font-medium mb-2">Payment Method</h3>
                             <p className="text-sm text-muted-foreground">
-                                **** **** **** {formData.cardNumber.slice(-4)}
+                                {METHOD_LABELS[formData.paymentMethod] ?? formData.paymentMethod}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                You will be redirected to complete payment after placing your order.
                             </p>
                         </div>
                     </div>
@@ -501,10 +408,13 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
                         size="lg"
                         onClick={handleSubmit}
                         disabled={
-                            processing || !validateStep(1) || !validateStep(2)
+                            processing ||
+                            !validateStep(1) ||
+                            !validateStep(2) ||
+                            paymentMethodOptions.length === 0
                         }
                     >
-                        {processing ? "Processing..." : "Place Order"}
+                        {processing ? "Processing..." : "Place Order & Pay"}
                     </GamingButton>
                 )}
             </div>

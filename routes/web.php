@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\BrandingController;
 use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\ContentPagesController;
+use App\Http\Controllers\Admin\PaymentSettingsController;
 use App\Http\Controllers\Front\ContentPageController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
 use App\Http\Controllers\Front\ReviewController;
@@ -58,6 +59,30 @@ Route::get('/orders/guest-confirmation', [OrderController::class, 'guestConfirma
 // Order show (accessible by owner, admin, or guest via session)
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
+// Payment gateway callbacks (no auth – called by the gateway after customer approval)
+Route::get('/payment/callback/bkash', [OrderController::class, 'handleBkashCallback'])->name('payment.callback.bkash');
+Route::get('/payment/callback/nagad', [OrderController::class, 'handleNagadCallback'])->name('payment.callback.nagad');
+Route::get('/payment/callback/rocket', [OrderController::class, 'handleRocketCallback'])->name('payment.callback.rocket');
+
+// IPN (Instant Payment Notification) webhooks – exempt from CSRF
+Route::post('/payment/ipn/bkash', [OrderController::class, 'handleBkashIpn'])->name('payment.ipn.bkash');
+Route::post('/payment/ipn/nagad', [OrderController::class, 'handleNagadIpn'])->name('payment.ipn.nagad');
+Route::post('/payment/ipn/rocket', [OrderController::class, 'handleRocketIpn'])->name('payment.ipn.rocket');
+
+// Payment failure page
+Route::get('/payment/failed', [OrderController::class, 'paymentFailed'])->name('payment.failed');
+
+// Authenticated checkout/order actions (must sit outside the customer-only dashboard group
+// so admins testing checkout are not redirected away before reaching the gateway).
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/orders/create-from-cart', [OrderController::class, 'createFromCart'])->name('orders.create-from-cart');
+    Route::post('/orders/create-from-products', [OrderController::class, 'createFromProducts'])->name('orders.create-from-products');
+    Route::post('/orders/{order}/payment', [OrderController::class, 'processPayment'])->name('orders.process-payment');
+    Route::post('/orders/{order}/simulate-payment', [OrderController::class, 'simulatePayment'])->name('orders.simulate-payment');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/check-availability', [OrderController::class, 'checkAvailability'])->name('orders.check-availability');
+});
+
 
 
 
@@ -95,14 +120,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Review routes
         Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-
-        // Order routes (auth required for creating/viewing user orders)
-        Route::post('/orders/create-from-cart', [OrderController::class, 'createFromCart'])->name('orders.create-from-cart');
-        Route::post('/orders/create-from-products', [OrderController::class, 'createFromProducts'])->name('orders.create-from-products');
-        Route::post('/orders/{order}/payment', [OrderController::class, 'processPayment'])->name('orders.process-payment');
-        Route::post('/orders/{order}/simulate-payment', [OrderController::class, 'simulatePayment'])->name('orders.simulate-payment');
-        Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-        Route::post('/orders/check-availability', [OrderController::class, 'checkAvailability'])->name('orders.check-availability');
 
         Route::get('/dashboard/orders', [OrderController::class, 'index'])->name('dashboard.orders');
 
@@ -157,6 +174,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/admin/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 
         Route::get('/admin/settings', [SettingsController::class, 'index'])->name('admin.settings');
+
+        Route::get('/admin/settings/payment', [PaymentSettingsController::class, 'index'])->name('admin.settings.payment');
+        Route::put('/admin/settings/payment', [PaymentSettingsController::class, 'update'])->name('admin.settings.payment.update');
 
         Route::get('/admin/settings/branding', [BrandingController::class, 'index'])->name('admin.settings.branding');
         Route::put('/admin/settings/branding', [BrandingController::class, 'update'])->name('admin.settings.branding.update');
