@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { Upload } from "lucide-react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
@@ -127,7 +128,7 @@ export default function Branding({ brandingSettings }) {
 
     return (
         <AdminLayout>
-            <Head title="Branding Settings" />
+            <PageHead title="Branding Settings" />
 
             <div className="space-y-6 max-w-4xl">
                 <div>

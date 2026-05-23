@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 
@@ -47,6 +48,7 @@ export default function VerifyEmailPage({ status }) {
 
     return (
         <SiteLayout variant="auth">
+            <PageHead title="Verify Email" />
             <AuthLayout
                 title="Verify Your Email"
                 subtitle="Check your inbox to complete registration"

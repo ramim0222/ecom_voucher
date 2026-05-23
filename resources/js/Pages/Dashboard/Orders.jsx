@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
@@ -90,7 +91,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
 
     return (
         <>
-            <Head title="Order History" />
+            <PageHead title="Order History" />
             <SiteLayout>
                 <DashboardLayout>
                     <div className="space-y-4 sm:space-y-6 lg:space-y-8">

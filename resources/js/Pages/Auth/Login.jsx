@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 import { AuthForm } from "@/Components/Auth/AuthForm";
@@ -30,7 +31,7 @@ export default function Login({ status, canResetPassword }) {
 
     return (
         <SiteLayout variant="auth">
-            <Head title="Log in" />
+            <PageHead title="Log in" />
             <AuthLayout
                 title="Welcome Back"
                 subtitle="Sign in to your GameVault account"

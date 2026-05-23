@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductTabs } from "@/Components/Product/ProductTabs";
 import { RelatedProducts } from "@/Components/Product/RelatedProducts";
@@ -118,6 +119,7 @@ export default function ProductDetailsPage({
 
     return (
         <SiteLayout>
+            <PageHead title={product.title} />
 
             {/* Breadcrumb */}
             <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 py-3 sm:py-4 md:py-4 lg:py-6 xl:py-8 2xl:py-10">

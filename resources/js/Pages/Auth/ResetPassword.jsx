@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 import { AuthForm } from "@/Components/Auth/AuthForm";
@@ -69,6 +70,7 @@ export default function ResetPasswordPage({ token, email, status }) {
 
     return (
         <SiteLayout variant="auth">
+            <PageHead title="Reset Password" />
             <AuthLayout
                 title="Reset Your Password"
                 subtitle="Create a new secure password"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export default function AdminOrders({ orders = { data: [] }, filters = {} }) {
@@ -103,6 +104,7 @@ export default function AdminOrders({ orders = { data: [] }, filters = {} }) {
 
     return (
         <AdminLayout>
+            <PageHead title="Orders Management" />
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>

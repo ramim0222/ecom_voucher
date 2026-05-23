@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
+import { PageHead } from "@/Components/PageHead";
 import { ReviewsTable } from "@/Components/Admin/ReviewsTable";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { DeleteConfirmModal } from "@/Components/Admin/DeleteConfirmModal";
@@ -69,6 +70,7 @@ export default function AdminReviewsPage({
 
     return (
         <AdminLayout>
+            <PageHead title="Reviews Management" />
             <div className="space-y-6">
                 {flash?.success && (
                     <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg">

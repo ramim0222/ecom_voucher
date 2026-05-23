@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 import { AuthForm } from "@/Components/Auth/AuthForm";
@@ -29,6 +30,7 @@ export default function ConfirmPasswordPage() {
 
     return (
         <SiteLayout variant="auth">
+            <PageHead title="Confirm Password" />
             <AuthLayout
                 title="Confirm Your Password"
                 subtitle="Please enter your password to continue"

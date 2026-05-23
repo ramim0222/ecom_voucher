@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { Plus, Trash2 } from "lucide-react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
@@ -69,7 +70,7 @@ export default function AdminFaqPage({ pageSettings = {} }) {
 
     return (
         <AdminLayout>
-            <Head title="FAQ Settings" />
+            <PageHead title="FAQ Settings" />
 
             <div className="space-y-6 max-w-4xl">
                 <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
+import { PageHead } from "@/Components/PageHead";
 import { StatsGrid } from "@/Components/Admin/StatsGrid";
 import { SalesChart } from "@/Components/Admin/SalesChart";
 import { OrderStatusOverview } from "@/Components/Admin/OrderStatusOverview";
@@ -19,6 +20,7 @@ export default function AdminDashboard({
 }) {
     return (
         <AdminLayout>
+            <PageHead title="Admin Dashboard" />
             <div className="space-y-6">
                 <div>
                     <h1 className="font-heading font-bold text-3xl mb-2 text-white">

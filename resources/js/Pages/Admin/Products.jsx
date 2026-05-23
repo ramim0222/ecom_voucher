@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductsTable } from "@/Components/Admin/ProductsTable";
 import { ProductModal } from "@/Components/Admin/ProductModal";
@@ -152,6 +153,7 @@ export default function AdminProducts({
 
     return (
         <AdminLayout>
+            <PageHead title="Products Management" />
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>

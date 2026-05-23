@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { router, usePage } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { UserAccountInfo } from "@/Components/Admin/UserAccountInfo";
 import { UserOrderHistory } from "@/Components/Admin/UserOrderHistory";
@@ -40,6 +41,9 @@ export default function AdminUserProfilePage({ user, orders = [] }) {
 
     return (
         <AdminLayout>
+            <PageHead
+                title={`${user.first_name} ${user.last_name}`.trim() || "User Profile"}
+            />
             <div className="space-y-6">
                 {flash?.success && (
                     <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg">

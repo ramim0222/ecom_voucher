@@ -1,4 +1,5 @@
-import { Head, useForm, usePage } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { useState } from "react";
@@ -35,7 +36,7 @@ export default function AdminProfile() {
 
     return (
         <AdminLayout>
-            <Head title="Admin Profile" />
+            <PageHead title="Admin Profile" />
             <div className="max-w-4xl mx-auto">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-white mb-2">

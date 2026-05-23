@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import DeleteUserForm from "./Partials/DeleteUserForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
@@ -13,7 +13,7 @@ export default function Edit({ mustVerifyEmail, status }) {
                 </h2>
             }
         >
-            <Head title="Profile" />
+            <PageHead title="Profile" />
 
             <div className="py-4 sm:py-6 md:py-8 lg:py-12 xl:py-16 2xl:py-20">
                 <div className="mx-auto max-w-7xl space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12">

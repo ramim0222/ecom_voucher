@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Head, Link } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { ChevronDown, ChevronUp, Search, HelpCircle } from "lucide-react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { useGsap } from "@/hooks/useGsap";
@@ -37,7 +38,7 @@ export default function Faq({ page = {} }) {
 
     return (
         <SiteLayout>
-            <Head title={title} />
+            <PageHead title={title} />
 
             <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10" />

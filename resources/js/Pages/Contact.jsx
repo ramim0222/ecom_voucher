@@ -1,4 +1,5 @@
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { useForm, usePage } from "@inertiajs/react";
 import { useCallback, useEffect, useRef } from "react";
@@ -106,6 +107,7 @@ export default function ContactPage({
 
     return (
         <SiteLayout>
+            <PageHead title="Contact Us" />
 
             <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10" />

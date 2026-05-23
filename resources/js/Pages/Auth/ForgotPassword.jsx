@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useForm, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
 import { AuthForm } from "@/Components/Auth/AuthForm";
@@ -39,6 +40,7 @@ export default function ForgotPasswordPage({ status }) {
     if (isSubmitted) {
         return (
             <SiteLayout variant="auth">
+                <PageHead title="Check Your Email" />
                 <AuthLayout
                     title="Check Your Email"
                     subtitle="We've sent password reset instructions"
@@ -88,6 +90,7 @@ export default function ForgotPasswordPage({ status }) {
 
     return (
         <SiteLayout variant="auth">
+            <PageHead title="Reset Password" />
             <AuthLayout
                 title="Reset Password"
                 subtitle="Enter your email to receive reset instructions"

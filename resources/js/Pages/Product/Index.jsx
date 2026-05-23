@@ -1,6 +1,7 @@
 "use client";
 
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { VoucherCard } from "@/Components/ui/VoucherCard";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductFilters } from "@/Components/Product/ProductFilter";
@@ -28,6 +29,7 @@ export default function ProductsPage({ products = [], filters = {} }) {
 
     return (
         <SiteLayout>
+            <PageHead title={productsTitle} />
 
             {/* Page Header */}
             <section className="py-6 sm:py-8 md:py-10 lg:py-12 xl:py-16 2xl:py-20 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 bg-gradient-to-r from-primary/10 to-accent/5">

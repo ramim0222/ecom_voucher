@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Head, Link } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export default function GuestConfirmation({ order }) {
@@ -24,7 +25,7 @@ export default function GuestConfirmation({ order }) {
 
     return (
         <>
-            <Head title="Order Confirmed" />
+            <PageHead title="Order Confirmed" />
             <SiteLayout>
 
                 <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-3xl">

@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Link } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { OrderCard } from "@/Components/Dashboard/OrderCard";
 import { StatsCard } from "@/Components/Dashboard/StatsCard";
@@ -32,6 +33,7 @@ export default function DashboardPage({ user, recentOrders, stats }) {
 
     return (
         <SiteLayout>
+            <PageHead title="Dashboard" />
             <DashboardLayout>
                 <div className="space-y-8">
                     {/* Welcome Section */}

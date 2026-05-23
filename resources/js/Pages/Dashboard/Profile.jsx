@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Head, useForm, usePage } from "@inertiajs/react";
+import { useForm, usePage } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
@@ -116,7 +117,7 @@ export default function ProfilePage({ user, status }) {
 
     return (
         <SiteLayout>
-            <Head title="Profile Settings" />
+            <PageHead title="Profile Settings" />
             <DashboardLayout>
                 <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
                     <div ref={headerRef}>

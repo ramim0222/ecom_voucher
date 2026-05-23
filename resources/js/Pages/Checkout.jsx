@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { CheckoutForm } from "@/Components/Checkout/CheckoutForm";
 import { OrderSummary } from "@/Components/Checkout/OrderSummary";
 import { usePage } from "@inertiajs/react";
@@ -57,6 +58,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
 
     return (
         <SiteLayout>
+            <PageHead title="Checkout" />
 
             <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
                 <div ref={refs.header} className="mb-8">

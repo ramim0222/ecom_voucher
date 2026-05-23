@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import {
@@ -155,7 +156,7 @@ export default function PaymentSettings({ paymentSettings }) {
 
     return (
         <AdminLayout>
-            <Head title="Payment Settings" />
+            <PageHead title="Payment Settings" />
 
             <div className="space-y-6 max-w-3xl">
                 <div>

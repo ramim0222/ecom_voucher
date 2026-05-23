@@ -1,4 +1,5 @@
-import { Head, Link } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { useRef, useState } from "react";
@@ -57,7 +58,7 @@ export default function OrderShow({ order }) {
 
     return (
         <>
-            <Head title={`Order ${order.order_number}`} />
+            <PageHead title={`Order ${order.order_number}`} />
             <SiteLayout>
 
                 <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">

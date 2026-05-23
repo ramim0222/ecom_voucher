@@ -1,11 +1,12 @@
-import { Head, Link } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export default function PaymentFailed({ orderNumber }) {
     return (
         <>
-            <Head title="Payment Failed" />
+            <PageHead title="Payment Failed" />
             <SiteLayout>
                 <div className="container mx-auto px-3 sm:px-4 py-16 max-w-lg text-center">
                     <div className="glass-card rounded-xl p-10">

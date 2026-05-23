@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { WishlistItem } from "@/Components/Wishlist/WishlistItem";
 import { WishlistSummary } from "@/Components/Wishlist/WishlistSummary";
@@ -107,6 +108,7 @@ export default function WishlistPage({
     if (wishlistItems.length === 0) {
         return (
             <SiteLayout>
+                <PageHead title="Wishlist" />
                 <div className="container mx-auto px-4 py-16 text-center">
                     <div className="glass-card rounded-xl p-12 max-w-md mx-auto">
                         <div className="text-6xl mb-4">💝</div>
@@ -130,6 +132,7 @@ export default function WishlistPage({
 
     return (
         <SiteLayout>
+            <PageHead title="Wishlist" />
 
             <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
                 <div ref={refs.header} className="mb-8">

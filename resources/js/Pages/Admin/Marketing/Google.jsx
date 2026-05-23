@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import {
@@ -44,7 +45,7 @@ export default function Google({ googleSettings }) {
 
     return (
         <AdminLayout>
-            <Head title="Google Integration" />
+            <PageHead title="Google Integration" />
 
             <div className="space-y-6 max-w-4xl">
                 <div>

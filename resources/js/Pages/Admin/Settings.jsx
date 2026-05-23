@@ -1,6 +1,7 @@
 "use client";
 
-import { Head, Link } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
+import { PageHead } from "@/Components/PageHead";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 
 export default function Settings() {
@@ -77,7 +78,7 @@ export default function Settings() {
     ];
     return (
         <AdminLayout>
-            <Head title="Settings" />
+            <PageHead title="Settings" />
 
             <div className="space-y-6">
                 <div>

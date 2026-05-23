@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthForm } from "@/Components/Auth/AuthForm";
 import GuestLayout from "@/Layouts/GuestLayout";
+import { PageHead } from "@/Components/PageHead";
 
 export default function Register({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -38,7 +39,7 @@ export default function Register({ status }) {
             title="Create Account"
             subtitle="Join GameVault and unlock exclusive gaming vouchers"
         >
-            <Head title="Register" />
+            <PageHead title="Register" />
 
             {status && (
                 <div className="mb-4 font-medium text-sm text-green-600">

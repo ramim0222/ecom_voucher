@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { UsersTable } from "@/Components/Admin/UsersTable";
 
@@ -28,6 +29,7 @@ export default function AdminUsers({
 
     return (
         <AdminLayout>
+            <PageHead title="Users Management" />
             <div className="space-y-6">
                 <div>
                     <h1 className="font-heading font-bold text-3xl mb-2">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
+import { PageHead } from "@/Components/PageHead";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { CategoriesTable } from "@/Components/Admin/CategoriesTable";
 import { CategoryModal } from "@/Components/Admin/CategoryModal";
@@ -102,6 +103,7 @@ export default function AdminCategoriesPage({
 
     return (
         <AdminLayout>
+            <PageHead title="Categories Management" />
             <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
