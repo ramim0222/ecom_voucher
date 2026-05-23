@@ -108,13 +108,11 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
                             Looks like you haven't added any vouchers to your
                             cart yet.
                         </p>
-                        <GamingButton
-                            variant="primary"
-                            size="lg"
-                            onClick={() => (window.location.href = "/products")}
-                        >
-                            Browse Vouchers
-                        </GamingButton>
+                        <Link href={route("products")}>
+                            <GamingButton variant="primary" size="lg">
+                                Browse Vouchers
+                            </GamingButton>
+                        </Link>
                     </div>
                 </div>
             </SiteLayout>
@@ -160,15 +158,11 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
                         ))}
 
                         <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                            <GamingButton
-                                variant="ghost"
-                                size="lg"
-                                onClick={() =>
-                                    (window.location.href = "/products")
-                                }
-                            >
-                                Continue Shopping
-                            </GamingButton>
+                            <Link href={route("products")}>
+                                <GamingButton variant="ghost" size="lg">
+                                    Continue Shopping
+                                </GamingButton>
+                            </Link>
                             <GamingButton
                                 variant="secondary"
                                 size="lg"

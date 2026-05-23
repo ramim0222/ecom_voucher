@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { useState } from "react";
@@ -290,17 +290,15 @@ export default function OrderShow({ order }) {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <GamingButton
-                                        variant="ghost"
-                                        size="lg"
-                                        className="w-full"
-                                        onClick={() =>
-                                            (window.location.href =
-                                                route("dashboard"))
-                                        }
-                                    >
-                                        ← Back to Dashboard
-                                    </GamingButton>
+                                    <Link href={route("dashboard")}>
+                                        <GamingButton
+                                            variant="ghost"
+                                            size="lg"
+                                            className="w-full"
+                                        >
+                                            ← Back to Dashboard
+                                        </GamingButton>
+                                    </Link>
 
                                     {order.status === "completed" && (
                                         <div className="text-center text-sm text-green-600">

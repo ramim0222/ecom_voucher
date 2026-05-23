@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
@@ -17,6 +17,14 @@ export default function OrdersPage({ orders = { data: [] } }) {
             setTimeout(() => setCopiedCode(null), 2000); // Reset after 2 seconds
         } catch (err) {
             console.error("Failed to copy: ", err);
+        }
+    };
+
+    const cancelOrder = (orderId) => {
+        if (
+            confirm("Are you sure you want to cancel this order?")
+        ) {
+            router.post(route("orders.cancel", orderId));
         }
     };
 
@@ -441,19 +449,11 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     className="w-full text-red-600 hover:text-red-700"
-                                                                    onClick={() => {
-                                                                        if (
-                                                                            confirm(
-                                                                                "Are you sure you want to cancel this order?"
-                                                                            )
-                                                                        ) {
-                                                                            window.location.href =
-                                                                                route(
-                                                                                    "orders.cancel",
-                                                                                    order.id
-                                                                                );
-                                                                        }
-                                                                    }}
+                                                                    onClick={() =>
+                                                                        cancelOrder(
+                                                                            order.id
+                                                                        )
+                                                                    }
                                                                 >
                                                                     Cancel Order
                                                                 </GamingButton>
@@ -776,19 +776,11 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     className="w-full text-red-600 hover:text-red-700"
-                                                                    onClick={() => {
-                                                                        if (
-                                                                            confirm(
-                                                                                "Are you sure you want to cancel this order?"
-                                                                            )
-                                                                        ) {
-                                                                            window.location.href =
-                                                                                route(
-                                                                                    "orders.cancel",
-                                                                                    order.id
-                                                                                );
-                                                                        }
-                                                                    }}
+                                                                    onClick={() =>
+                                                                        cancelOrder(
+                                                                            order.id
+                                                                        )
+                                                                    }
                                                                 >
                                                                     Cancel Order
                                                                 </GamingButton>
@@ -1105,19 +1097,11 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                                     variant="ghost"
                                                                     size="default"
                                                                     className="w-full text-red-600 hover:text-red-700"
-                                                                    onClick={() => {
-                                                                        if (
-                                                                            confirm(
-                                                                                "Are you sure you want to cancel this order?"
-                                                                            )
-                                                                        ) {
-                                                                            window.location.href =
-                                                                                route(
-                                                                                    "orders.cancel",
-                                                                                    order.id
-                                                                                );
-                                                                        }
-                                                                    }}
+                                                                    onClick={() =>
+                                                                        cancelOrder(
+                                                                            order.id
+                                                                        )
+                                                                    }
                                                                 >
                                                                     Cancel Order
                                                                 </GamingButton>
@@ -1141,16 +1125,14 @@ export default function OrdersPage({ orders = { data: [] } }) {
                                                 ? "You haven't placed any orders yet."
                                                 : `No ${filter} orders found.`}
                                         </p>
-                                        <GamingButton
-                                            variant="primary"
-                                            size="default"
-                                            onClick={() =>
-                                                (window.location.href =
-                                                    "/products")
-                                            }
-                                        >
-                                            Start Shopping
-                                        </GamingButton>
+                                        <Link href={route("products")}>
+                                            <GamingButton
+                                                variant="primary"
+                                                size="default"
+                                            >
+                                                Start Shopping
+                                            </GamingButton>
+                                        </Link>
                                     </div>
                                 )}
                             </div>

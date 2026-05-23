@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@inertiajs/react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export function WishlistSummary({
@@ -44,14 +45,11 @@ export function WishlistSummary({
                     {hasInStockItems ? "Move All to Cart" : "No Items in Stock"}
                 </GamingButton>
 
-                <GamingButton
-                    variant="ghost"
-                    size="lg"
-                    className="w-full"
-                    onClick={() => (window.location.href = "/products")}
-                >
-                    Continue Shopping
-                </GamingButton>
+                <Link href={route("products")}>
+                    <GamingButton variant="ghost" size="lg" className="w-full">
+                        Continue Shopping
+                    </GamingButton>
+                </Link>
 
                 <div className="text-center">
                     <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">

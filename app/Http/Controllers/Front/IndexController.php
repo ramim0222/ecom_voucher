@@ -106,9 +106,7 @@ class IndexController extends Controller
                 ];
             })->values();
 
-            dispatch(function () use ($dbCartItems, $request) {
-                MetaConversionApiService::trackInitiateCheckout($dbCartItems, $request);
-            })->afterResponse();
+            MetaConversionApiService::trackInitiateCheckout($dbCartItems, $request);
         } else {
             // Guest user: load cart from session
             $guestCart = session('guest_cart', []);

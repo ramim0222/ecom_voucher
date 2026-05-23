@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { OrderCard } from "@/Components/Dashboard/OrderCard";
@@ -26,9 +27,11 @@ export default function DashboardPage({ user, recentOrders, stats }) {
                                     vouchers
                                 </p>
                             </div>
-                            <GamingButton variant="primary" size="lg">
-                                Browse New Vouchers
-                            </GamingButton>
+                            <Link href={route("products")}>
+                                <GamingButton variant="primary" size="lg">
+                                    Browse New Vouchers
+                                </GamingButton>
+                            </Link>
                         </div>
                     </div>
 
@@ -51,14 +54,11 @@ export default function DashboardPage({ user, recentOrders, stats }) {
                             <h2 className="font-heading font-semibold text-xl">
                                 Recent Orders
                             </h2>
-                            <GamingButton
-                                variant="ghost"
-                                onClick={() =>
-                                    (window.location.href = "/dashboard/orders")
-                                }
-                            >
-                                View All Orders
-                            </GamingButton>
+                            <Link href={route("dashboard.orders")}>
+                                <GamingButton variant="ghost">
+                                    View All Orders
+                                </GamingButton>
+                            </Link>
                         </div>
 
                         <div className="space-y-4">
@@ -88,51 +88,46 @@ export default function DashboardPage({ user, recentOrders, stats }) {
                             Quick Actions
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <GamingButton
-                                variant="secondary"
-                                size="lg"
-                                className="h-20 flex-col"
-                                onClick={() =>
-                                    (window.location.href = "/products")
-                                }
-                            >
-                                <span className="text-2xl mb-1">🛒</span>
-                                <span>Shop Vouchers</span>
-                            </GamingButton>
-                            <GamingButton
-                                variant="secondary"
-                                size="lg"
-                                className="h-20 flex-col"
-                                onClick={() =>
-                                    (window.location.href = "/dashboard/orders")
-                                }
-                            >
-                                <span className="text-2xl mb-1">📋</span>
-                                <span>Order History</span>
-                            </GamingButton>
-                            <GamingButton
-                                variant="secondary"
-                                size="lg"
-                                className="h-20 flex-col"
-                                onClick={() =>
-                                    (window.location.href = "/wishlist")
-                                }
-                            >
-                                <span className="text-2xl mb-1">❤️</span>
-                                <span>Wishlist</span>
-                            </GamingButton>
-                            <GamingButton
-                                variant="secondary"
-                                size="lg"
-                                className="h-20 flex-col"
-                                onClick={() =>
-                                    (window.location.href =
-                                        "/dashboard/profile")
-                                }
-                            >
-                                <span className="text-2xl mb-1">⚙️</span>
-                                <span>Account Settings</span>
-                            </GamingButton>
+                            <Link href={route("products")}>
+                                <GamingButton
+                                    variant="secondary"
+                                    size="lg"
+                                    className="h-20 flex-col w-full"
+                                >
+                                    <span className="text-2xl mb-1">🛒</span>
+                                    <span>Shop Vouchers</span>
+                                </GamingButton>
+                            </Link>
+                            <Link href={route("dashboard.orders")}>
+                                <GamingButton
+                                    variant="secondary"
+                                    size="lg"
+                                    className="h-20 flex-col w-full"
+                                >
+                                    <span className="text-2xl mb-1">📋</span>
+                                    <span>Order History</span>
+                                </GamingButton>
+                            </Link>
+                            <Link href={route("wishlist")}>
+                                <GamingButton
+                                    variant="secondary"
+                                    size="lg"
+                                    className="h-20 flex-col w-full"
+                                >
+                                    <span className="text-2xl mb-1">❤️</span>
+                                    <span>Wishlist</span>
+                                </GamingButton>
+                            </Link>
+                            <Link href={route("dashboard.profile")}>
+                                <GamingButton
+                                    variant="secondary"
+                                    size="lg"
+                                    className="h-20 flex-col w-full"
+                                >
+                                    <span className="text-2xl mb-1">⚙️</span>
+                                    <span>Account Settings</span>
+                                </GamingButton>
+                            </Link>
                         </div>
                     </div>
                 </div>

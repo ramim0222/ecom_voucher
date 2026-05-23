@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@inertiajs/react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export function WishlistItem({ item, onMoveToCart, onRemove }) {
@@ -79,16 +80,15 @@ export function WishlistItem({ item, onMoveToCart, onRemove }) {
                         >
                             {item.stock > 0 ? "Move to Cart" : "Out of Stock"}
                         </GamingButton>
-                        <GamingButton
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                                (window.location.href = `/products/${item.product_id}`)
-                            }
-                            className="flex-1 sm:flex-none"
-                        >
-                            View Details
-                        </GamingButton>
+                        <Link href={route("product", item.product_id)}>
+                            <GamingButton
+                                variant="ghost"
+                                size="sm"
+                                className="flex-1 sm:flex-none"
+                            >
+                                View Details
+                            </GamingButton>
+                        </Link>
                     </div>
                 </div>
             </div>

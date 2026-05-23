@@ -194,14 +194,15 @@ export default function GuestConfirmation({ order }) {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <GamingButton
-                            variant="accent"
-                            size="lg"
-                            className="flex-1"
-                            onClick={() => (window.location.href = "/products")}
-                        >
-                            Continue Shopping
-                        </GamingButton>
+                        <Link href={route("products")} className="flex-1">
+                            <GamingButton
+                                variant="accent"
+                                size="lg"
+                                className="w-full"
+                            >
+                                Continue Shopping
+                            </GamingButton>
+                        </Link>
                     </div>
                 </div>
             </SiteLayout>

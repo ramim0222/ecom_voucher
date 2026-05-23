@@ -165,9 +165,7 @@ export function Header() {
                         ) : (
                             <div className="flex items-center gap-1 sm:gap-2">
                                 <GamingButton
-                                    onClick={() => {
-                                        window.location.href = "/login";
-                                    }}
+                                    onClick={() => router.visit(route("login"))}
                                     variant="ghost"
                                     size="sm"
                                     className="text-xs sm:text-sm md:text-base px-2 sm:px-3 md:px-4 py-1.5 sm:py-2"
@@ -177,9 +175,9 @@ export function Header() {
                                 <GamingButton
                                     variant="primary"
                                     size="sm"
-                                    onClick={() => {
-                                        window.location.href = "/register";
-                                    }}
+                                    onClick={() =>
+                                        router.visit(route("register"))
+                                    }
                                     className="text-xs sm:text-sm md:text-base px-2 sm:px-3 md:px-4 py-1.5 sm:py-2"
                                 >
                                     Sign Up

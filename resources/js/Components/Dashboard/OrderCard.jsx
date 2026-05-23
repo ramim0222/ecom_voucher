@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@inertiajs/react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 
 export function OrderCard({ order, detailed = false }) {
@@ -107,16 +108,15 @@ export function OrderCard({ order, detailed = false }) {
                                     : "0.00"}
                             </p>
                         </div>
-                        <GamingButton
-                            variant="ghost"
-                            size="sm"
-                            className="text-xs px-3 py-1"
-                            onClick={() =>
-                                (window.location.href = `/orders/${order?.id}`)
-                            }
-                        >
-                            View
-                        </GamingButton>
+                        <Link href={route("orders.show", order?.id)}>
+                            <GamingButton
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs px-3 py-1"
+                            >
+                                View
+                            </GamingButton>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -204,15 +204,11 @@ export function OrderCard({ order, detailed = false }) {
                                     ? order.total.toFixed(2)
                                     : "0.00"}
                             </p>
-                            <GamingButton
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                    (window.location.href = `/orders/${order?.id}`)
-                                }
-                            >
-                                View Details
-                            </GamingButton>
+                            <Link href={route("orders.show", order?.id)}>
+                                <GamingButton variant="ghost" size="sm">
+                                    View Details
+                                </GamingButton>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -304,15 +300,11 @@ export function OrderCard({ order, detailed = false }) {
                         </div>
 
                         <div className="flex gap-2">
-                            <GamingButton
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                    (window.location.href = `/orders/${order?.id}`)
-                                }
-                            >
-                                View Details
-                            </GamingButton>
+                            <Link href={route("orders.show", order?.id)}>
+                                <GamingButton variant="ghost" size="sm">
+                                    View Details
+                                </GamingButton>
+                            </Link>
                         </div>
                     </div>
                 </div>
