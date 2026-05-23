@@ -5,6 +5,7 @@ import { useForm, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
+import { AuthForm } from "@/Components/Auth/AuthForm";
 
 export default function ForgotPasswordPage({ status }) {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -91,12 +92,18 @@ export default function ForgotPasswordPage({ status }) {
                 title="Reset Password"
                 subtitle="Enter your email to receive reset instructions"
             >
-                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <AuthForm
+                    onSubmit={handleSubmit}
+                    errors={errors}
+                    className="space-y-4 sm:space-y-6"
+                >
                     <div>
                         <label className="block text-sm font-medium mb-2">
                             Email Address
                         </label>
                         <input
+                            id="email"
+                            name="email"
                             type="email"
                             value={data.email}
                             onChange={(e) => setData("email", e.target.value)}
@@ -133,7 +140,7 @@ export default function ForgotPasswordPage({ status }) {
                             Sign in
                         </Link>
                     </p>
-                </form>
+                </AuthForm>
             </AuthLayout>
         </SiteLayout>
     );

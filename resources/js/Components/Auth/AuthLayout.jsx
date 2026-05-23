@@ -3,9 +3,13 @@ import { usePage } from "@inertiajs/react";
 import { scaleIn, fadeInUp } from "@/lib/animations";
 
 export function AuthLayout({ title, subtitle, children }) {
-    const { branding = {} } = usePage().props;
+    const {
+        props: { branding = {} },
+        url,
+    } = usePage();
     const panelRef = useRef(null);
     const headerRef = useRef(null);
+    const scrollRef = useRef(null);
 
     const panelTitle =
         branding?.auth_panel_title || "Join the Gaming Revolution";
@@ -21,8 +25,12 @@ export function AuthLayout({ title, subtitle, children }) {
         fadeInUp(headerRef.current, { delay: 0.15 });
     }, []);
 
+    useEffect(() => {
+        scrollRef.current?.scrollTo(0, 0);
+    }, [url]);
+
     return (
-        <div className="h-full flex flex-col lg:flex-row overflow-hidden">
+        <div className="h-full min-h-0 flex flex-col lg:flex-row overflow-hidden">
             {/* Mobile / tablet branding banner */}
             <div className="lg:hidden relative h-28 sm:h-36 shrink-0 overflow-hidden">
                 <img
@@ -42,10 +50,13 @@ export function AuthLayout({ title, subtitle, children }) {
                 </div>
             </div>
 
-            {/* Form */}
-            <div className="flex-1 flex min-h-0 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                <div className="w-full max-w-md mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 lg:flex lg:items-center lg:justify-center">
-                    <div ref={panelRef} className="w-full">
+            {/* Form — scrolls independently so long signup forms stay fully reachable */}
+            <div
+                ref={scrollRef}
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+            >
+                <div className="w-full max-w-md mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 min-h-full flex flex-col justify-center">
+                    <div ref={panelRef} className="w-full py-2">
                         <div ref={headerRef} className="text-center mb-5 sm:mb-8">
                             <h1 className="font-heading font-bold text-2xl sm:text-3xl mb-1.5 sm:mb-2">
                                 {title}

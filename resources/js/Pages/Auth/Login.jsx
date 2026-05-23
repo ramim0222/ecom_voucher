@@ -3,6 +3,7 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
+import { AuthForm } from "@/Components/Auth/AuthForm";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
@@ -34,7 +35,11 @@ export default function Login({ status, canResetPassword }) {
                 title="Welcome Back"
                 subtitle="Sign in to your GameVault account"
             >
-                <form onSubmit={submit} className="space-y-4 sm:space-y-6">
+                <AuthForm
+                    onSubmit={submit}
+                    errors={errors}
+                    className="space-y-4 sm:space-y-6"
+                >
                     {status && (
                         <div className="mb-4 text-sm font-medium text-green-600">
                             {status}
@@ -168,7 +173,7 @@ export default function Login({ status, canResetPassword }) {
                             Sign up
                         </Link>
                     </p>
-                </form>
+                </AuthForm>
             </AuthLayout>
         </SiteLayout>
     );

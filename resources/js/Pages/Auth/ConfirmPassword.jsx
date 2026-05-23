@@ -5,6 +5,7 @@ import { useForm, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
+import { AuthForm } from "@/Components/Auth/AuthForm";
 
 export default function ConfirmPasswordPage() {
     const { data, setData, post, processing, errors } = useForm({
@@ -40,12 +41,18 @@ export default function ConfirmPasswordPage() {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                    <AuthForm
+                        onSubmit={handleSubmit}
+                        errors={errors}
+                        className="space-y-4 sm:space-y-6"
+                    >
                         <div>
                             <label className="block text-sm font-medium mb-2">
                                 Current Password
                             </label>
                             <input
+                                id="password"
+                                name="password"
                                 type="password"
                                 value={data.password}
                                 onChange={(e) =>
@@ -89,7 +96,7 @@ export default function ConfirmPasswordPage() {
                                 Cancel
                             </GamingButton>
                         </div>
-                    </form>
+                    </AuthForm>
 
                     <p className="text-center text-sm text-muted-foreground">
                         Forgot your password?{" "}

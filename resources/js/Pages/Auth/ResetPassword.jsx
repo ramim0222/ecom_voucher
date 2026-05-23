@@ -5,6 +5,7 @@ import { useForm, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { AuthLayout } from "@/Components/Auth/AuthLayout";
+import { AuthForm } from "@/Components/Auth/AuthForm";
 
 export default function ResetPasswordPage({ token, email, status }) {
     const [passwordStrength, setPasswordStrength] = useState(0);
@@ -72,12 +73,18 @@ export default function ResetPasswordPage({ token, email, status }) {
                 title="Reset Your Password"
                 subtitle="Create a new secure password"
             >
-                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <AuthForm
+                    onSubmit={handleSubmit}
+                    errors={errors}
+                    className="space-y-4 sm:space-y-6"
+                >
                     <div>
                         <label className="block text-sm font-medium mb-2">
                             New Password
                         </label>
                         <input
+                            id="password"
+                            name="password"
                             type="password"
                             value={data.password}
                             onChange={handlePasswordChange}
@@ -128,8 +135,9 @@ export default function ResetPasswordPage({ token, email, status }) {
                             Confirm New Password
                         </label>
                         <input
+                            id="password_confirmation"
+                            name="password_confirmation"
                             type="password"
-                            value={data.password_confirmation}
                             onChange={(e) =>
                                 setData("password_confirmation", e.target.value)
                             }
@@ -168,7 +176,7 @@ export default function ResetPasswordPage({ token, email, status }) {
                             Sign in
                         </Link>
                     </p>
-                </form>
+                </AuthForm>
             </AuthLayout>
         </SiteLayout>
     );

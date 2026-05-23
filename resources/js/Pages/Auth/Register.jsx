@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { AuthForm } from "@/Components/Auth/AuthForm";
 import GuestLayout from "@/Layouts/GuestLayout";
 
 export default function Register({ status }) {
@@ -45,7 +46,11 @@ export default function Register({ status }) {
                 </div>
             )}
 
-            <form onSubmit={submit} className="space-y-4 sm:space-y-6">
+            <AuthForm
+                onSubmit={submit}
+                errors={errors}
+                className="space-y-4 sm:space-y-6"
+            >
                 {/* Name Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -477,7 +482,7 @@ export default function Register({ status }) {
                         Sign in
                     </Link>
                 </p>
-            </form>
+            </AuthForm>
         </GuestLayout>
     );
 }
