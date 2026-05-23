@@ -189,6 +189,7 @@ class WishlistController extends Controller
         return [
             'id' => (int) $productId,
             'product_id' => (int) $productId,
+            'slug' => $product->slug,
             'title' => $product->title,
             'price' => $product->price ? (float) $product->price : 0.0,
             'originalPrice' => $product->original_price ? (float) $product->original_price : null,

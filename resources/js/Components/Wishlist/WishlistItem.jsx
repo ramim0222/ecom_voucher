@@ -80,7 +80,7 @@ export function WishlistItem({ item, onMoveToCart, onRemove }) {
                         >
                             {item.stock > 0 ? "Move to Cart" : "Out of Stock"}
                         </GamingButton>
-                        <Link href={route("product", item.product_id)}>
+                        <Link href={route("product", item.slug)}>
                             <GamingButton
                                 variant="ghost"
                                 size="sm"

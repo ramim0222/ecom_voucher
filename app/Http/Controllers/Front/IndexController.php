@@ -25,7 +25,7 @@ class IndexController extends Controller
             ->orderBy('sort_order')
             ->orderByDesc('id')
             ->take(8)
-            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image', 'is_featured'])
+            ->get(['id', 'slug', 'title', 'price', 'original_price', 'category_id', 'product_image', 'is_featured'])
             ->map(function ($product) {
                 // Calculate review statistics
                 $approvedReviews = $product->reviews;
@@ -53,7 +53,7 @@ class IndexController extends Controller
             ->orderByRaw('(original_price - price) / NULLIF(original_price, 0) DESC')
             ->orderByDesc('id')
             ->take(8)
-            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image', 'is_featured'])
+            ->get(['id', 'slug', 'title', 'price', 'original_price', 'category_id', 'product_image', 'is_featured'])
             ->map(function ($product) {
                 $approvedReviews = $product->reviews;
                 $reviewsCount = $approvedReviews->count();

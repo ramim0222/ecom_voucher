@@ -73,7 +73,7 @@ class ProductController extends Controller
         };
 
         $products = $query
-            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image', 'created_at'])
+            ->get(['id', 'slug', 'title', 'price', 'original_price', 'category_id', 'product_image', 'created_at'])
             ->map(function ($product) {
                 $reviewsCount = (int) $product->reviews_count_calc;
                 $averageRating = $reviewsCount > 0
@@ -102,11 +102,11 @@ class ProductController extends Controller
         ]);
     }
 
-    public function product(Request $request, $id)
+    public function product(Request $request, Product $product)
     {
-        $product = Product::with(['category', 'reviews.user'])->find($id);
+        $product->load(['category', 'reviews.user']);
 
-        if (!$product) {
+        if ($product->status !== 'active') {
             abort(404);
         }
 
@@ -167,7 +167,7 @@ class ProductController extends Controller
             ->orderBy('sort_order')
             ->orderByDesc('id')
             ->limit(3)
-            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image'])
+            ->get(['id', 'slug', 'title', 'price', 'original_price', 'category_id', 'product_image'])
             ->map(function ($relatedProduct) use ($product) {
                 $reviewsCount = (int) $relatedProduct->reviews_count_calc;
                 $averageRating = $reviewsCount > 0
@@ -176,6 +176,7 @@ class ProductController extends Controller
 
                 return [
                     'id' => $relatedProduct->id,
+                    'slug' => $relatedProduct->slug,
                     'title' => $relatedProduct->title,
                     'price' => $relatedProduct->price,
                     'original_price' => $relatedProduct->original_price,

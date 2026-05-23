@@ -131,7 +131,7 @@ export default function ProductsPage({ products = [], filters = {} }) {
                                     }
                                     rating={product.average_rating}
                                     reviewsCount={product.reviews_count}
-                                    href={route("product", product.id)}
+                                    href={route("product", product.slug)}
                                 />
                             ))}
                         </div>

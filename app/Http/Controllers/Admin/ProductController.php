@@ -52,6 +52,7 @@ class ProductController extends Controller
 
         $data = [
             'title' => $request->title,
+            'slug' => Product::generateUniqueSlug($request->title),
             'category_id' => $request->category_id,
             'status' => $request->status,
             'price' => $request->price,
@@ -94,6 +95,7 @@ class ProductController extends Controller
 
         $data = [
             'title' => $request->title,
+            'slug' => Product::generateUniqueSlug($request->title, $product->id),
             'category_id' => $request->category_id,
             'status' => $request->status,
             'price' => $request->price,

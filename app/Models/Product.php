@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
     protected $fillable = [
         'product_image',
         'title',
+        'slug',
         'category_id',
         'status',
         'price',
@@ -81,5 +83,29 @@ class Product extends Model
     public function orders()
     {
         return $this->hasManyThrough(Order::class, OrderItem::class);
+    }
+
+    public static function generateUniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($title);
+
+        if ($baseSlug === '') {
+            $baseSlug = 'product';
+        }
+
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while (
+            static::query()
+                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+                ->where('slug', $slug)
+                ->exists()
+        ) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

@@ -37,7 +37,7 @@ export function RelatedProducts({ relatedProducts = [] }) {
                         platform={product.platform}
                         rating={product.average_rating}
                         reviewsCount={product.reviews_count}
-                        href={route("product", product.id)}
+                        href={route("product", product.slug)}
                     />
                 ))}
             </div>

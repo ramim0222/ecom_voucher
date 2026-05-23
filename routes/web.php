@@ -27,7 +27,7 @@ use App\Http\Controllers\Front\ContactController;
 Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
 Route::get('/products', [FrontProductController::class, 'products'])->name('products');
-Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('product');
+Route::get('/products/{product:slug}', [FrontProductController::class, 'product'])->name('product');
 Route::get('/faq', [ContentPageController::class, 'faq'])->name('faq');
 Route::get('/refund-policy', [ContentPageController::class, 'refund'])->name('refund-policy');
 Route::get('/privacy-policy', [ContentPageController::class, 'privacy'])->name('privacy-policy');
