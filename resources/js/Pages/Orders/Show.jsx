@@ -1,10 +1,22 @@
 import { Head, Link } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInUp, staggerIn } from "@/lib/animations";
 
 export default function OrderShow({ order }) {
     const [copiedCode, setCopiedCode] = useState(null);
+    const headerRef = useRef(null);
+    const contentRef = useRef(null);
+
+    useGsap(() => {
+        fadeInUp(headerRef.current);
+
+        if (contentRef.current) {
+            staggerIn(contentRef.current.children, 0.08, { delay: 0.1 });
+        }
+    }, [order.id]);
 
     const copyToClipboard = async (code) => {
         try {
@@ -49,7 +61,7 @@ export default function OrderShow({ order }) {
             <SiteLayout>
 
                 <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-                    <div className="mb-8">
+                    <div ref={headerRef} className="mb-8">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
                                 <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-2">
@@ -83,7 +95,7 @@ export default function OrderShow({ order }) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div ref={contentRef} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Order Items */}
                         <div className="lg:col-span-2 space-y-6">
                             <div className="glass-card rounded-xl p-6">

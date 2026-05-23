@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductTabs } from "@/Components/Product/ProductTabs";
@@ -8,6 +8,8 @@ import {
     formatValidationErrors,
     useToast,
 } from "@/Components/Admin/ToastProvider";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInLeft, fadeInUp, scaleIn, staggerIn } from "@/lib/animations";
 
 export default function ProductDetailsPage({
     product,
@@ -22,6 +24,27 @@ export default function ProductDetailsPage({
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [isWishlisted, setIsWishlisted] = useState(userHasWishlisted);
     const { addToast } = useToast();
+    const imageRef = useRef(null);
+    const infoRef = useRef(null);
+    const ctaRef = useRef(null);
+
+    useGsap(() => {
+        fadeInLeft(imageRef.current, { delay: 0.05 });
+
+        if (infoRef.current) {
+            staggerIn(infoRef.current.children, 0.08, { delay: 0.1 });
+        }
+
+        scaleIn(ctaRef.current, {
+            delay: 0.35,
+            ease: "elastic.out(1, 0.6)",
+            fromScale: 0.92,
+        });
+    }, [product.id]);
+
+    useEffect(() => {
+        setIsWishlisted(userHasWishlisted);
+    }, [userHasWishlisted]);
 
     const discount = product.original_price
         ? Math.round(
@@ -56,6 +79,8 @@ export default function ProductDetailsPage({
                 quantity: quantity,
             },
             {
+                preserveScroll: true,
+                preserveState: true,
                 onSuccess: () => {
                     addToast("Product added to cart successfully!", "success");
                     setIsAddingToCart(false);
@@ -77,25 +102,16 @@ export default function ProductDetailsPage({
                 { product_id: product.id },
                 {
                     preserveScroll: true,
+                    preserveState: true,
                     onError: () => setIsWishlisted(false),
-                    onFinish: () => {
-                        // Optionally reload wishlist status if needed
-                        router.reload({
-                            only: ["userHasWishlisted", "wishlistId"],
-                        });
-                    },
                 }
             );
         } else {
             setIsWishlisted(false);
             router.delete(`/wishlist/product/${product.id}`, {
                 preserveScroll: true,
+                preserveState: true,
                 onError: () => setIsWishlisted(true),
-                onFinish: () => {
-                    router.reload({
-                        only: ["userHasWishlisted", "wishlistId"],
-                    });
-                },
             });
         }
     };
@@ -126,7 +142,7 @@ export default function ProductDetailsPage({
             <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 py-4 sm:py-6 md:py-8 lg:py-8 xl:py-10 2xl:py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12 xl:gap-16 2xl:gap-20 mb-8 sm:mb-12 md:mb-16 lg:mb-16 xl:mb-20 2xl:mb-24">
                     {/* Product Image */}
-                    <div className="space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
+                    <div ref={imageRef} className="space-y-3 sm:space-y-4 md:space-y-4 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
                         <div className="glass-card rounded-xl p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 2xl:p-10">
                             <img
                                 src={
@@ -141,7 +157,7 @@ export default function ProductDetailsPage({
                     </div>
 
                     {/* Product Info */}
-                    <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
+                    <div ref={infoRef} className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
                         <div>
                             <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-3 md:mb-3 lg:mb-4 xl:mb-5 2xl:mb-6">
                                 <span className="bg-primary/20 text-primary px-2 py-1 rounded text-xs sm:text-sm md:text-sm lg:text-sm xl:text-base 2xl:text-base font-medium">
@@ -278,7 +294,7 @@ export default function ProductDetailsPage({
                                 </div>
                             )}
 
-                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-4 lg:gap-6 xl:gap-8 2xl:gap-10">
+                            <div ref={ctaRef} className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-4 lg:gap-6 xl:gap-8 2xl:gap-10">
                                 <GamingButton
                                     variant="accent"
                                     size="lg"

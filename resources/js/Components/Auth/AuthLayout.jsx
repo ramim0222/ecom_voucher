@@ -1,7 +1,11 @@
+import { useEffect, useRef } from "react";
 import { usePage } from "@inertiajs/react";
+import { scaleIn, fadeInUp } from "@/lib/animations";
 
 export function AuthLayout({ title, subtitle, children }) {
     const { branding = {} } = usePage().props;
+    const panelRef = useRef(null);
+    const headerRef = useRef(null);
 
     const panelTitle =
         branding?.auth_panel_title || "Join the Gaming Revolution";
@@ -11,6 +15,11 @@ export function AuthLayout({ title, subtitle, children }) {
     const backgroundImage = branding?.auth_background_path
         ? `/storage/${branding.auth_background_path}`
         : "/placeholder-j7n3w.png";
+
+    useEffect(() => {
+        scaleIn(panelRef.current, { delay: 0.05 });
+        fadeInUp(headerRef.current, { delay: 0.15 });
+    }, []);
 
     return (
         <div className="h-full flex flex-col lg:flex-row overflow-hidden">
@@ -36,8 +45,8 @@ export function AuthLayout({ title, subtitle, children }) {
             {/* Form */}
             <div className="flex-1 flex min-h-0 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 <div className="w-full max-w-md mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8 lg:flex lg:items-center lg:justify-center">
-                    <div className="w-full">
-                        <div className="text-center mb-5 sm:mb-8">
+                    <div ref={panelRef} className="w-full">
+                        <div ref={headerRef} className="text-center mb-5 sm:mb-8">
                             <h1 className="font-heading font-bold text-2xl sm:text-3xl mb-1.5 sm:mb-2">
                                 {title}
                             </h1>

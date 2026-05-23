@@ -2,6 +2,8 @@ import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { useForm, usePage } from "@inertiajs/react";
 import { useCallback, useEffect, useRef } from "react";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInUp, fadeInLeft, fadeInRight } from "@/lib/animations";
 import {
     Mail,
     Phone,
@@ -20,6 +22,15 @@ export default function ContactPage({
 }) {
     const { flash } = usePage().props;
     const recaptchaTokenRef = useRef("");
+    const heroRef = useRef(null);
+    const infoRef = useRef(null);
+    const formRef = useRef(null);
+
+    useGsap(() => {
+        fadeInUp(heroRef.current);
+        fadeInLeft(infoRef.current, { delay: 0.1 });
+        fadeInRight(formRef.current, { delay: 0.2 });
+    }, []);
 
     const { data, setData, post, processing, errors, reset, transform } =
         useForm({
@@ -100,7 +111,7 @@ export default function ContactPage({
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10" />
 
                 <div className="container mx-auto relative z-10">
-                    <div className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-16">
+                    <div ref={heroRef} className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-16">
                         <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-foreground via-accent to-primary bg-clip-text text-transparent">
                             Get In Touch
                         </h1>
@@ -130,7 +141,7 @@ export default function ContactPage({
                     )}
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 max-w-6xl mx-auto">
-                        <div className="lg:col-span-1">
+                        <div ref={infoRef} className="lg:col-span-1">
                             <div className="glass-card rounded-xl p-5 sm:p-6 md:p-8 border border-border/50 h-full">
                                 <h2 className="font-heading font-bold text-lg sm:text-xl md:text-2xl mb-5 sm:mb-6">
                                     Contact Information
@@ -212,7 +223,7 @@ export default function ContactPage({
                             </div>
                         </div>
 
-                        <div className="lg:col-span-2">
+                        <div ref={formRef} className="lg:col-span-2">
                             <div className="glass-card rounded-xl p-5 sm:p-6 md:p-8 border border-border/50">
                                 <h2 className="font-heading font-bold text-lg sm:text-xl md:text-2xl mb-5 sm:mb-6">
                                     Send Us a Message

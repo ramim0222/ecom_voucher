@@ -6,11 +6,17 @@ import { GamingButton } from "@/Components/ui/GamingButton";
 import { WishlistItem } from "@/Components/Wishlist/WishlistItem";
 import { WishlistSummary } from "@/Components/Wishlist/WishlistSummary";
 import { Link, router, usePage } from "@inertiajs/react";
+import { usePageAnimations } from "@/hooks/usePageAnimations";
 
 export default function WishlistPage({
     wishlistItems: initialWishlistItems = [],
 }) {
     const [wishlistItems, setWishlistItems] = useState(initialWishlistItems);
+    const refs = usePageAnimations({
+        header: true,
+        list: true,
+        split: true,
+    });
     const { props } = usePage();
     const { flash, auth } = props;
 
@@ -41,13 +47,9 @@ export default function WishlistPage({
             {},
             {
                 preserveScroll: true,
+                preserveState: true,
                 onError: () => {
-                    // Revert on error
                     setWishlistItems(previous);
-                },
-                onFinish: () => {
-                    // Optionally reload counts or server truth
-                    router.reload({ only: ["wishlistItems"] });
                 },
             }
         );
@@ -59,11 +61,9 @@ export default function WishlistPage({
 
         router.delete(`/wishlist/${id}`, {
             preserveScroll: true,
+            preserveState: true,
             onError: () => {
                 setWishlistItems(previous);
-            },
-            onFinish: () => {
-                router.reload({ only: ["wishlistItems"] });
             },
         });
     };
@@ -82,11 +82,9 @@ export default function WishlistPage({
             {},
             {
                 preserveScroll: true,
+                preserveState: true,
                 onError: () => {
                     setWishlistItems(previous);
-                },
-                onFinish: () => {
-                    router.reload({ only: ["wishlistItems"] });
                 },
             }
         );
@@ -97,8 +95,8 @@ export default function WishlistPage({
         setWishlistItems([]);
         router.delete("/wishlist", {
             preserveScroll: true,
+            preserveState: true,
             onError: () => setWishlistItems(previous),
-            onFinish: () => router.reload({ only: ["wishlistItems"] }),
         });
     };
 
@@ -134,7 +132,7 @@ export default function WishlistPage({
         <SiteLayout>
 
             <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-                <div className="mb-8">
+                <div ref={refs.header} className="mb-8">
                     <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-2">
                         My Wishlist
                     </h1>
@@ -161,7 +159,7 @@ export default function WishlistPage({
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Wishlist Items */}
-                    <div className="lg:col-span-2 space-y-4">
+                    <div ref={refs.left} className="lg:col-span-2 space-y-4">
                         {wishlistItems.map((item) => (
                             <WishlistItem
                                 key={item.id}
@@ -188,7 +186,7 @@ export default function WishlistPage({
                     </div>
 
                     {/* Wishlist Summary */}
-                    <div className="lg:col-span-1">
+                    <div ref={refs.summary} className="lg:col-span-1">
                         <WishlistSummary
                             totalItems={wishlistItems.length}
                             totalValue={totalValue}

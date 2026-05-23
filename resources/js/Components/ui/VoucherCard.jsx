@@ -1,5 +1,9 @@
 import { cn } from "@/lib/utils";
 import { Link } from "@inertiajs/react";
+import { useRef } from "react";
+import { useGsap } from "@/hooks/useGsap";
+import gsap from "gsap";
+import { mm } from "@/lib/animations";
 
 export function VoucherCard({
     title,
@@ -14,6 +18,46 @@ export function VoucherCard({
     className,
     ...props
 }) {
+    const cardRef = useRef(null);
+
+    useGsap(() => {
+        const card = cardRef.current;
+
+        if (!card) {
+            return;
+        }
+
+        mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+            const onEnter = () => {
+                gsap.to(card, {
+                    y: -6,
+                    scale: 1.02,
+                    duration: 0.2,
+                    ease: "power2.out",
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.35)",
+                });
+            };
+
+            const onLeave = () => {
+                gsap.to(card, {
+                    y: 0,
+                    scale: 1,
+                    duration: 0.2,
+                    ease: "power2.out",
+                    boxShadow: "none",
+                });
+            };
+
+            card.addEventListener("mouseenter", onEnter);
+            card.addEventListener("mouseleave", onLeave);
+
+            return () => {
+                card.removeEventListener("mouseenter", onEnter);
+                card.removeEventListener("mouseleave", onLeave);
+            };
+        });
+    }, []);
+
     const cardClasses = cn(
         "glass-card rounded-xl p-4 hover-lift group cursor-pointer block",
         className
@@ -91,14 +135,14 @@ export function VoucherCard({
 
     if (href) {
         return (
-            <Link href={href} className={cardClasses}>
+            <Link href={href} ref={cardRef} className={cardClasses}>
                 {content}
             </Link>
         );
     }
 
     return (
-        <div className={cardClasses} {...props}>
+        <div ref={cardRef} className={cardClasses} {...props}>
             {content}
         </div>
     );

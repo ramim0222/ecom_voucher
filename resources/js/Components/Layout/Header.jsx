@@ -1,7 +1,9 @@
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { usePage, Link, router } from "@inertiajs/react";
 import Dropdown from "@/Components/Dropdown";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { slideDown } from "@/lib/animations";
 
 export function Header() {
     const {
@@ -22,6 +24,8 @@ export function Header() {
         branding?.brand_description || "Premium Gaming Vouchers";
     const logoPath = branding?.logo_path || "";
     const brandInitial = brandName.charAt(0).toUpperCase() || "G";
+    const mobileNavRef = useRef(null);
+    const categoriesPanelRef = useRef(null);
 
     const closeMobileMenu = () => {
         setIsMobileMenuOpen(false);
@@ -69,6 +73,34 @@ export function Header() {
 
         return () => window.removeEventListener("resize", onResize);
     }, []);
+
+    useEffect(() => {
+        const nav = mobileNavRef.current;
+
+        if (!nav) {
+            return undefined;
+        }
+
+        if (isMobileMenuOpen) {
+            gsap.fromTo(
+                nav,
+                { y: -20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" },
+            );
+        } else {
+            gsap.set(nav, { clearProps: "all" });
+        }
+    }, [isMobileMenuOpen]);
+
+    useEffect(() => {
+        const panel = categoriesPanelRef.current;
+
+        if (!panel) {
+            return undefined;
+        }
+
+        slideDown(panel, isCategoriesOpen);
+    }, [isCategoriesOpen]);
 
     return (
         <header className="sticky top-0 z-50 glass-card border-b border-border/50 shrink-0">
@@ -269,6 +301,7 @@ export function Header() {
             {isMobileMenuOpen && (
                 <div
                     id="mobile-nav"
+                    ref={mobileNavRef}
                     className="relative z-50 max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t border-border/50 bg-background/95 backdrop-blur-xl lg:hidden"
                 >
                     <nav className="container mx-auto flex flex-col gap-1 px-3 py-4 sm:px-4 md:px-6">
@@ -307,7 +340,10 @@ export function Header() {
                                     </span>
                                 </button>
                                 {isCategoriesOpen && (
-                                    <div className="dropdown-scroll max-h-48 space-y-1 overflow-y-auto overflow-x-hidden pb-2 pl-3">
+                                    <div
+                                        ref={categoriesPanelRef}
+                                        className="dropdown-scroll max-h-48 space-y-1 overflow-y-auto overflow-x-hidden pb-2 pl-3"
+                                    >
                                         {(categories || []).map((cat) => (
                                             <Link
                                                 key={cat.id}

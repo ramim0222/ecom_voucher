@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import { ChevronDown, ChevronUp, Search, HelpCircle } from "lucide-react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInUp, staggerInOnScroll } from "@/lib/animations";
 
 export default function Faq({ page = {} }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedFaq, setExpandedFaq] = useState(null);
+    const heroRef = useRef(null);
+    const faqListRef = useRef(null);
 
     const title = page.title || "Frequently Asked Questions";
     const subtitle =
@@ -21,6 +25,16 @@ export default function Faq({ page = {} }) {
             faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    useGsap(() => {
+        fadeInUp(heroRef.current);
+
+        if (faqListRef.current) {
+            staggerInOnScroll(faqListRef.current.children, 0.06, {
+                trigger: faqListRef.current,
+            });
+        }
+    }, []);
+
     return (
         <SiteLayout>
             <Head title={title} />
@@ -29,7 +43,7 @@ export default function Faq({ page = {} }) {
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10" />
 
                 <div className="container mx-auto relative z-10 max-w-4xl">
-                    <div className="text-center mb-8 sm:mb-10 md:mb-12">
+                    <div ref={heroRef} className="text-center mb-8 sm:mb-10 md:mb-12">
                         <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-xl mb-4">
                             <HelpCircle className="h-8 w-8 text-accent" />
                         </div>
@@ -53,7 +67,7 @@ export default function Faq({ page = {} }) {
                     </div>
 
                     {filteredFaqs.length > 0 ? (
-                        <div className="space-y-3 sm:space-y-4">
+                        <div ref={faqListRef} className="space-y-3 sm:space-y-4">
                             {filteredFaqs.map((faq, index) => (
                                 <div
                                     key={`${faq.question}-${index}`}

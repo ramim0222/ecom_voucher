@@ -6,7 +6,8 @@ import { GamingButton } from "@/Components/ui/GamingButton";
 import { ProductFilters } from "@/Components/Product/ProductFilter";
 import { ProductSort } from "@/Components/Product/ProductSort";
 import { Link, usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { usePageAnimations } from "@/hooks/usePageAnimations";
 
 export default function ProductsPage({ products = [], filters = {} }) {
     const { branding = {}, categories = [] } = usePage().props;
@@ -15,6 +16,7 @@ export default function ProductsPage({ products = [], filters = {} }) {
         branding?.products_description ||
         "Discover the best deals on gaming vouchers for all your favorite platforms";
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+    const refs = usePageAnimations({ header: true, sidebar: true, grid: true });
 
     const activeCategoryNames = (filters.categories ?? [])
         .map((id) => categories.find((c) => String(c.id) === String(id))?.name)
@@ -30,7 +32,7 @@ export default function ProductsPage({ products = [], filters = {} }) {
             {/* Page Header */}
             <section className="py-6 sm:py-8 md:py-10 lg:py-12 xl:py-16 2xl:py-20 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 bg-gradient-to-r from-primary/10 to-accent/5">
                 <div className="container mx-auto">
-                    <div className="text-center mb-6 sm:mb-8 lg:mb-8 xl:mb-10 2xl:mb-12">
+                    <div ref={refs.header} className="text-center mb-6 sm:mb-8 lg:mb-8 xl:mb-10 2xl:mb-12">
                         <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl mb-3 sm:mb-4 md:mb-4 lg:mb-6 xl:mb-8 2xl:mb-10">
                             {productsTitle}
                         </h1>
@@ -77,6 +79,7 @@ export default function ProductsPage({ products = [], filters = {} }) {
 
                     {/* Filters Sidebar */}
                     <aside
+                        ref={refs.sidebar}
                         className={`lg:w-64 lg:flex-shrink-0 ${
                             isFiltersOpen ? "block" : "hidden lg:block"
                         }`}
@@ -91,7 +94,10 @@ export default function ProductsPage({ products = [], filters = {} }) {
 
                     {/* Products Grid */}
                     <main className="flex-1">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
+                        <div
+                            ref={refs.grid}
+                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10"
+                        >
                             {products.map((product) => (
                                 <VoucherCard
                                     key={product.id}

@@ -3,7 +3,9 @@ import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { VoucherCard } from "@/Components/ui/VoucherCard";
 import { Link, usePage } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInUp, staggerInOnScroll } from "@/lib/animations";
 
 export default function HomePage({
     featuredProducts = [],
@@ -26,6 +28,34 @@ export default function HomePage({
     const categoriesTitle =
         branding?.categories_title || "Browse by Platform";
     const [showScrollTop, setShowScrollTop] = useState(false);
+    const heroTitleRef = useRef(null);
+    const heroDescRef = useRef(null);
+    const heroCtaRef = useRef(null);
+    const featuredGridRef = useRef(null);
+    const discountedGridRef = useRef(null);
+    const categoriesSectionRef = useRef(null);
+
+    useGsap(() => {
+        fadeInUp(heroTitleRef.current, { delay: 0.05 });
+        fadeInUp(heroDescRef.current, { delay: 0.15 });
+        fadeInUp(heroCtaRef.current, { delay: 0.25 });
+
+        if (featuredGridRef.current) {
+            staggerInOnScroll(featuredGridRef.current.children, 0.08, {
+                trigger: featuredGridRef.current,
+            });
+        }
+
+        if (discountedGridRef.current) {
+            staggerInOnScroll(discountedGridRef.current.children, 0.08, {
+                trigger: discountedGridRef.current,
+            });
+        }
+
+        if (categoriesSectionRef.current) {
+            fadeInUp(categoriesSectionRef.current);
+        }
+    }, []);
 
     useEffect(() => {
         const onScroll = () => setShowScrollTop(window.scrollY > 300);
@@ -42,13 +72,22 @@ export default function HomePage({
             <section className="relative py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 2xl:py-32 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10"></div>
                 <div className="container mx-auto text-center relative z-10">
-                    <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl mb-4 sm:mb-5 md:mb-6 lg:mb-8 xl:mb-10 2xl:mb-12 bg-gradient-to-r from-foreground via-accent to-primary bg-clip-text text-transparent leading-tight">
+                    <h1
+                        ref={heroTitleRef}
+                        className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl mb-4 sm:mb-5 md:mb-6 lg:mb-8 xl:mb-10 2xl:mb-12 bg-gradient-to-r from-foreground via-accent to-primary bg-clip-text text-transparent leading-tight"
+                    >
                         {heroTitle}
                     </h1>
-                    <p className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl 2xl:text-2xl text-muted-foreground mb-6 sm:mb-7 md:mb-8 lg:mb-8 xl:mb-10 2xl:mb-12 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl mx-auto px-2 sm:px-0">
+                    <p
+                        ref={heroDescRef}
+                        className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl 2xl:text-2xl text-muted-foreground mb-6 sm:mb-7 md:mb-8 lg:mb-8 xl:mb-10 2xl:mb-12 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl mx-auto px-2 sm:px-0"
+                    >
                         {heroDescription}
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                    <div
+                        ref={heroCtaRef}
+                        className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
+                    >
                         <Link href={route("products")}>
                             <GamingButton
                                 variant="accent"
@@ -74,7 +113,10 @@ export default function HomePage({
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
+                    <div
+                        ref={featuredGridRef}
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10"
+                    >
                         {featuredProducts.map((product) => (
                             <VoucherCard
                                 key={product.id}
@@ -135,7 +177,10 @@ export default function HomePage({
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10">
+                    <div
+                        ref={discountedGridRef}
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10"
+                    >
                         {discountedProducts.map((product) => (
                             <VoucherCard
                                 key={product.id}
@@ -185,7 +230,10 @@ export default function HomePage({
             </section>
 
             {/* Categories */}
-            <section className="py-8 sm:py-12 md:py-16 lg:py-16 xl:py-20 2xl:py-24 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 bg-card/30">
+            <section
+                ref={categoriesSectionRef}
+                className="py-8 sm:py-12 md:py-16 lg:py-16 xl:py-20 2xl:py-24 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 bg-card/30"
+            >
                 <div className="container mx-auto">
                     <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-5xl text-center mb-8 sm:mb-10 md:mb-12 lg:mb-12 xl:mb-16 2xl:mb-20">
                         {categoriesTitle}

@@ -1,14 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Head, Link, router } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInUp, staggerIn } from "@/lib/animations";
 
 export default function OrdersPage({ orders = { data: [] } }) {
     const [filter, setFilter] = useState("all");
     const [copiedCode, setCopiedCode] = useState(null);
+    const headerRef = useRef(null);
+    const filtersRef = useRef(null);
+    const ordersListRef = useRef(null);
+
+    useGsap(() => {
+        fadeInUp(headerRef.current);
+        fadeInUp(filtersRef.current, { delay: 0.1 });
+
+        if (ordersListRef.current) {
+            staggerIn(ordersListRef.current.children, 0.06, { delay: 0.15 });
+        }
+    }, []);
 
     const copyToClipboard = async (code) => {
         try {
@@ -24,7 +38,10 @@ export default function OrdersPage({ orders = { data: [] } }) {
         if (
             confirm("Are you sure you want to cancel this order?")
         ) {
-            router.post(route("orders.cancel", orderId));
+            router.post(route("orders.cancel", orderId), {}, {
+                preserveScroll: true,
+                preserveState: true,
+            });
         }
     };
 
@@ -79,7 +96,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
                         {/* Header Section */}
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="space-y-2">
+                            <div ref={headerRef} className="space-y-2">
                                 <h1 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
                                     Order History
                                 </h1>
@@ -89,7 +106,7 @@ export default function OrdersPage({ orders = { data: [] } }) {
                             </div>
 
                             {/* Filter Buttons - Responsive Layout */}
-                            <div className="flex flex-wrap gap-2">
+                            <div ref={filtersRef} className="flex flex-wrap gap-2">
                                 {/* Mobile: Stack vertically on very small screens */}
                                 <div className="flex flex-col gap-2 w-full sm:hidden">
                                     {filterOptions.map((option) => (
@@ -135,7 +152,10 @@ export default function OrdersPage({ orders = { data: [] } }) {
 
                         {/* Orders Container */}
                         <div className="glass-card rounded-xl p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10">
-                            <div className="space-y-3 sm:space-y-4 md:space-y-6">
+                            <div
+                                ref={ordersListRef}
+                                className="space-y-3 sm:space-y-4 md:space-y-6"
+                            >
                                 {filteredOrders.length > 0 ? (
                                     filteredOrders.map((order) => (
                                         <div

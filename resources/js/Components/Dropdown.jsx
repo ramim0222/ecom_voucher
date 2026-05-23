@@ -1,6 +1,7 @@
 import { Transition } from '@headlessui/react';
 import { Link } from '@inertiajs/react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useRef, useState } from 'react';
+import { dropdownEnter, dropdownLeave } from '@/lib/animations';
 
 const DropDownContext = createContext();
 
@@ -42,6 +43,7 @@ const Content = ({
     children,
 }) => {
     const { open, setOpen } = useContext(DropDownContext);
+    const contentRef = useRef(null);
 
     let alignmentClasses = 'origin-top';
 
@@ -61,18 +63,31 @@ const Content = ({
         <>
             <Transition
                 show={open}
-                enter="transition ease-out duration-200"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
+                enter=""
+                enterFrom=""
+                enterTo=""
+                leave=""
+                leaveFrom=""
+                leaveTo=""
+                afterEnter={() => {
+                    if (contentRef.current) {
+                        dropdownEnter(contentRef.current);
+                    }
+                }}
+                beforeLeave={(done) => {
+                    if (contentRef.current) {
+                        dropdownLeave(contentRef.current, done);
+                    } else {
+                        done();
+                    }
+                }}
             >
                 <div
                     className={`absolute z-50 mt-2 rounded-md shadow-lg ${alignmentClasses} ${widthClasses}`}
                     onClick={() => setOpen(false)}
                 >
                     <div
+                        ref={contentRef}
                         className={
                             `rounded-md ring-1 ring-black ring-opacity-5 ` +
                             contentClasses

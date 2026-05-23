@@ -30,7 +30,7 @@ export function DashboardLayout({ children }) {
             {/* Sidebar */}
             <aside
                 className={`fixed lg:static inset-y-0 left-0 z-50 w-64 glass-card transform transition-transform duration-200 ease-in-out lg:translate-x-0 ${
-                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 }`}
             >
                 <div className="flex flex-col h-full p-6">
@@ -39,6 +39,7 @@ export function DashboardLayout({ children }) {
                             <Link
                                 key={item.href}
                                 href={item.href}
+                                onClick={() => setIsSidebarOpen(false)}
                                 className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors group"
                             >
                                 <span className="text-xl">{item.icon}</span>
@@ -48,7 +49,6 @@ export function DashboardLayout({ children }) {
                             </Link>
                         ))}
 
-                        {/* Logout item handled separately */}
                         <button
                             onClick={handleLogout}
                             className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors group w-full text-left"

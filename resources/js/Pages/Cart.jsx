@@ -6,11 +6,17 @@ import { GamingButton } from "@/Components/ui/GamingButton";
 import { CartItem } from "@/Components/Cart/CartItem";
 import { CartSummary } from "@/Components/Cart/CartSummary";
 import { Link, router, usePage } from "@inertiajs/react";
+import { usePageAnimations } from "@/hooks/usePageAnimations";
 
 export default function CartPage({ cartItems: initialCartItems = [] }) {
     const { props } = usePage();
     const { flash, auth } = props;
     const [cartItems, setCartItems] = useState(initialCartItems);
+    const refs = usePageAnimations({
+        header: true,
+        list: true,
+        split: true,
+    });
 
     // Update local state when props change
     useEffect(() => {
@@ -53,9 +59,10 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
             `/cart/${id}`,
             { quantity: newQuantity },
             {
+                preserveScroll: true,
+                preserveState: true,
                 onError: () => {
-                    // Revert on error and reload fresh data
-                    router.reload({ only: ["cartItems"] });
+                    setCartItems(initialCartItems);
                 },
             }
         );
@@ -67,9 +74,10 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
 
         // Send request to server
         router.delete(`/cart/${id}`, {
+            preserveScroll: true,
+            preserveState: true,
             onError: () => {
-                // Revert on error and reload fresh data
-                router.reload({ only: ["cartItems"] });
+                setCartItems(initialCartItems);
             },
         });
     };
@@ -81,9 +89,10 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
 
             // Send request to server
             router.delete("/cart", {
+                preserveScroll: true,
+                preserveState: true,
                 onError: () => {
-                    // Revert on error and reload fresh data
-                    router.reload({ only: ["cartItems"] });
+                    setCartItems(initialCartItems);
                 },
             });
         }
@@ -123,7 +132,7 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
         <SiteLayout>
 
             <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-                <div className="mb-8">
+                <div ref={refs.header} className="mb-8">
                     <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-2">
                         Shopping Cart
                     </h1>
@@ -147,7 +156,7 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Cart Items */}
-                    <div className="lg:col-span-2 space-y-4">
+                    <div ref={refs.left} className="lg:col-span-2 space-y-4">
                         {cartItems.map((item) => (
                             <CartItem
                                 key={item.id}
@@ -174,7 +183,7 @@ export default function CartPage({ cartItems: initialCartItems = [] }) {
                     </div>
 
                     {/* Cart Summary */}
-                    <div className="lg:col-span-1">
+                    <div ref={refs.summary} className="lg:col-span-1">
                         <CartSummary
                             subtotal={subtotal}
                             total={total}

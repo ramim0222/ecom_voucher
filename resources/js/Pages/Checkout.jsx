@@ -5,6 +5,7 @@ import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { CheckoutForm } from "@/Components/Checkout/CheckoutForm";
 import { OrderSummary } from "@/Components/Checkout/OrderSummary";
 import { usePage } from "@inertiajs/react";
+import { usePageAnimations } from "@/hooks/usePageAnimations";
 
 export default function CheckoutPage({ cartItems = [], user }) {
     const { props } = usePage();
@@ -46,6 +47,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
     }, [cartItems]);
 
     const [currentStep, setCurrentStep] = useState(1);
+    const refs = usePageAnimations({ header: true, form: true });
 
     const steps = [
         { number: 1, title: "Customer Info", completed: false },
@@ -57,7 +59,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
         <SiteLayout>
 
             <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-                <div className="mb-8">
+                <div ref={refs.header} className="mb-8">
                     <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl mb-4">
                         Checkout
                     </h1>
@@ -103,7 +105,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Checkout Form */}
-                    <div className="lg:col-span-2">
+                    <div ref={refs.form} className="lg:col-span-2">
                         <CheckoutForm
                             currentStep={currentStep}
                             onStepChange={setCurrentStep}
@@ -113,7 +115,7 @@ export default function CheckoutPage({ cartItems = [], user }) {
                     </div>
 
                     {/* Order Summary */}
-                    <div className="lg:col-span-1">
+                    <div ref={refs.summary} className="lg:col-span-1">
                         <OrderSummary orderData={orderData} />
                     </div>
                 </div>

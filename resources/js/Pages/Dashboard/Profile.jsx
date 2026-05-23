@@ -1,14 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Head, useForm, usePage } from "@inertiajs/react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
 import { DashboardLayout } from "@/Components/Dashboard/DashboardLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInUp, staggerIn } from "@/lib/animations";
 
 export default function ProfilePage({ user, status }) {
     const { props } = usePage();
     const [activeTab, setActiveTab] = useState("profile");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deletePassword, setDeletePassword] = useState("");
+    const headerRef = useRef(null);
+    const contentRef = useRef(null);
+
+    useGsap(() => {
+        fadeInUp(headerRef.current);
+
+        if (contentRef.current) {
+            staggerIn(contentRef.current.children, 0.08, { delay: 0.1 });
+        }
+    }, []);
 
     // Profile form
     const {
@@ -107,7 +119,7 @@ export default function ProfilePage({ user, status }) {
             <Head title="Profile Settings" />
             <DashboardLayout>
                 <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-6 xl:space-y-8 2xl:space-y-10">
-                    <div>
+                    <div ref={headerRef}>
                         <h1 className="font-heading font-bold text-xl sm:text-2xl md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-4xl mb-2 sm:mb-3 md:mb-3 lg:mb-4 xl:mb-5 2xl:mb-6">
                             Account Settings
                         </h1>
@@ -116,7 +128,7 @@ export default function ProfilePage({ user, status }) {
                         </p>
                     </div>
 
-                    <div className="glass-card rounded-xl p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 2xl:p-10">
+                    <div ref={contentRef} className="glass-card rounded-xl p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 2xl:p-10">
                         {/* Tab Navigation */}
                         <div className="flex flex-col sm:flex-row border-b border-border mb-4 sm:mb-5 md:mb-6 lg:mb-6 xl:mb-8 2xl:mb-10">
                             {tabs.map((tab) => (

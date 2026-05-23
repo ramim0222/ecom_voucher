@@ -1,8 +1,11 @@
 "use client";
 
+import { useRef } from "react";
 import { Head, Link } from "@inertiajs/react";
 import { FileText } from "lucide-react";
 import { SiteLayout } from "@/Components/Layout/SiteLayout";
+import { useGsap } from "@/hooks/useGsap";
+import { fadeInUp, revealOnScroll } from "@/lib/animations";
 
 function renderContent(content = "") {
     return content
@@ -42,6 +45,13 @@ export default function PolicyPage({ page = {} }) {
     const title = page.title || "Policy";
     const subtitle = page.subtitle || "";
     const content = page.content || "";
+    const heroRef = useRef(null);
+    const contentRef = useRef(null);
+
+    useGsap(() => {
+        fadeInUp(heroRef.current);
+        revealOnScroll(contentRef.current, { delay: 0.1 });
+    }, []);
 
     return (
         <SiteLayout>
@@ -51,7 +61,7 @@ export default function PolicyPage({ page = {} }) {
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10" />
 
                 <div className="container mx-auto relative z-10 max-w-3xl">
-                    <div className="text-center mb-8 sm:mb-10 md:mb-12">
+                    <div ref={heroRef} className="text-center mb-8 sm:mb-10 md:mb-12">
                         <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-xl mb-4">
                             <FileText className="h-8 w-8 text-accent" />
                         </div>
@@ -65,7 +75,10 @@ export default function PolicyPage({ page = {} }) {
                         )}
                     </div>
 
-                    <div className="glass-card rounded-xl border border-border/50 p-5 sm:p-6 md:p-8">
+                    <div
+                        ref={contentRef}
+                        className="glass-card rounded-xl border border-border/50 p-5 sm:p-6 md:p-8"
+                    >
                         {content ? (
                             <div>{renderContent(content)}</div>
                         ) : (

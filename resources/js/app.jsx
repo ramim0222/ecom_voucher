@@ -5,6 +5,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { ToastProvider } from '@/Components/Admin/ToastProvider';
+import PageTransition from '@/Components/PageTransition';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -20,7 +21,9 @@ createInertiaApp({
             hydrateRoot(
                 el,
                 <ToastProvider>
-                    <App {...props} />
+                    <PageTransition>
+                        <App {...props} />
+                    </PageTransition>
                 </ToastProvider>,
             );
             return;
@@ -28,7 +31,9 @@ createInertiaApp({
 
         createRoot(el).render(
             <ToastProvider>
-                <App {...props} />
+                <PageTransition>
+                    <App {...props} />
+                </PageTransition>
             </ToastProvider>,
         );
     },
