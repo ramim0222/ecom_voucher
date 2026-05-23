@@ -1,59 +1,62 @@
 "use client";
 
 import { useState } from "react";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { UserAccountInfo } from "@/Components/Admin/UserAccountInfo";
 import { UserOrderHistory } from "@/Components/Admin/UserOrderHistory";
-import { AdminActionModal } from "@/Components/Admin/AdminActionModal";
+import { ConfirmModal } from "@/Components/Admin/ConfirmModal";
 
-export default function AdminUserProfilePage({ user }) {
+export default function AdminUserProfilePage({ user, orders = [] }) {
+    const { flash, errors } = usePage().props;
     const [activeTab, setActiveTab] = useState("account");
-    const [actionModal, setActionModal] = useState({
-        isOpen: false,
-        type: "",
-        title: "",
-        message: "",
-    });
+    const [showBanModal, setShowBanModal] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleAdminAction = (actionType) => {
-        const actions = {
-            deactivate: {
-                title: "Deactivate Account",
-                message: `Are you sure you want to deactivate ${user.firstName} ${user.lastName}'s account? They will no longer be able to access their account or make purchases.`,
-            },
-        };
+    const isBanned = user.status === "banned";
+    const nextStatus = isBanned ? "active" : "banned";
 
-        setActionModal({
-            isOpen: true,
-            type: actionType,
-            ...actions[actionType],
-        });
-    };
+    const handleConfirmStatusChange = () => {
+        setLoading(true);
 
-    const handleConfirmAction = async (actionType, data) => {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        switch (actionType) {
-            case "deactivate":
-                alert("Account deactivated successfully");
-                break;
-            case "sendEmail":
-                alert(`Email sent to ${user.email}`);
-                break;
-            case "resetPassword":
-                alert("Password reset link sent");
-                break;
-        }
-
-        setActionModal({ isOpen: false, type: "", title: "", message: "" });
+        router.patch(
+            route("admin.users.update-status", user.id),
+            { status: nextStatus },
+            {
+                preserveScroll: true,
+                onSuccess: () => setShowBanModal(false),
+                onError: (errors) => {
+                    console.error("Status update failed:", errors);
+                    alert(
+                        errors.error ||
+                            "Failed to update user status. Please try again."
+                    );
+                },
+                onFinish: () => setLoading(false),
+            }
+        );
     };
 
     return (
         <AdminLayout>
             <div className="space-y-6">
+                {flash?.success && (
+                    <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg">
+                        {flash.success}
+                    </div>
+                )}
+                {flash?.error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg">
+                        {flash.error}
+                    </div>
+                )}
+                {errors?.error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg">
+                        {errors.error}
+                    </div>
+                )}
+
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <GamingButton
@@ -108,7 +111,7 @@ export default function AdminUserProfilePage({ user }) {
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-white">
-                                    User Order Count
+                                    {user.orders_count ?? 0}
                                 </div>
                                 <div className="text-slate-400 text-sm">
                                     Total Orders
@@ -116,7 +119,8 @@ export default function AdminUserProfilePage({ user }) {
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-white">
-                                    User Total Spent
+                                    Tk{" "}
+                                    {Number(user.total_spent ?? 0).toFixed(2)}
                                 </div>
                                 <div className="text-slate-400 text-sm">
                                     Total Spent
@@ -140,10 +144,15 @@ export default function AdminUserProfilePage({ user }) {
                         <GamingButton
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleAdminAction("deactivate")}
-                            className="text-red-400 hover:text-red-300"
+                            onClick={() => setShowBanModal(true)}
+                            disabled={loading}
+                            className={
+                                isBanned
+                                    ? "text-green-400 hover:text-green-300"
+                                    : "text-red-400 hover:text-red-300"
+                            }
                         >
-                            🚫 Ban Account
+                            {isBanned ? "✅ Unban Account" : "🚫 Ban Account"}
                         </GamingButton>
                     </div>
                 </div>
@@ -180,28 +189,25 @@ export default function AdminUserProfilePage({ user }) {
                             <UserAccountInfo user={user} />
                         )}
                         {activeTab === "orders" && (
-                            <UserOrderHistory userId={user.id} />
+                            <UserOrderHistory orders={orders} />
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Admin Action Modal */}
-            <AdminActionModal
-                isOpen={actionModal.isOpen}
-                onClose={() =>
-                    setActionModal({
-                        isOpen: false,
-                        type: "",
-                        title: "",
-                        message: "",
-                    })
+            <ConfirmModal
+                isOpen={showBanModal}
+                onClose={() => !loading && setShowBanModal(false)}
+                onConfirm={handleConfirmStatusChange}
+                title={isBanned ? "Unban Account" : "Ban Account"}
+                message={
+                    isBanned
+                        ? `Are you sure you want to unban ${user.first_name} ${user.last_name}? They will regain access to their account and be able to make purchases again.`
+                        : `Are you sure you want to ban ${user.first_name} ${user.last_name}? They will no longer be able to access their account or make purchases.`
                 }
-                onConfirm={handleConfirmAction}
-                type={actionModal.type}
-                title={actionModal.title}
-                message={actionModal.message}
-                user={user}
+                confirmText={isBanned ? "Unban Account" : "Ban Account"}
+                confirmVariant={isBanned ? "success" : "danger"}
+                icon={isBanned ? "✅" : "⚠️"}
             />
         </AdminLayout>
     );

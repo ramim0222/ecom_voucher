@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
+use App\Models\Order;
 
 class UserController extends Controller
 {
@@ -46,8 +47,37 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::findOrFail($id);
-        return Inertia::render('Admin/Users/Page', ['user' => $user]);
+        $user = User::withCount('orders')
+            ->withSum(['orders as total_spent' => function ($query) {
+                $query->where('payment_status', 'paid');
+            }], 'total_amount')
+            ->findOrFail($id);
+
+        $orders = Order::where('user_id', $id)
+            ->with(['orderItems.product'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'created_at' => $order->created_at,
+                    'status' => $order->status,
+                    'total_amount' => $order->total_amount,
+                    'items' => $order->orderItems->map(function ($item) {
+                        return [
+                            'name' => $item->product->title ?? 'Unknown Product',
+                            'quantity' => $item->quantity,
+                            'price' => $item->unit_price,
+                        ];
+                    }),
+                ];
+            });
+
+        return Inertia::render('Admin/Users/Page', [
+            'user' => $user,
+            'orders' => $orders,
+        ]);
     }
 
     /**

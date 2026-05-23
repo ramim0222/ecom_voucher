@@ -1,59 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { router } from "@inertiajs/react";
 
-export function UserOrderHistory({ userId }) {
-    const [orders] = useState([
-        {
-            id: "ORD-2024-001",
-            date: "2024-01-20T10:30:00Z",
-            status: "delivered",
-            total: 89.99,
-            items: [
-                { name: "Steam $50 Gift Card", quantity: 1, price: 50.0 },
-                { name: "PlayStation Plus 1 Month", quantity: 1, price: 39.99 },
-            ],
-        },
-        {
-            id: "ORD-2024-002",
-            date: "2024-01-15T14:22:00Z",
-            status: "processing",
-            total: 129.98,
-            items: [
-                {
-                    name: "Xbox Game Pass Ultimate 3 Months",
-                    quantity: 1,
-                    price: 129.98,
-                },
-            ],
-        },
-        {
-            id: "ORD-2023-045",
-            date: "2023-12-28T09:15:00Z",
-            status: "delivered",
-            total: 199.97,
-            items: [
-                {
-                    name: "Nintendo eShop $100 Gift Card",
-                    quantity: 1,
-                    price: 100.0,
-                },
-                { name: "Steam $50 Gift Card", quantity: 1, price: 50.0 },
-                { name: "Epic Games $25 Gift Card", quantity: 1, price: 49.97 },
-            ],
-        },
-    ]);
-
+export function UserOrderHistory({ orders = [] }) {
     const getStatusColor = (status) => {
         switch (status) {
-            case "delivered":
+            case "completed":
                 return "text-green-400 bg-green-400/20";
             case "processing":
                 return "text-yellow-400 bg-yellow-400/20";
+            case "pending":
+                return "text-blue-400 bg-blue-400/20";
             case "cancelled":
                 return "text-red-400 bg-red-400/20";
+            case "refunded":
+                return "text-purple-400 bg-purple-400/20";
             default:
                 return "text-slate-400 bg-slate-400/20";
         }
@@ -90,15 +52,15 @@ export function UserOrderHistory({ userId }) {
                                 <div className="flex items-center gap-4">
                                     <div>
                                         <h4 className="font-medium text-white">
-                                            {order.id}
+                                            {order.order_number}
                                         </h4>
                                         <p className="text-slate-400 text-sm">
                                             {new Date(
-                                                order.date
+                                                order.created_at
                                             ).toLocaleDateString()}{" "}
                                             at{" "}
                                             {new Date(
-                                                order.date
+                                                order.created_at
                                             ).toLocaleTimeString()}
                                         </p>
                                     </div>
@@ -113,10 +75,13 @@ export function UserOrderHistory({ userId }) {
                                 <div className="flex items-center gap-4">
                                     <div className="text-right">
                                         <div className="text-white font-medium">
-                                            Tk {order.total.toFixed(2)}
+                                            Tk{" "}
+                                            {parseFloat(
+                                                order.total_amount || 0
+                                            ).toFixed(2)}
                                         </div>
                                         <div className="text-slate-400 text-sm">
-                                            {order.items.length} items
+                                            {order.items?.length || 0} items
                                         </div>
                                     </div>
                                     <GamingButton
@@ -137,29 +102,33 @@ export function UserOrderHistory({ userId }) {
                                 </div>
                             </div>
 
-                            {/* Order Items */}
-                            <div className="border-t border-slate-600 pt-4">
-                                <div className="space-y-2">
-                                    {order.items.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center justify-between text-sm"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-slate-400">
-                                                    ×{item.quantity}
-                                                </span>
-                                                <span className="text-white">
-                                                    {item.name}
+                            {order.items?.length > 0 && (
+                                <div className="border-t border-slate-600 pt-4">
+                                    <div className="space-y-2">
+                                        {order.items.map((item, index) => (
+                                            <div
+                                                key={index}
+                                                className="flex items-center justify-between text-sm"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-slate-400">
+                                                        ×{item.quantity}
+                                                    </span>
+                                                    <span className="text-white">
+                                                        {item.name}
+                                                    </span>
+                                                </div>
+                                                <span className="text-slate-300">
+                                                    Tk{" "}
+                                                    {parseFloat(
+                                                        item.price || 0
+                                                    ).toFixed(2)}
                                                 </span>
                                             </div>
-                                            <span className="text-slate-300">
-                                                Tk {item.price.toFixed(2)}
-                                            </span>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     ))}
                 </div>

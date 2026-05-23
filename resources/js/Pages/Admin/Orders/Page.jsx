@@ -1,17 +1,24 @@
-import { useState } from "react";
-import { router } from "@inertiajs/react";
+import { useState, useEffect } from "react";
+import { router, usePage } from "@inertiajs/react";
 import { AdminLayout } from "@/Components/Admin/AdminLayout";
 import { GamingButton } from "@/Components/ui/GamingButton";
 import { OrderItemsTable } from "@/Components/Admin/OrderItemsTable";
+import { ConfirmModal } from "@/Components/Admin/ConfirmModal";
+
+const CANCELLABLE_STATUSES = ["pending", "processing"];
 
 export default function AdminOrderDetailsPage({ order }) {
+    const { flash } = usePage().props;
     const [loading, setLoading] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     const [statusModal, setStatusModal] = useState({
         isOpen: false,
         type: "",
         title: "",
         currentValue: "",
     });
+
+    const canCancel = CANCELLABLE_STATUSES.includes(order.status);
 
     const handleStatusUpdate = (type) => {
         setStatusModal({
@@ -26,7 +33,7 @@ export default function AdminOrderDetailsPage({ order }) {
         });
     };
 
-    const handleStatusChange = async (newValue) => {
+    const handleStatusChange = (newValue) => {
         setLoading(true);
 
         const endpoint =
@@ -39,30 +46,40 @@ export default function AdminOrderDetailsPage({ order }) {
                 ? { status: newValue }
                 : { payment_status: newValue };
 
-        try {
-            await router.patch(endpoint, data, {
+        router.patch(endpoint, data, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setStatusModal({
+                    isOpen: false,
+                    type: "",
+                    title: "",
+                    currentValue: "",
+                });
+            },
+            onError: (errors) => {
+                console.error("Status update failed:", errors);
+                alert("Failed to update status. Please try again.");
+            },
+            onFinish: () => setLoading(false),
+        });
+    };
+
+    const handleCancelOrder = () => {
+        setLoading(true);
+
+        router.post(
+            route("admin.orders.cancel", order.id),
+            { reason: "Cancelled by admin" },
+            {
                 preserveScroll: true,
-                onSuccess: () => {
-                    setStatusModal({
-                        isOpen: false,
-                        type: "",
-                        title: "",
-                        currentValue: "",
-                    });
-                    // Refresh the page to show updated data
-                    router.reload();
-                },
+                onSuccess: () => setShowCancelModal(false),
                 onError: (errors) => {
-                    console.error("Status update failed:", errors);
-                    alert("Failed to update status. Please try again.");
+                    console.error("Cancel order failed:", errors);
+                    alert("Failed to cancel order. Please try again.");
                 },
-            });
-        } catch (error) {
-            console.error("Status update error:", error);
-            alert("An error occurred. Please try again.");
-        } finally {
-            setLoading(false);
-        }
+                onFinish: () => setLoading(false),
+            }
+        );
     };
 
     const getStatusColor = (status) => {
@@ -100,6 +117,17 @@ export default function AdminOrderDetailsPage({ order }) {
     return (
         <AdminLayout>
             <div className="space-y-6">
+                {flash?.success && (
+                    <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg">
+                        {flash.success}
+                    </div>
+                )}
+                {flash?.error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg">
+                        {flash.error}
+                    </div>
+                )}
+
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <GamingButton
@@ -142,7 +170,8 @@ export default function AdminOrderDetailsPage({ order }) {
                                 </span>
                                 <button
                                     onClick={() => handleStatusUpdate("status")}
-                                    className={`px-2 py-1 rounded-full text-xs font-medium hover:opacity-80 transition-opacity ${getStatusColor(
+                                    disabled={loading}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium hover:opacity-80 transition-opacity disabled:opacity-50 ${getStatusColor(
                                         order.status
                                     )}`}
                                 >
@@ -152,7 +181,8 @@ export default function AdminOrderDetailsPage({ order }) {
                                     onClick={() =>
                                         handleStatusUpdate("payment_status")
                                     }
-                                    className={`px-2 py-1 rounded-full text-xs font-medium hover:opacity-80 transition-opacity ${getPaymentStatusColor(
+                                    disabled={loading}
+                                    className={`px-2 py-1 rounded-full text-xs font-medium hover:opacity-80 transition-opacity disabled:opacity-50 ${getPaymentStatusColor(
                                         order.payment_status
                                     )}`}
                                 >
@@ -189,6 +219,17 @@ export default function AdminOrderDetailsPage({ order }) {
                         >
                             💳 Update Payment
                         </GamingButton>
+                        {canCancel && (
+                            <GamingButton
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowCancelModal(true)}
+                                disabled={loading}
+                                className="text-red-400 hover:text-red-300"
+                            >
+                                ❌ Cancel Order
+                            </GamingButton>
+                        )}
                     </div>
                 </div>
 
@@ -202,18 +243,20 @@ export default function AdminOrderDetailsPage({ order }) {
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
                                     <span className="text-white font-bold text-sm">
-                                        {order.customer.name
+                                        {(order.customer.name || "G")
                                             .split(" ")
                                             .map((n) => n[0])
-                                            .join("")}
+                                            .join("")
+                                            .slice(0, 2)
+                                            .toUpperCase()}
                                     </span>
                                 </div>
                                 <div>
                                     <div className="text-white font-medium">
-                                        {order.customer.name}
+                                        {order.customer.name || "Guest"}
                                     </div>
                                     <div className="text-slate-400 text-sm">
-                                        {order.customer.email}
+                                        {order.customer.email || "—"}
                                     </div>
                                 </div>
                             </div>
@@ -228,27 +271,34 @@ export default function AdminOrderDetailsPage({ order }) {
                                         </span>
                                     </div>
                                 )}
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">
-                                        Customer ID:
-                                    </span>
-                                    <span className="text-white">
-                                        #{order.customer.id}
-                                    </span>
-                                </div>
+                                {order.customer.id && (
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">
+                                            Customer ID:
+                                        </span>
+                                        <span className="text-white">
+                                            #{order.customer.id}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
-                            <GamingButton
-                                variant="ghost"
-                                size="sm"
-                                className="w-full text-slate-300"
-                                onClick={() =>
-                                    router.visit(
-                                        `/admin/users/${order.customer.id}`
-                                    )
-                                }
-                            >
-                                View Customer Profile
-                            </GamingButton>
+                            {order.customer.id && (
+                                <GamingButton
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full text-slate-300"
+                                    onClick={() =>
+                                        router.visit(
+                                            route(
+                                                "admin.users.show",
+                                                order.customer.id
+                                            )
+                                        )
+                                    }
+                                >
+                                    View Customer Profile
+                                </GamingButton>
+                            )}
                         </div>
                     </div>
 
@@ -260,17 +310,37 @@ export default function AdminOrderDetailsPage({ order }) {
                         <div className="space-y-2 text-sm">
                             {order.billing_address ? (
                                 <>
+                                    {(order.billing_address.first_name ||
+                                        order.billing_address.last_name) && (
+                                        <div className="text-white">
+                                            {order.billing_address.first_name}{" "}
+                                            {order.billing_address.last_name}
+                                        </div>
+                                    )}
+                                    {order.billing_address.address && (
+                                        <div className="text-white">
+                                            {order.billing_address.address}
+                                        </div>
+                                    )}
                                     <div className="text-white">
-                                        {order.billing_address.address}
+                                        {[
+                                            order.billing_address.city,
+                                            order.billing_address.state,
+                                            order.billing_address.zip,
+                                        ]
+                                            .filter(Boolean)
+                                            .join(", ")}
                                     </div>
-                                    <div className="text-white">
-                                        {order.billing_address.city},{" "}
-                                        {order.billing_address.state}{" "}
-                                        {order.billing_address.zip}
-                                    </div>
-                                    <div className="text-white">
-                                        {order.billing_address.country}
-                                    </div>
+                                    {order.billing_address.country && (
+                                        <div className="text-white">
+                                            {order.billing_address.country}
+                                        </div>
+                                    )}
+                                    {order.billing_address.email && (
+                                        <div className="text-slate-400 pt-2">
+                                            {order.billing_address.email}
+                                        </div>
+                                    )}
                                 </>
                             ) : (
                                 <div className="text-slate-400">
@@ -400,6 +470,7 @@ export default function AdminOrderDetailsPage({ order }) {
                 <StatusUpdateModal
                     isOpen={statusModal.isOpen}
                     onClose={() =>
+                        !loading &&
                         setStatusModal({
                             isOpen: false,
                             type: "",
@@ -414,11 +485,21 @@ export default function AdminOrderDetailsPage({ order }) {
                     loading={loading}
                 />
             )}
+
+            <ConfirmModal
+                isOpen={showCancelModal}
+                onClose={() => !loading && setShowCancelModal(false)}
+                onConfirm={handleCancelOrder}
+                title="Cancel Order"
+                message={`Are you sure you want to cancel order ${order.order_number}? This action cannot be undone.`}
+                confirmText="Cancel Order"
+                confirmVariant="danger"
+                icon="❌"
+            />
         </AdminLayout>
     );
 }
 
-// Status Update Modal Component
 function StatusUpdateModal({
     isOpen,
     onClose,
@@ -429,6 +510,12 @@ function StatusUpdateModal({
     loading,
 }) {
     const [selectedValue, setSelectedValue] = useState(currentValue);
+
+    useEffect(() => {
+        if (isOpen) {
+            setSelectedValue(currentValue);
+        }
+    }, [currentValue, isOpen]);
 
     const statusOptions =
         type === "status"
@@ -470,6 +557,7 @@ function StatusUpdateModal({
                             onChange={(e) => setSelectedValue(e.target.value)}
                             className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                             required
+                            disabled={loading}
                         >
                             {statusOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
