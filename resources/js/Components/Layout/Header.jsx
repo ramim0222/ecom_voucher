@@ -77,7 +77,7 @@ export function Header() {
                                 </Dropdown.Content>
                             </Dropdown>
                             <Link
-                                href="#"
+                                href={route("contact")}
                                 className="text-foreground hover:text-accent transition-colors text-sm xl:text-base"
                             >
                                 Support
@@ -214,7 +214,7 @@ export function Header() {
                             </div>
 
                             <Link
-                                href="#"
+                                href={route("contact")}
                                 className="text-foreground hover:text-accent transition-colors text-base font-medium"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >

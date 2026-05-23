@@ -18,12 +18,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Front\IndexController;
 use App\Http\Controllers\Front\DashboardController as FrontDashboardController;
+use App\Http\Controllers\Front\ContactController;
 
 Route::get('/', [IndexController::class, 'welcome'])->name('welcome');
 Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
 Route::get('/products', [FrontProductController::class, 'products'])->name('products');
 Route::get('/products/{id}', [FrontProductController::class, 'product'])->name('product');
 Route::get('/support', [IndexController::class, 'support'])->name('support');
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
 
 // Public cart routes (work for both auth and guest users)
 Route::get('/cart', [CartController::class, 'cart'])->name('cart');
