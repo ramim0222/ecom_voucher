@@ -2,8 +2,25 @@
 
 import { useState } from "react";
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { ThemedSelect } from "@/Components/ui/ThemedSelect";
 import { useForm } from "@inertiajs/react";
-import { router } from "@inertiajs/react";
+
+const countryOptions = [
+    { value: "", label: "Select Country" },
+    { value: "BD", label: "Bangladesh" },
+    { value: "IN", label: "India" },
+    { value: "PK", label: "Pakistan" },
+    { value: "US", label: "United States" },
+    { value: "CA", label: "Canada" },
+    { value: "UK", label: "United Kingdom" },
+];
+
+const paymentMethodOptions = [
+    { value: "card", label: "Credit/Debit Card" },
+    { value: "bkash", label: "bKash" },
+    { value: "rocket", label: "Rocket" },
+    { value: "nagad", label: "Nagad" },
+];
 
 export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -78,6 +95,10 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
         if (name === "paymentMethod") {
             setData("payment_method", value);
         }
+    };
+
+    const handleThemedSelectChange = (name) => (value) => {
+        handleInputChange({ target: { name, value } });
     };
 
     const validateStep = (step) => {
@@ -280,21 +301,14 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
                                 <label className="block text-sm font-medium mb-2">
                                     Country
                                 </label>
-                                <select
+                                <ThemedSelect
+                                    id="country"
                                     name="country"
                                     value={formData.country}
-                                    onChange={handleInputChange}
-                                    className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                    required
-                                >
-                                    <option value="">Select Country</option>
-                                    <option value="BD">Bangladesh</option>
-                                    <option value="IN">India</option>
-                                    <option value="PK">Pakistan</option>
-                                    <option value="US">United States</option>
-                                    <option value="CA">Canada</option>
-                                    <option value="UK">United Kingdom</option>
-                                </select>
+                                    onChange={handleThemedSelectChange("country")}
+                                    options={countryOptions}
+                                    placeholder="Select Country"
+                                />
                             </div>
                         </div>
                     </form>
@@ -311,18 +325,12 @@ export function CheckoutForm({ currentStep, onStepChange, orderData, user }) {
                             <label className="block text-sm font-medium mb-2">
                                 Payment Method
                             </label>
-                            <select
+                            <ThemedSelect
                                 name="paymentMethod"
                                 value={formData.paymentMethod}
-                                onChange={handleInputChange}
-                                className="w-full bg-input border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                                required
-                            >
-                                <option value="card">Credit/Debit Card</option>
-                                <option value="bkash">bKash</option>
-                                <option value="rocket">Rocket</option>
-                                <option value="nagad">Nagad</option>
-                            </select>
+                                onChange={handleThemedSelectChange("paymentMethod")}
+                                options={paymentMethodOptions}
+                            />
                         </div>
 
                         {formData.paymentMethod === "card" && (

@@ -1,8 +1,22 @@
 "use client";
 
 import { GamingButton } from "@/Components/ui/GamingButton";
+import { router } from "@inertiajs/react";
+import { useState } from "react";
 
 export function CartSummary({ subtotal, total, itemCount }) {
+    const [isNavigating, setIsNavigating] = useState(false);
+
+    const handleCheckout = () => {
+        if (isNavigating) return;
+
+        router.visit(route("checkout"), {
+            onStart: () => setIsNavigating(true),
+            onFinish: () => setIsNavigating(false),
+            onCancel: () => setIsNavigating(false),
+        });
+    };
+
     return (
         <div className="glass-card rounded-xl p-6 sticky top-24">
             <h2 className="font-heading font-semibold text-xl mb-6">
@@ -30,17 +44,18 @@ export function CartSummary({ subtotal, total, itemCount }) {
                     variant="accent"
                     size="lg"
                     className="w-full"
-                    onClick={() => (window.location.href = "/checkout")}
+                    onClick={handleCheckout}
+                    disabled={isNavigating}
                 >
-                    Proceed to Checkout
+                    {isNavigating ? "Loading..." : "Proceed to Checkout"}
                 </GamingButton>
 
-                <div className="text-center">
+                {/* <div className="text-center">
                     <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                         <span>🔒</span>
                         <span>Secure checkout with 256-bit SSL encryption</span>
                     </div>
-                </div>
+                </div> */}
             </div>
 
             <div className="mt-6 pt-6 border-t border-border">

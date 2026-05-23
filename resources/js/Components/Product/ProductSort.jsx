@@ -1,4 +1,14 @@
 import { router } from "@inertiajs/react";
+import { ThemedSelect } from "@/Components/ui/ThemedSelect";
+
+const sortOptions = [
+    { value: "featured", label: "Featured" },
+    { value: "price-low", label: "Price: Low to High" },
+    { value: "price-high", label: "Price: High to Low" },
+    { value: "rating", label: "Highest Rated" },
+    { value: "newest", label: "Newest" },
+    { value: "popular", label: "Most Popular" },
+];
 
 function buildQuery(filters) {
     const query = {};
@@ -31,9 +41,7 @@ function buildQuery(filters) {
 }
 
 export function ProductSort({ filters = {} }) {
-    const handleSortChange = (event) => {
-        const sort = event.target.value;
-
+    const handleSortChange = (sort) => {
         router.get(
             route("products"),
             buildQuery({
@@ -50,19 +58,16 @@ export function ProductSort({ filters = {} }) {
 
     return (
         <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Sort by:</span>
-            <select
+            <span className="text-sm text-muted-foreground whitespace-nowrap">
+                Sort by:
+            </span>
+            <ThemedSelect
                 value={filters.sort || "featured"}
                 onChange={handleSortChange}
-                className="bg-input border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-                <option value="newest">Newest</option>
-                <option value="popular">Most Popular</option>
-            </select>
+                options={sortOptions}
+                size="sm"
+                className="min-w-[200px] sm:min-w-[220px]"
+            />
         </div>
     );
 }

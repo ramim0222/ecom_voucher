@@ -104,9 +104,11 @@ class IndexController extends Controller
                     'stock' => (int) $cartItem->product->stock,
                     'image' => $cartItem->product->product_image ? asset('storage/' . $cartItem->product->product_image) : '/placeholder.svg',
                 ];
-            });
+            })->values();
 
-            MetaConversionApiService::trackInitiateCheckout($dbCartItems, $request);
+            dispatch(function () use ($dbCartItems, $request) {
+                MetaConversionApiService::trackInitiateCheckout($dbCartItems, $request);
+            })->afterResponse();
         } else {
             // Guest user: load cart from session
             $guestCart = session('guest_cart', []);
