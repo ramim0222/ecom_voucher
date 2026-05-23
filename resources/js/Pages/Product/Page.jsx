@@ -9,6 +9,7 @@ export default function ProductDetailsPage({
     product,
     auth,
     reviews,
+    relatedProducts = [],
     userHasReviewed,
     userHasWishlisted = false,
     wishlistId = null,
@@ -336,7 +337,7 @@ export default function ProductDetailsPage({
                 />
 
                 {/* Related Products */}
-                <RelatedProducts currentProductId={product.id} />
+                <RelatedProducts relatedProducts={relatedProducts} />
             </div>
         </div>
     );

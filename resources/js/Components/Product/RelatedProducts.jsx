@@ -2,34 +2,10 @@
 
 import { VoucherCard } from "@/Components/ui/VoucherCard";
 
-export function RelatedProducts({ currentProductId }) {
-    const relatedProducts = [
-        {
-            id: 2,
-            title: "Steam Wallet $25",
-            price: "22.99",
-            originalPrice: "25.00",
-            discount: 8,
-            platform: "Steam",
-            rating: 4.7,
-        },
-        {
-            id: 3,
-            title: "Steam Wallet $100",
-            price: "92.99",
-            originalPrice: "100.00",
-            discount: 7,
-            platform: "Steam",
-            rating: 4.9,
-        },
-        {
-            id: 4,
-            title: "CS:GO Weapon Case Key",
-            price: "2.49",
-            platform: "Steam",
-            rating: 4.5,
-        },
-    ];
+export function RelatedProducts({ relatedProducts = [] }) {
+    if (relatedProducts.length === 0) {
+        return null;
+    }
 
     return (
         <section className="mt-16">
@@ -40,7 +16,27 @@ export function RelatedProducts({ currentProductId }) {
                 {relatedProducts.map((product) => (
                     <VoucherCard
                         key={product.id}
-                        {...product}
+                        title={product.title}
+                        price={product.price}
+                        originalPrice={product.original_price}
+                        discount={
+                            product.original_price &&
+                            product.original_price > product.price
+                                ? Math.round(
+                                      ((product.original_price - product.price) /
+                                          product.original_price) *
+                                          100
+                                  )
+                                : null
+                        }
+                        image={
+                            product.product_image
+                                ? `/storage/${product.product_image}`
+                                : null
+                        }
+                        platform={product.platform}
+                        rating={product.average_rating}
+                        reviewsCount={product.reviews_count}
                         onClick={() =>
                             (window.location.href = `/products/${product.id}`)
                         }

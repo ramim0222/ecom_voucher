@@ -155,9 +155,41 @@ class ProductController extends Controller
 
         MetaConversionApiService::trackViewContent($product, $request);
 
+        $approvedReviewsQuery = fn ($query) => $query->where('status', 'approved');
+
+        $relatedProducts = Product::query()
+            ->where('status', 'active')
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->withAvg(['reviews as average_rating_calc' => $approvedReviewsQuery], 'rating')
+            ->withCount(['reviews as reviews_count_calc' => $approvedReviewsQuery])
+            ->orderByDesc('is_featured')
+            ->orderBy('sort_order')
+            ->orderByDesc('id')
+            ->limit(3)
+            ->get(['id', 'title', 'price', 'original_price', 'category_id', 'product_image'])
+            ->map(function ($relatedProduct) use ($product) {
+                $reviewsCount = (int) $relatedProduct->reviews_count_calc;
+                $averageRating = $reviewsCount > 0
+                    ? round((float) $relatedProduct->average_rating_calc, 1)
+                    : 0;
+
+                return [
+                    'id' => $relatedProduct->id,
+                    'title' => $relatedProduct->title,
+                    'price' => $relatedProduct->price,
+                    'original_price' => $relatedProduct->original_price,
+                    'product_image' => $relatedProduct->product_image,
+                    'platform' => $product->category->name,
+                    'average_rating' => $averageRating,
+                    'reviews_count' => $reviewsCount,
+                ];
+            });
+
         return Inertia::render('Product/Page', [
             'product' => $product,
             'reviews' => $approvedReviews,
+            'relatedProducts' => $relatedProducts,
             'userHasReviewed' => $userHasReviewed,
             'userHasWishlisted' => (bool) $wishlistEntry,
             'wishlistId' => $wishlistEntry?->id,
