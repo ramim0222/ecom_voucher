@@ -4,11 +4,22 @@ import Dropdown from "@/Components/Dropdown";
 import { useState } from "react";
 
 export function Header() {
-    const { auth, categories = [], cartCount = 0, wishlistCount = 0 } = usePage().props;
+    const {
+        auth,
+        branding = {},
+        categories = [],
+        cartCount = 0,
+        wishlistCount = 0,
+    } = usePage().props;
     const isAuthenticated = !!auth.user;
     const isAdmin = auth.user?.role === "admin";
     const dashboardRoute = isAdmin ? route("admin") : route("dashboard");
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const brandName = branding?.brand_name || "GameVault";
+    const brandDescription =
+        branding?.brand_description || "Premium Gaming Vouchers";
+    const logoPath = branding?.logo_path || "";
+    const brandInitial = brandName.charAt(0).toUpperCase() || "G";
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -20,16 +31,32 @@ export function Header() {
                 <div className="flex items-center justify-between">
                     {/* Logo Section */}
                     <div className="flex items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
-                        <div className="flex items-center gap-1 sm:gap-2">
-                            <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                                <span className="text-white font-bold text-sm sm:text-base md:text-lg">
-                                    G
+                        <Link
+                            href={route("welcome")}
+                            className="flex items-center gap-1 sm:gap-2"
+                        >
+                            {logoPath ? (
+                                <img
+                                    src={`/storage/${logoPath}`}
+                                    alt={brandName}
+                                    className="h-6 sm:h-7 md:h-8 w-auto max-w-[120px] object-contain"
+                                />
+                            ) : (
+                                <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+                                    <span className="text-white font-bold text-sm sm:text-base md:text-lg">
+                                        {brandInitial}
+                                    </span>
+                                </div>
+                            )}
+                            <div className="flex flex-col">
+                                <span className="font-heading font-bold text-base sm:text-lg md:text-xl lg:text-2xl leading-tight">
+                                    {brandName}
+                                </span>
+                                <span className="hidden md:block text-xs text-muted-foreground leading-tight">
+                                    {brandDescription}
                                 </span>
                             </div>
-                            <span className="font-heading font-bold text-base sm:text-lg md:text-xl lg:text-2xl">
-                                GameVault
-                            </span>
-                        </div>
+                        </Link>
 
                         {/* Desktop Navigation - Hidden on mobile */}
                         <nav className="hidden lg:flex items-center gap-4 xl:gap-6 2xl:gap-8">

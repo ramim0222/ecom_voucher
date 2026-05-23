@@ -8,6 +8,7 @@ use Tighten\Ziggy\Ziggy;
 use App\Models\Category;
 use App\Models\Cart;
 use App\Models\Wishlist;
+use App\Services\BrandingService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -48,6 +49,7 @@ class HandleInertiaRequests extends Middleware
             'wishlistCount' => fn () => $request->user()
                 ? (int) Wishlist::where('user_id', $request->user()->id)->count()
                 : (int) count($request->session()->get('guest_wishlist', [])),
+            'branding' => fn () => BrandingService::getSettings(),
             'categories' => fn () => Category::query()
                 ->orderBy('name')
                 ->get(['id', 'name', 'logo', 'status'])

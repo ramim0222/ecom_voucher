@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\RedirectsAuthenticatedUsers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\GuestSessionMergeService;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,8 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
+    use RedirectsAuthenticatedUsers;
+
     public function __construct(
         protected GuestSessionMergeService $guestSessionMergeService
     ) {}
@@ -40,12 +43,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Redirect based on user role
-        if (auth()->user()->isAdmin()) {
-            return redirect()->intended(route('admin', absolute: false));
-        } else {
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
+        return $this->redirectAuthenticatedUser();
     }
 
     /**

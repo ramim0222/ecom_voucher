@@ -9,7 +9,22 @@ export default function HomePage({
     featuredProducts = [],
     discountedProducts = [],
 }) {
-    const { categories = [] } = usePage().props;
+    const { branding = {}, categories = [] } = usePage().props;
+    const heroTitle =
+        branding?.hero_title || "Unlock Your Next Adventure";
+    const heroDescription =
+        branding?.hero_description ||
+        "Seamless purchases for gamers, by gamers. Get instant access to your favorite gaming platforms.";
+    const featuredTitle = branding?.featured_title || "Top Picks for You";
+    const featuredDescription =
+        branding?.featured_description ||
+        "Limited-time deals on the most popular gaming vouchers";
+    const discountsTitle = branding?.discounts_title || "Biggest Discounts";
+    const discountsDescription =
+        branding?.discounts_description ||
+        "Save more on these top discounted vouchers";
+    const categoriesTitle =
+        branding?.categories_title || "Browse by Platform";
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     useEffect(() => {
@@ -29,11 +44,10 @@ export default function HomePage({
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10"></div>
                 <div className="container mx-auto text-center relative z-10">
                     <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl mb-4 sm:mb-5 md:mb-6 lg:mb-8 xl:mb-10 2xl:mb-12 bg-gradient-to-r from-foreground via-accent to-primary bg-clip-text text-transparent leading-tight">
-                        Unlock Your Next Adventure
+                        {heroTitle}
                     </h1>
                     <p className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl 2xl:text-2xl text-muted-foreground mb-6 sm:mb-7 md:mb-8 lg:mb-8 xl:mb-10 2xl:mb-12 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl mx-auto px-2 sm:px-0">
-                        Seamless purchases for gamers, by gamers. Get instant
-                        access to your favorite gaming platforms.
+                        {heroDescription}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                         <Link href={route("products")}>
@@ -54,11 +68,10 @@ export default function HomePage({
                 <div className="container mx-auto">
                     <div className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-12 xl:mb-16 2xl:mb-20">
                         <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-5xl mb-3 sm:mb-4 md:mb-4 lg:mb-6 xl:mb-8 2xl:mb-10">
-                            Top Picks for You
+                            {featuredTitle}
                         </h2>
                         <p className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl 2xl:text-xl px-2 sm:px-0">
-                            Limited-time deals on the most popular gaming
-                            vouchers
+                            {featuredDescription}
                         </p>
                     </div>
 
@@ -116,10 +129,10 @@ export default function HomePage({
                 <div className="container mx-auto">
                     <div className="text-center mb-8 sm:mb-10 md:mb-12 lg:mb-12 xl:mb-16 2xl:mb-20">
                         <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-5xl mb-3 sm:mb-4 md:mb-4 lg:mb-6 xl:mb-8 2xl:mb-10">
-                            Biggest Discounts
+                            {discountsTitle}
                         </h2>
                         <p className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl 2xl:text-xl px-2 sm:px-0">
-                            Save more on these top discounted vouchers
+                            {discountsDescription}
                         </p>
                     </div>
 
@@ -176,7 +189,7 @@ export default function HomePage({
             <section className="py-8 sm:py-12 md:py-16 lg:py-16 xl:py-20 2xl:py-24 px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-12 bg-card/30">
                 <div className="container mx-auto">
                     <h2 className="font-heading font-bold text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-5xl text-center mb-8 sm:mb-10 md:mb-12 lg:mb-12 xl:mb-16 2xl:mb-20">
-                        Browse by Platform
+                        {categoriesTitle}
                     </h2>
 
                     <CategorySlider categories={categories} />

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\BrandingController;
 use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Front\ProductController as FrontProductController;
@@ -60,7 +61,15 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.sh
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::group([
         'middleware' => function ($request, $next) {
-            if (! auth()->user() || auth()->user()->role !== 'customer') {
+            if (! auth()->user()) {
+                abort(403, 'Unauthorized.');
+            }
+
+            if (auth()->user()->role === 'admin') {
+                return redirect()->route('admin');
+            }
+
+            if (auth()->user()->role !== 'customer') {
                 abort(403, 'Unauthorized.');
             }
             if (auth()->user()->status !== 'active') {
@@ -142,6 +151,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/admin/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 
         Route::get('/admin/settings', [SettingsController::class, 'index'])->name('admin.settings');
+
+        Route::get('/admin/settings/branding', [BrandingController::class, 'index'])->name('admin.settings.branding');
+        Route::put('/admin/settings/branding', [BrandingController::class, 'update'])->name('admin.settings.branding.update');
 
         Route::prefix('admin/settings/marketing')->group(function () {
             Route::get('/meta', [MarketingController::class, 'indexMeta'])->name('admin.settings.marketing.meta');

@@ -6,8 +6,20 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
 
-        <title inertia>GameVault - Premium Gaming Vouchers</title>
-        <meta name="description" content="Unlock Your Next Adventure - Premium gaming vouchers for all platforms">
+        @php
+            $brandingSettings = \App\Services\BrandingService::getSettings();
+            $brandName = $brandingSettings['brand_name'] ?? 'GameVault';
+            $brandDescription = $brandingSettings['brand_description'] ?? 'Premium Gaming Vouchers';
+            $faviconPath = $brandingSettings['favicon_path'] ?? '';
+        @endphp
+
+        <title inertia>{{ $brandName }} - {{ $brandDescription }}</title>
+        <meta name="description" content="{{ $brandDescription }}">
+
+        @if (!empty($faviconPath))
+            <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $faviconPath) }}">
+            <link rel="shortcut icon" href="{{ asset('storage/' . $faviconPath) }}">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

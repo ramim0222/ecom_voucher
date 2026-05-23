@@ -9,7 +9,11 @@ import { Link, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
 export default function ProductsPage({ products = [], filters = {} }) {
-    const { categories = [] } = usePage().props;
+    const { branding = {}, categories = [] } = usePage().props;
+    const productsTitle = branding?.products_title || "Gaming Vouchers";
+    const productsDescription =
+        branding?.products_description ||
+        "Discover the best deals on gaming vouchers for all your favorite platforms";
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     const activeCategoryNames = (filters.categories ?? [])
@@ -29,11 +33,10 @@ export default function ProductsPage({ products = [], filters = {} }) {
                 <div className="container mx-auto">
                     <div className="text-center mb-6 sm:mb-8 lg:mb-8 xl:mb-10 2xl:mb-12">
                         <h1 className="font-heading font-bold text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl mb-3 sm:mb-4 md:mb-4 lg:mb-6 xl:mb-8 2xl:mb-10">
-                            Gaming Vouchers
+                            {productsTitle}
                         </h1>
                         <p className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl 2xl:text-xl max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl mx-auto px-2 sm:px-0">
-                            Discover the best deals on gaming vouchers for all
-                            your favorite platforms
+                            {productsDescription}
                         </p>
                     </div>
 

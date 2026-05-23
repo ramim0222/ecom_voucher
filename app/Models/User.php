@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function defaultRedirectPath(): string
+    {
+        return route($this->isAdmin() ? 'admin' : 'dashboard', absolute: false);
+    }
+
     // Check if user is customer
     public function isCustomer()
     {

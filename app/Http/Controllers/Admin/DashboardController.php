@@ -133,13 +133,19 @@ class DashboardController extends Controller
         return Order::with(['user:id,first_name,last_name,email'])
             ->orderByDesc('created_at')
             ->take(8)
-            ->get(['id', 'order_number', 'user_id', 'total_amount', 'status', 'payment_status', 'created_at'])
+            ->get(['id', 'order_number', 'user_id', 'total_amount', 'status', 'payment_status', 'created_at', 'billing_address'])
             ->map(function ($order) {
+                $billingAddress = is_array($order->billing_address) ? $order->billing_address : [];
+                $customerName = $order->user
+                    ? trim($order->user->first_name . ' ' . $order->user->last_name)
+                    : trim(($billingAddress['first_name'] ?? '') . ' ' . ($billingAddress['last_name'] ?? ''));
+                $customerEmail = $order->user?->email ?? ($billingAddress['email'] ?? '');
+
                 return [
                     'id' => $order->id,
                     'order_number' => $order->order_number,
-                    'customer_name' => $order->user->first_name . ' ' . $order->user->last_name,
-                    'customer_email' => $order->user->email,
+                    'customer_name' => $customerName !== '' ? $customerName : 'Guest Customer',
+                    'customer_email' => $customerEmail !== '' ? $customerEmail : 'N/A',
                     'total_amount' => $order->total_amount,
                     'status' => $order->status,
                     'payment_status' => $order->payment_status,
